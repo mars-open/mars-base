@@ -1,0 +1,48 @@
+Configuration:
+  name: SDLB
+
+  appenders:
+    Console:
+      name: STDOUT
+      target: SYSTEM_OUT
+      PatternLayout:
+        Pattern: "%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1} - %m [%t]%n"
+
+  Loggers:
+
+    Root:
+      level: WARN
+      AppenderRef:
+        ref: STDOUT
+
+    logger:
+
+      # INFO:
+      - name: ch.zzeekk
+        level: INFO
+      - name: io.smartdatalake
+        level: INFO
+
+      # ERROR:
+      - name: org.reflections.Reflections
+        level: ERROR
+      - name: org.apache.hadoop.hive.conf.HiveConf
+        level: ERROR
+      - name: org.apache.spark.sql.catalyst.analysis.SimpleFunctionRegistry
+        level: ERROR
+      - name: org.apache.spark.sql.catalyst.util.package
+        level: ERROR
+      - name: org.apache.spark.sql.catalyst.csv.CSVHeaderChecker
+        level: ERROR
+      - name: org.apache.spark.sql.execution.streaming.ResolveWriteToStream
+        level: ERROR
+      - name: org.apache.spark.sql.execution.streaming.ProcessingTimeExecutor
+        level: ERROR
+      - name: org.apache.spark.executor.ProcfsMetricsGetter
+        level: ERROR
+      - name: org.apache.hadoop.hive.metastore.ObjectStore
+        level: ERROR
+      - name: org.apache.hadoop.hive.ql.session.SessionState
+        level: ERROR
+      - name: org.apache.hadoop.util.NativeCodeLoader
+        level: ERROR
