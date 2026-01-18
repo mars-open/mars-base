@@ -1,0 +1,6 @@
+.venv
+data
+metastore_db
+.idea
+target
+state

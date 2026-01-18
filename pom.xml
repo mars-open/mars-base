@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.smartdatalake</groupId>
+        <artifactId>sdl-parent</artifactId>
+        <!--
+          Set the smartdatalake version to use here.
+          If version cannot be resolved, make sure maven central repository is defined in settings.xml and the corresponding profile activated.
+        -->
+        <version>2.8.2-SNAPSHOT</version>
+    </parent>
+
+    <groupId>ch.sbb.mars</groupId>
+    <artifactId>mars-tps</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+
+    <name>SDLB pipelines for MARS Positionpoint processing</name>
+
+    <properties>
+        <encoding>UTF-8</encoding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <exec-maven-plugin.version>3.6.2</exec-maven-plugin.version>
+        <scala.compat.version>2.13</scala.compat.version>
+        <scala.version>${scala.compat.version}.12</scala.version>
+        <scala-maven-plugin.version>4.9.6</scala-maven-plugin.version>
+        <scalatest.version>3.2.19</scalatest.version>
+        <scalatestplus.version>${scalatest.version}.0</scalatestplus.version>
+        <sedona.version>1.8.1</sedona.version>
+        <spark-temporalquery.version>3.0.0</spark-temporalquery.version>
+        <spark.version>3.5.7</spark.version>
+    </properties>
+
+    <profiles>
+
+        <profile>
+            <id>generate-catalog</id>
+            <build>
+                <plugins>
+                    <!-- generate catalog scala code. -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>${exec-maven-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>generate-catalog</id>
+                                <phase>process-classes</phase>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                                <configuration>
+                                    <mainClass>io.smartdatalake.lab.LabCatalogGenerator</mainClass>
+                                    <arguments>
+                                        <argument>--config</argument>
+                                        <argument>./config,./envConfig/ci.conf
+                                        </argument>
+                                        <argument>--srcDirectory</argument>
+                                        <argument>./src/main/scala-generated</argument>
+                                        <argument>--packageName</argument>
+                                        <argument>ch.sbb.mars.generated</argument>
+                                        <argument>--additionalSrcPath</argument>
+                                        <argument>./src/main/scala-2ndpass</argument>
+                                    </arguments>
+                                    <classpathScope>compile</classpathScope>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <!-- Compiles generated Scala sources. -->
+                    <plugin>
+                        <groupId>net.alchim31.maven</groupId>
+                        <artifactId>scala-maven-plugin</artifactId>
+                        <version>${scala-maven-plugin.version}</version>
+                        <executions>
+                            <!-- add additional execution to compile generated catalog (see id generate-catalog) -->
+                            <execution>
+                                <id>compile-catalog</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>compile</goal>
+                                </goals>
+                                <configuration>
+                                    <sourceDir>./src/main/scala-generated</sourceDir>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>export-config</id>
+            <build>
+                <plugins>
+                    <!-- parse and export configuration -->
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>${exec-maven-plugin.version}</version>
+                        <executions>
+                            <execution>
+                                <id>parse-export-config</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <!-- use exec instead of java, so sdlb runs in a separate jvm from mvn -->
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>java</executable>
+                                    <longClasspath>true</longClasspath>
+                                    <arguments>
+                                        <argument>-Dlog4j.configurationFile=log4j2.yml</argument>
+                                        <argument>-classpath</argument>
+                                        <classpath/>
+                                        <argument>
+                                            io.smartdatalake.meta.configexporter.ConfigJsonExporter
+                                        </argument>
+                                        <argument>--config</argument>
+                                        <argument>./config,./envConfig/ci.conf</argument>
+                                        <argument>--target</argument>
+                                        <argument>uiBackend</argument>
+                                        <argument>--descriptionPath</argument>
+                                        <argument>./description</argument>
+                                    </arguments>
+                                    <classpathScope>test</classpathScope>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <repositories>
+        <repository>
+            <id>mvn</id>
+            <url>https://repo1.maven.org/maven2</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>geotools</id>
+            <url>https://repo.osgeo.org/repository/geotools-releases/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <!-- smartdatalake snapshots -->
+        <repository>
+            <id>sonatype-snapshots</id>
+            <name>Sonatype Snapshots Repository</name>
+            <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <build>
+        <sourceDirectory>src/main/scala</sourceDirectory>
+        <testSourceDirectory>src/test/scala</testSourceDirectory>
+        <outputDirectory>target/classes</outputDirectory>
+        <plugins>
+            <!-- Compiles Scala sources. -->
+            <plugin>
+                <groupId>net.alchim31.maven</groupId>
+                <artifactId>scala-maven-plugin</artifactId>
+                <version>${scala-maven-plugin.version}</version>
+            </plugin>
+
+            <!-- Copies files in resources folders to target folder. -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.3.1</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.scalatest</groupId>
+                <artifactId>scalatest-maven-plugin</artifactId>
+                <version>2.2.0</version>
+                <configuration>
+                    <!-- only execute unit tests (suffix Test), but no integration tests (suffix IT) -->
+                    <suffixes>Test</suffixes>
+                    <environmentVariables>
+                        <ENV_CONFIG>ci.conf</ENV_CONFIG>
+                    </environmentVariables>
+                </configuration>
+            </plugin>
+
+            <!-- Creates the jar without dependencies -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>io.smartdatalake.app.LocalSmartDataLakeBuilder</mainClass>
+                        </manifest>
+                        <manifestEntries>
+                            <Implementation-Version>${project.version}</Implementation-Version>
+                        </manifestEntries>
+                    </archive>
+                    <excludes>
+                        <exclude>log4j.properties
+                        </exclude> <!-- Logging configuration should be left to user. -->
+                        <exclude>${project.artifactId}*.jar
+                        </exclude> <!-- avoid "Error assembling JAR" because of already existing artifact jar -->
+                        <exclude>*.conf
+                        </exclude> <!-- no SDL configuration files - they must be provided by the user separately -->
+                    </excludes>
+                </configuration>
+            </plugin>
+
+            <!-- create sources jar -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+
+            <!-- check for dependency version conflicts -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+            </plugin>
+
+            <!-- generate version info properties file -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>generate-version-info</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <!-- use exec instead of java, so sdlb runs in a separate jvm from mvn -->
+                            <goal>exec</goal>
+                        </goals>
+                        <configuration>
+                            <executable>java</executable>
+                            <longClasspath>true</longClasspath>
+                            <arguments>
+                                <argument>-Dlog4j.configurationFile=log4j2.yml</argument>
+                                <argument>-classpath</argument>
+                                <classpath/>
+                                <argument>io.smartdatalake.app.VersionInfoWriter</argument>
+                                <argument>--outputDir</argument>
+                                <argument>${project.build.outputDirectory}</argument>
+                                <argument>--version</argument>
+                                <argument>${project.version}</argument>
+                                <argument>--app</argument>
+                                <argument>true</argument>
+                            </arguments>
+                            <classpathScope>compile</classpathScope>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-slf4j2-impl</artifactId>
+                <version>${log4j.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.logging.log4j</groupId>
+                <artifactId>log4j-core</artifactId>
+                <version>${log4j.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+                <scope>compile</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>io.smartdatalake</groupId>
+            <artifactId>sdl-core_${scala.compat.version}</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.smartdatalake</groupId>
+            <artifactId>sdl-deltalake_${scala.compat.version}</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.smartdatalake</groupId>
+            <artifactId>sdl-lang_${scala.compat.version}</artifactId>
+            <version>${project.parent.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.hadoop</groupId>
+                    <artifactId>hadoop-client</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.zzeekk.spark</groupId>
+            <artifactId>spark-temporalquery_${scala.compat.version}</artifactId>
+            <version>${spark-temporalquery.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.sedona</groupId>
+            <artifactId>sedona-spark-3.5_${scala.compat.version}</artifactId>
+            <version>${sedona.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.datasyslab</groupId>
+            <artifactId>geotools-wrapper</artifactId>
+            <version>${sedona.version}-33.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.geotools</groupId>
+            <artifactId>gt-flatgeobuf</artifactId>
+            <version>33.4</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.tileverse.pmtiles</groupId>
+            <artifactId>tileverse-pmtiles</artifactId>
+            <version>1.2.0</version>
+        </dependency>
+
+        <!-- scope test -->
+        <dependency>
+            <groupId>org.scalactic</groupId>
+            <artifactId>scalactic_${scala.compat.version}</artifactId>
+            <version>${scalatest.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.scalatest</groupId>
+            <artifactId>scalatest_${scala.compat.version}</artifactId>
+            <version>${scalatest.version}</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <artifactId>scalactic_${scala.compat.version}</artifactId>
+                    <groupId>org.scalactic</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>org.scalatestplus</groupId>
+            <artifactId>scalacheck-1-18_${scala.compat.version}</artifactId>
+            <version>${scalatestplus.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.smartdatalake</groupId>
+            <artifactId>sdl-core_${scala.compat.version}</artifactId>
+            <version>${project.parent.version}</version>
+            <classifier>test-jar</classifier>
+            <exclusions>
+                <exclusion>
+                    <artifactId>sshj</artifactId>
+                    <groupId>com.hierynomus</groupId>
+                </exclusion>
+            </exclusions>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.sshd</groupId>
+            <artifactId>sshd-sftp</artifactId>
+            <version>${sshd.test.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.sshd</groupId>
+            <artifactId>sshd-common</artifactId>
+            <version>${sshd.test.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.sshd</groupId>
+            <artifactId>sshd-core</artifactId>
+            <version>${sshd.test.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.wiremock</groupId>
+            <artifactId>wiremock-standalone</artifactId>
+            <version>3.13.1</version>
+            <scope>test</scope>
+        </dependency>
+
+    </dependencies>
+
+</project>
