@@ -1,7 +1,10 @@
 package ch.zzeekk.mars.pp.utils
 
+import org.geotools.api.referencing.operation.MathTransform
+import org.geotools.geometry.jts.JTS
+import org.geotools.referencing.CRS
 import org.locationtech.jts.algorithm.Angle
-import org.locationtech.jts.geom.{Coordinate, CoordinateXYZM, GeometryFactory, PrecisionModel}
+import org.locationtech.jts.geom.{Coordinate, CoordinateXYZM, Geometry, GeometryFactory, PrecisionModel}
 
 import scala.collection.mutable
 
@@ -96,4 +99,25 @@ object GeometryCalcUtils {
   @transient private lazy val geoFactories = mutable.Map[String,GeometryFactory]()
   @transient private lazy val stdPrecisionModel = new PrecisionModel()
 
+  @inline
+  def convert4326to3857(geometry: Geometry): Geometry = {
+    JTS.transform(geometry, _4326to3857transform)
+  }
+  @transient private lazy val _4326to3857transform = getCrsTransform("EPSG:4326", "EPSG:3857")
+
+  @inline
+  def convertTo4326(geometry: Geometry, srcCrs: String): Geometry = {
+    JTS.transform(geometry, getCrsTransform(srcCrs, "EPSG:4326"))
+  }
+
+  @inline
+  def convertCrs(geometry: Geometry, srcCrs: String, tgtCrs: String): Geometry = {
+    JTS.transform(geometry, getCrsTransform(srcCrs, tgtCrs))
+  }
+
+  @inline
+  def getCrsTransform(srcCrs: String, tgtCrs: String): MathTransform = {
+    crsTransforms.getOrElseUpdate((srcCrs,tgtCrs), CRS.findMathTransform(CRS.decode(srcCrs, true), CRS.decode(tgtCrs, true), false))
+  }
+  @transient private lazy val crsTransforms = mutable.Map[(String,String),MathTransform]()
 }

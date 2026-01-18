@@ -1,9 +1,10 @@
 package ch.zzeekk.mars.pp.utils
 
 import io.smartdatalake.util.misc.SmartDataLakeLogger
-import org.locationtech.jts.geom.{Envelope, Geometry, GeometryFactory}
+import org.locationtech.jts.geom.{Geometry, GeometryFactory}
 import org.locationtech.jts.index.strtree.STRtree
 
+import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
 /**
@@ -16,7 +17,9 @@ import scala.jdk.CollectionConverters._
  */
 class SpatialIndex[X](initialData: Seq[X], geometryFn: X => Geometry)(implicit factory: GeometryFactory) extends SmartDataLakeLogger {
   private var index: Option[STRtree] = None // note that STRtree needs to be rebuilt after querying before inserting new nodes. For good performance, insert and query operations should therefore not be mixed to often.
-  private val data = initialData.toBuffer
+  private val data = Option(initialData).map(_.toBuffer).getOrElse(mutable.Buffer[X]())
+
+  def count(pred: X => Boolean): Int = data.count(pred)
 
   def insert(element: X): Unit = {
     index = None // reset index

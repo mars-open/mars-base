@@ -7,7 +7,7 @@ import io.smartdatalake.lab.{LabSparkDfActionWrapper, LabSparkDfsActionWrapper}
 import io.smartdatalake.util.misc.SmartDataLakeLogger
 import io.smartdatalake.workflow.ActionPipelineContext
 import io.smartdatalake.workflow.action.{CustomDataFrameAction, DataFrameOneToOneActionImpl}
-import io.smartdatalake.workflow.dataobject.{CanCreateSparkDataFrame, DataObject, SparkFileDataObject}
+import io.smartdatalake.workflow.dataobject._
 import org.apache.sedona.sql.UDT.UdtRegistrator
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.slf4j.Logger
@@ -21,9 +21,8 @@ object Sandbox extends App with SmartDataLakeLogger {
 
   private implicit lazy val loggImp: Logger = logger
   private implicit val (registry: InstanceRegistry, globalConfig: GlobalConfig) = ConfigToolbox.loadAndParseConfig(Seq(s"file:///$workingDir/config"))
-  private implicit val spark: SparkSession = globalConfig.sparkSession("test", Some("local[2]"))
+  private implicit val spark: SparkSession = globalConfig.sparkSession("test", Some("local[*]"))
   private implicit val context: ActionPipelineContext = ConfigToolbox.getDefaultActionPipelineContext(spark, registry)
-  import spark.implicits._
   import org.apache.spark.sql.functions._
 
   // reading a DataFrame from a DataObject
@@ -33,17 +32,27 @@ object Sandbox extends App with SmartDataLakeLogger {
   def dfActionWrapper(actionId: String) = LabSparkDfActionWrapper(registry.get[DataFrameOneToOneActionImpl](ActionId(actionId)), context)
   def dfsActionWrapper(actionId: String) = LabSparkDfsActionWrapper(registry.get[CustomDataFrameAction](ActionId(actionId)), context)
 
-  val df = dfs[SparkFileDataObject]("slv-tlm3d-edge")
-    .where($"uuid_edge".isin("b4e05052-30de-4d99-9ac1-81d3bb5ca657"))
-  df.printSchema()
+  //val df = dfs[DeltaLakeTableDataObject]("slv-pp")
+    //.where($"uuid_edge".isin("b4e05052-30de-4d99-9ac1-81d3bb5ca657"))
+  //  .where($"uuid_edge".startsWith("5b681701-7769-45e"))
+  //df.printSchema()
   //df.groupBy($"objektart").count.show
-  df.show(100, false)
+  //df.orderBy($"uuid_edge", $"edge_idx").show()
+  //df.show
 
+  //val udfH3idL15 = udf(PpIdGenerator.getH3idL15 _)
   // getting DataFrames of an Action
-  //val dfs = dfsActionWrapper("create-slv-tlm3d-pp").buildDataFrames
-  //  .withFilter("uuid_edge", $"uuid_edge"==="bd31e7c5-7ba3-4bb2-b6a3-4369c02f0222").get
-  //val dfPp = dfs("slv-tlm3d-pp")
-  //dfPp.orderBy($"position").show
+  //val dfs = dfsActionWrapper("create-pp").buildDataFrames
+  //  .withFilter("uuid_edge", $"uuid_edge".startsWith("5b681701-7769-45e"))
+  //  .withFilter("edge_idx", $"edge_idx" <= 3)
+  //  .get
+  //val dfTlm3d = dfs("slv-tlm3d-pp")
+  //val dfPp = dfs("slv-pp-tlm3d")
+  //dfPp
+    //.withColumn("h3id", udfH3idL15($"x", $"y", lit("EPSG:2056")))
+  //  .orderBy($"uuid_edge", $"edge_idx").show
+
+  // 646171828143330547, 646171828143330517, 646171828143330512, 646171828143330513, 646171828143330515
 
   /*
   // simulating a run

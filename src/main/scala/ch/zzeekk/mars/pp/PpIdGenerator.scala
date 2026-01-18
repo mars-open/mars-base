@@ -1,11 +1,11 @@
 package ch.zzeekk.mars.pp
 
 import ch.zzeekk.mars.pp.PpIdGenerator._
-import ch.zzeekk.mars.pp.utils.GeometryCalcUtils.getGeoFactory
+import ch.zzeekk.mars.pp.utils.GeometryCalcUtils.{convertTo4326, getGeoFactory}
 import com.uber.h3core.H3Core
 import org.apache.commons.codec.binary.Base32
 import org.apache.sedona.common.FunctionsGeoTools
-import org.locationtech.jts.geom.{Coordinate, Geometry, Point}
+import org.locationtech.jts.geom.Coordinate
 
 import java.nio.{ByteBuffer, ByteOrder}
 import java.util.concurrent.atomic.AtomicInteger
@@ -37,13 +37,13 @@ object PpIdGenerator {
   private val h3 = H3Core.newInstance
 
   /**
-   * Get h3id of point for ressolution 15.
+   * Get h3id of point for resolution 15.
    * Note: 15 is max h3 resolution
    */
   def getH3idL15(x: Double, y: Double, srcCrs: String): Long = {
     val geoFactory = getGeoFactory(srcCrs)
-    val wgs84coord = FunctionsGeoTools.transform(geoFactory.createPoint(new Coordinate(x,y)), srcCrs, "EPSG:4326").getCoordinate
-    h3.latLngToCell(wgs84coord.getX, wgs84coord.getY, 15)
+    val wgs84coord = convertTo4326(geoFactory.createPoint(new Coordinate(x,y)), srcCrs).getCoordinate
+    h3.latLngToCell(wgs84coord.getY, wgs84coord.getX, 15)
   }
 
   /**

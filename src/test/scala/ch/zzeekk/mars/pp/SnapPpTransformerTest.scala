@@ -1,6 +1,5 @@
 package ch.zzeekk.mars.pp
 
-import ch.zzeekk.mars.tlm3d.PpWithMapping
 import com.uber.h3core.H3Core
 import org.locationtech.jts.geom.{CoordinateXYZM, GeometryFactory, PrecisionModel}
 import org.scalatest.funsuite.AnyFunSuite
@@ -26,7 +25,7 @@ class SnapPpTransformerTest extends AnyFunSuite {
     val idGenerator = new PpIdGenerator(0, h3IdSample)
 
     val newPpms = Seq(
-      PpWithMapping(0, 0, 0, 0, position = 0.0, uuid_edge = "1", prio = 1, azimuth = 0.0f, tags = Set(), radius = None, grade = None, well_defined = true),
+      PpWithMapping(0, 0, 0, 0, position = 0.0, uuid_edge = "1", prio = 1, azimuth = 0.0f),
     )
     val existingPps = Seq(
       Pp.from(newPpms.head, h3IdSample, idGenerator.nextPpId, srcCrs)
@@ -45,7 +44,7 @@ class SnapPpTransformerTest extends AnyFunSuite {
     val idGenerator = new PpIdGenerator(0, h3IdSample)
 
     val newPpms = Seq(
-      PpWithMapping(0, 0, 0, 0, position = 0.0, uuid_edge = "1", prio = 1, azimuth = 0.0f, tags = Set(), radius = None, grade = None, well_defined = true),
+      PpWithMapping(0, 0, 0, 0, position = 0.0, uuid_edge = "1", prio = 1, azimuth = 0.0f),
     )
     val existingPps = Seq(
       Pp.from(newPpms.head, h3IdSample, idGenerator.nextPpId, srcCrs)
@@ -64,7 +63,7 @@ class SnapPpTransformerTest extends AnyFunSuite {
     val idGenerator = new PpIdGenerator(0, h3IdSample)
 
     val newPpms = Seq(
-      PpWithMapping(0, 0, 0, 0, position = 0.0, uuid_edge = "1", prio = 1, azimuth = 0.0f, tags = Set(), radius = None, grade = None, well_defined = true),
+      PpWithMapping(0, 0, 0, 0, position = 0.0, uuid_edge = "1", prio = 1, azimuth = 0.0f),
     )
     val existingPps = Seq(
       Pp.from(newPpms.head, h3IdSample, idGenerator.nextPpId, srcCrs)
@@ -83,7 +82,7 @@ class SnapPpTransformerTest extends AnyFunSuite {
     val idGenerator = new PpIdGenerator(0, h3IdSample)
 
     val newPpms = Seq(
-      PpWithMapping(0, 0, 0, 0, position = 0.0, uuid_edge = "1", prio = 1, azimuth = 0.0f, tags = Set(), radius = None, grade = None, well_defined = true),
+      PpWithMapping(0, 0, 0, 0, position = 0.0, uuid_edge = "1", prio = 1, azimuth = 0.0f),
     )
     val existingPps = Seq(
       Pp.from(newPpms.head, h3IdSample, idGenerator.nextPpId, srcCrs)
@@ -102,7 +101,7 @@ class SnapPpTransformerTest extends AnyFunSuite {
     val idGenerator = new PpIdGenerator(0, h3IdSample)
 
     val newPpms = Seq(
-      PpWithMapping(0, 0, 0, 0, position = 0.0, uuid_edge = "1", prio = 1, azimuth = 0.0f, tags = Set(), radius = None, grade = None, well_defined = true),
+      PpWithMapping(0, 0, 0, 0, position = 0.0, uuid_edge = "1", prio = 1, azimuth = 0.0f),
     )
     val existingPps = Seq(
       Pp.from(newPpms.head, h3IdSample, idGenerator.nextPpId, srcCrs)
@@ -121,26 +120,26 @@ class SnapPpTransformerTest extends AnyFunSuite {
     // A square, each side one edge, with ascending priority.
     // Corner points are present in two edges and must be consolidated to one Pp by the snap algorithm.
     val squarePps = Seq(
-      PpWithMapping(-0.5, -0.5, 100, 0, position = 0.0, uuid_edge = "1", prio = 1, azimuth = 0.0f, tags = Set(), radius = None, grade = None, well_defined = true),
-      PpWithMapping(-0.25, -0.5, 100, 3, position = 0.25, uuid_edge = "1", prio = 1, azimuth = 0.0f, tags = Set(), radius = None, grade = None, well_defined = true),
-      PpWithMapping(0, -0.5, 100, 3, position = 0.5, uuid_edge = "1", prio = 1, azimuth = 0.0f, tags = Set(), radius = None, grade = None, well_defined = true),
-      PpWithMapping(0.25, -0.5, 100, 3, position = 0.75, uuid_edge = "1", prio = 1, azimuth = 0.0f, tags = Set(), radius = None, grade = None, well_defined = true),
-      PpWithMapping(0.5, -0.5, 100, 2, position = 1.0, uuid_edge = "1", prio = 1, azimuth = 0.7853982f, tags = Set(), radius = None, grade = None, well_defined = true),
-      PpWithMapping(0.5, -0.5, 100, 2, position = 1.0, uuid_edge = "2", prio = 2, azimuth = 0.7853982f, tags = Set(), radius = None, grade = None, well_defined = true),
-      PpWithMapping(0.5, -0.25, 102.5f, 3, position = 1.25, uuid_edge = "2", prio = 2, azimuth = 1.5707964f, tags = Set(), radius = None, grade = None, well_defined = true),
-      PpWithMapping(0.5, 0, 105, 3, position = 1.5, uuid_edge = "2", prio = 2, azimuth = 1.5707964f, tags = Set(), radius = None, grade = None, well_defined = true),
-      PpWithMapping(0.5, 0.25, 107.5f, 3, position = 1.75, uuid_edge = "2", prio = 2, azimuth = 1.5707964f, tags = Set(), radius = None, grade = None, well_defined = true),
-      PpWithMapping(0.5, 0.5, 110, 2, position = 2.0, uuid_edge = "2", prio = 2, azimuth = 2.3561945f, tags = Set(), radius = None, grade = None, well_defined = true),
-      PpWithMapping(0.5, 0.5, 110, 2, position = 2.0, uuid_edge = "3", prio = 3, azimuth = 2.3561945f, tags = Set(), radius = None, grade = None, well_defined = true),
-      PpWithMapping(0.25, 0.5, 107.5f, 3, position = 2.25, uuid_edge = "3", prio = 3, azimuth = 3.1415927f, tags = Set(), radius = None, grade = None, well_defined = true),
-      PpWithMapping(0, 0.5, 105, 3, position = 2.5, uuid_edge = "3", prio = 3, azimuth = 3.1415927f, tags = Set(), radius = None, grade = None, well_defined = true),
-      PpWithMapping(-0.25, 0.5, 102.5f, 3, position = 2.75, uuid_edge = "3", prio = 3, azimuth = 3.1415927f, tags = Set(), radius = None, grade = None, well_defined = true),
-      PpWithMapping(-0.5, 0.5, 100, 2, position = 3, uuid_edge = "3", prio = 3, azimuth = -2.3561945f, tags = Set(), radius = None, grade = None, well_defined = true),
-      PpWithMapping(-0.5, 0.5, 100, 2, position = 3, uuid_edge = "4", prio = 4, azimuth = -2.3561945f, tags = Set(), radius = None, grade = None, well_defined = true),
-      PpWithMapping(-0.5, 0.25, 100, 3, position = 3.25, uuid_edge = "4", prio = 4, azimuth = -1.5707964f, tags = Set(), radius = None, grade = None, well_defined = true),
-      PpWithMapping(-0.5, 0, 100, 3, position = 3.5, uuid_edge = "4", prio = 4, azimuth = -1.5707964f, tags = Set(), radius = None, grade = None, well_defined = true),
-      PpWithMapping(-0.5, -0.25, 100, 3, position = 3.75, uuid_edge = "4", prio = 4, azimuth = -1.5707964f, tags = Set(), radius = None, grade = None, well_defined = true),
-      PpWithMapping(-0.5, -0.5, 100, 0, position = 4.0, uuid_edge = "4", prio = 4, azimuth = -1.5707964f, tags = Set(), radius = None, grade = None, well_defined = true),
+      PpWithMapping(-0.5, -0.5, 100, 0, position = 0.0, uuid_edge = "1", prio = 1, azimuth = 0.0f),
+      PpWithMapping(-0.25, -0.5, 100, 3, position = 0.25, uuid_edge = "1", prio = 1, azimuth = 0.0f),
+      PpWithMapping(0, -0.5, 100, 3, position = 0.5, uuid_edge = "1", prio = 1, azimuth = 0.0f),
+      PpWithMapping(0.25, -0.5, 100, 3, position = 0.75, uuid_edge = "1", prio = 1, azimuth = 0.0f),
+      PpWithMapping(0.5, -0.5, 100, 2, position = 1.0, uuid_edge = "1", prio = 1, azimuth = 0.7853982f),
+      PpWithMapping(0.5, -0.5, 100, 2, position = 1.0, uuid_edge = "2", prio = 2, azimuth = 0.7853982f),
+      PpWithMapping(0.5, -0.25, 102.5f, 3, position = 1.25, uuid_edge = "2", prio = 2, azimuth = 1.5707964f),
+      PpWithMapping(0.5, 0, 105, 3, position = 1.5, uuid_edge = "2", prio = 2, azimuth = 1.5707964f),
+      PpWithMapping(0.5, 0.25, 107.5f, 3, position = 1.75, uuid_edge = "2", prio = 2, azimuth = 1.5707964f),
+      PpWithMapping(0.5, 0.5, 110, 2, position = 2.0, uuid_edge = "2", prio = 2, azimuth = 2.3561945f),
+      PpWithMapping(0.5, 0.5, 110, 2, position = 2.0, uuid_edge = "3", prio = 3, azimuth = 2.3561945f),
+      PpWithMapping(0.25, 0.5, 107.5f, 3, position = 2.25, uuid_edge = "3", prio = 3, azimuth = 3.1415927f),
+      PpWithMapping(0, 0.5, 105, 3, position = 2.5, uuid_edge = "3", prio = 3, azimuth = 3.1415927f),
+      PpWithMapping(-0.25, 0.5, 102.5f, 3, position = 2.75, uuid_edge = "3", prio = 3, azimuth = 3.1415927f),
+      PpWithMapping(-0.5, 0.5, 100, 2, position = 3, uuid_edge = "3", prio = 3, azimuth = -2.3561945f),
+      PpWithMapping(-0.5, 0.5, 100, 2, position = 3, uuid_edge = "4", prio = 4, azimuth = -2.3561945f),
+      PpWithMapping(-0.5, 0.25, 100, 3, position = 3.25, uuid_edge = "4", prio = 4, azimuth = -1.5707964f),
+      PpWithMapping(-0.5, 0, 100, 3, position = 3.5, uuid_edge = "4", prio = 4, azimuth = -1.5707964f),
+      PpWithMapping(-0.5, -0.25, 100, 3, position = 3.75, uuid_edge = "4", prio = 4, azimuth = -1.5707964f),
+      PpWithMapping(-0.5, -0.5, 100, 0, position = 4.0, uuid_edge = "4", prio = 4, azimuth = -1.5707964f),
     )
 
     // first snap -> create new pps
@@ -165,35 +164,35 @@ class SnapPpTransformerTest extends AnyFunSuite {
   test("Create pps for switch, respect main track priority, no new points when repeating") {
 
     val edge1 = Seq(
-      PpWithMapping(0, 0, 0, 0.toShort, Set(), 0.0, "1", 1.toShort, None, None, 0.0f, true),
-      PpWithMapping(0, 0.25, 0, 0.toShort, Set(), 0.25, "1", 1.toShort, None, None, 0.0f, true),
-      PpWithMapping(0, 0.5, 0, 0.toShort, Set(), 0.5, "1", 1.toShort, None, None, 0.0f, true),
-      PpWithMapping(0, 0.75, 0, 0.toShort, Set(), 0.75, "1", 1.toShort, None, None, 0.0f, true),
-      PpWithMapping(0, 1.0, 0, 0.toShort, Set(), 1.0, "1", 1.toShort, None, None, 0.0f, true),
-      PpWithMapping(0, 1.25, 0, 0.toShort, Set(), 1.25, "1", 1.toShort, None, None, 0.0f, true),
-      PpWithMapping(0, 1.5, 0, 0.toShort, Set(), 1.5, "1", 1.toShort, None, None, 0.0f, true),
-      PpWithMapping(0, 1.75, 0, 0.toShort, Set(), 1.75, "1", 1.toShort, None, None, 0.0f, true),
-      PpWithMapping(0, 2.0, 0, 0.toShort, Set(), 2.0, "1", 1.toShort, None, None, 0.0f, true),
-      PpWithMapping(0, 2.25, 0, 0.toShort, Set(), 2.25, "1", 1.toShort, None, None, 0.0f, true),
-      PpWithMapping(0, 2.5, 0, 0.toShort, Set(), 2.5, "1", 1.toShort, None, None, 0.0f, true),
-      PpWithMapping(0, 2.75, 0, 0.toShort, Set(), 2.75, "1", 1.toShort, None, None, 0.0f, true),
-      PpWithMapping(0, 3.0, 0, 0.toShort, Set(), 3.0, "1", 1.toShort, None, None, 0.0f, true)
+      PpWithMapping(0, 0, 0, 0.toShort, 0.0, "1", 1.toShort, azimuth = 0.0f),
+      PpWithMapping(0, 0.25, 0, 0.toShort, 0.25, "1", 1.toShort, azimuth = 0.0f),
+      PpWithMapping(0, 0.5, 0, 0.toShort, 0.5, "1", 1.toShort, azimuth = 0.0f),
+      PpWithMapping(0, 0.75, 0, 0.toShort, 0.75, "1", 1.toShort, azimuth = 0.0f),
+      PpWithMapping(0, 1.0, 0, 0.toShort, 1.0, "1", 1.toShort, azimuth = 0.0f),
+      PpWithMapping(0, 1.25, 0, 0.toShort, 1.25, "1", 1.toShort, azimuth = 0.0f),
+      PpWithMapping(0, 1.5, 0, 0.toShort, 1.5, "1", 1.toShort, azimuth = 0.0f),
+      PpWithMapping(0, 1.75, 0, 0.toShort, 1.75, "1", 1.toShort, azimuth = 0.0f),
+      PpWithMapping(0, 2.0, 0, 0.toShort, 2.0, "1", 1.toShort, azimuth = 0.0f),
+      PpWithMapping(0, 2.25, 0, 0.toShort, 2.25, "1", 1.toShort, azimuth = 0.0f),
+      PpWithMapping(0, 2.5, 0, 0.toShort, 2.5, "1", 1.toShort, azimuth = 0.0f),
+      PpWithMapping(0, 2.75, 0, 0.toShort, 2.75, "1", 1.toShort, azimuth = 0.0f),
+      PpWithMapping(0, 3.0, 0, 0.toShort, 3.0, "1", 1.toShort, azimuth = 0.0f)
     )
 
     val edge2 = Seq(
-      PpWithMapping(0.0, 0.0, 0, 0.toShort, Set(), 0.0, "2", 1.toShort, None, None, 0.0f, true),
-      PpWithMapping(0.08, 0.24, 0, 0.toShort, Set(), 0.25, "2", 1.toShort, None, None, 0.0f, true),
-      PpWithMapping(0.16, 0.47, 0, 0.toShort, Set(), 0.5, "2", 1.toShort, None, None, 0.0f, true),
-      PpWithMapping(0.24, 0.71, 0, 0.toShort, Set(), 0.75, "2", 1.toShort, None, None, 0.0f, true),
-      PpWithMapping(0.32, 0.95, 0, 0.toShort, Set(), 1.0, "2", 1.toShort, None, None, 0.0f, true),
-      PpWithMapping(0.4, 1.19, 0, 0.toShort, Set(), 1.25, "2", 1.toShort, None, None, 0.0f, true),
-      PpWithMapping(0.47, 1.42, 0, 0.toShort, Set(), 1.5, "2", 1.toShort, None, None, 0.0f, true),
-      PpWithMapping(0.55, 1.66, 0, 0.toShort, Set(), 1.75, "2", 1.toShort, None, None, 0.0f, true),
-      PpWithMapping(0.63, 1.9, 0, 0.toShort, Set(), 2.0, "2", 1.toShort, None, None, 0.0f, true),
-      PpWithMapping(0.71, 2.13, 0, 0.toShort, Set(), 2.25, "2", 1.toShort, None, None, 0.0f, true),
-      PpWithMapping(0.79, 2.37, 0, 0.toShort, Set(), 2.5, "2", 1.toShort, None, None, 0.0f, true),
-      PpWithMapping(0.87, 2.61, 0, 0.toShort, Set(), 2.75, "2", 1.toShort, None, None, 0.0f, true),
-      PpWithMapping(0.95, 2.85, 0, 0.toShort, Set(), 3.0, "2", 1.toShort, None, None, 0.0f, true),
+      PpWithMapping(0.0, 0.0, 0, 0.toShort, 0.0, "2", 1.toShort, azimuth = 0.0f),
+      PpWithMapping(0.08, 0.24, 0, 0.toShort, 0.25, "2", 1.toShort, azimuth = 0.0f),
+      PpWithMapping(0.16, 0.47, 0, 0.toShort, 0.5, "2", 1.toShort, azimuth = 0.0f),
+      PpWithMapping(0.24, 0.71, 0, 0.toShort, 0.75, "2", 1.toShort, azimuth = 0.0f),
+      PpWithMapping(0.32, 0.95, 0, 0.toShort, 1.0, "2", 1.toShort, azimuth = 0.0f),
+      PpWithMapping(0.4, 1.19, 0, 0.toShort, 1.25, "2", 1.toShort, azimuth = 0.0f),
+      PpWithMapping(0.47, 1.42, 0, 0.toShort, 1.5, "2", 1.toShort, azimuth = 0.0f),
+      PpWithMapping(0.55, 1.66, 0, 0.toShort, 1.75, "2", 1.toShort, azimuth = 0.0f),
+      PpWithMapping(0.63, 1.9, 0, 0.toShort, 2.0, "2", 1.toShort, azimuth = 0.0f),
+      PpWithMapping(0.71, 2.13, 0, 0.toShort, 2.25, "2", 1.toShort, azimuth = 0.0f),
+      PpWithMapping(0.79, 2.37, 0, 0.toShort, 2.5, "2", 1.toShort, azimuth = 0.0f),
+      PpWithMapping(0.87, 2.61, 0, 0.toShort, 2.75, "2", 1.toShort, azimuth = 0.0f),
+      PpWithMapping(0.95, 2.85, 0, 0.toShort, 3.0, "2", 1.toShort, azimuth = 0.0f),
     )
 
     // first snap -> create new pps
@@ -203,7 +202,7 @@ class SnapPpTransformerTest extends AnyFunSuite {
       .partition(_.is_new_pp)
     assert(newPps1.size == 22)
     assert(snappedPps1.size == 4)
-    assert(snappedPps1.count(x => x.pp.getGeometry(lv95GeomFactory) != x.snapped_pp.getGeometry(lv95GeomFactory)) == 3) // Anzahl Punkte welche beim Snapping verschoben wurden...
+    assert(snappedPps1.count(x => x.pp.get.getGeometry(lv95GeomFactory) != x.snapped_pp.getGeometry(lv95GeomFactory)) == 3) // Anzahl Punkte welche beim Snapping verschoben wurden...
     assert(snappedPps1.forall(_.direction.contains(1)))
 
     // second snap -> snap to existing pps
@@ -213,7 +212,7 @@ class SnapPpTransformerTest extends AnyFunSuite {
       .partition(_.is_new_pp)
     assert(newPps2.isEmpty)
     assert(snappedPps2.size == 26)
-    assert(snappedPps2.count(x => x.pp.getGeometry(lv95GeomFactory) != x.snapped_pp.getGeometry(lv95GeomFactory)) == 3) // Anzahl Punkte welche beim Snapping verschoben wurden...
+    assert(snappedPps2.count(x => x.pp.get.getGeometry(lv95GeomFactory) != x.snapped_pp.getGeometry(lv95GeomFactory)) == 3) // Anzahl Punkte welche beim Snapping verschoben wurden...
     assert(snappedPps1.forall(_.direction.contains(1)))
 
   }
