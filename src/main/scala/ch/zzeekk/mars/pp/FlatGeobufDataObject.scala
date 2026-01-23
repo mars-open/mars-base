@@ -45,7 +45,7 @@ case class FlatGeobufDataObject(
                                  geometryColName: String = "geometry",
                                  idColName: Option[String] = None,
                                  colsToIgnore: Seq[String] = Seq(),
-                                 ogr2ogrFix: Boolean = false,
+                                 ogr2OgrFix: Boolean = false,
                                  metadata: Option[DataObjectMetadata] = None
                                )(@transient implicit val instanceRegistry: InstanceRegistry)
   extends DataObject with CanWriteSparkDataFrame {
@@ -132,7 +132,7 @@ case class FlatGeobufDataObject(
     dataStore.dispose()
 
     // fix with ogr2ogr workaround if configured
-    if (ogr2ogrFix) {
+    if (ogr2OgrFix) {
       val localFileOrg = new File(localFile.toString.stripSuffix(".fgb") + "-org.fgb")
       Files.move(localFile.toPath, localFileOrg.toPath, StandardCopyOption.REPLACE_EXISTING)
       val cmd = Seq("ogr2ogr", "-f", "FlatGeobuf", localFile.toString, localFileOrg.toString, "-skipfailures", "-lco", "SPATIAL_INDEX=YES")

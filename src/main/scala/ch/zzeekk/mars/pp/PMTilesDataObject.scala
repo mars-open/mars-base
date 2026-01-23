@@ -10,7 +10,7 @@ import io.smartdatalake.util.hdfs.{HdfsUtil, PartitionValues}
 import io.smartdatalake.workflow.ActionPipelineContext
 import io.smartdatalake.workflow.action.ActionSubFeedsImpl.MetricsMap
 import io.smartdatalake.workflow.dataobject.{CanWriteSparkDataFrame, DataObject, DataObjectMetadata}
-import io.tileverse.pmtiles.TileverseAccessor
+import io.tileverse.pmtiles.{CompressionUtil, PMTilesHeader, TileverseAccessor}
 import io.tileverse.tiling.common.{Coordinate => TLCoordinate}
 import io.tileverse.tiling.matrix.{DefaultTileMatrixSets, TileMatrix}
 import io.tileverse.tiling.pyramid.TileIndex
@@ -33,6 +33,9 @@ import scala.jdk.CollectionConverters._
  * - can have a column with name "id" with type "long", used as feature id
  *
  * Note that geometries are expected in WGS84 / EPSG:4326 coordinate reference system.
+ *
+ * @param compressTiles if true tiles are compressed using gzip.
+ *                      Unfortunately this doesnt seem to work with maplibre online, but it works when accessing a local file (pmtiles.io viewer)
  */
 case class PMTilesDataObject(
                               id: DataObjectId,
@@ -40,6 +43,7 @@ case class PMTilesDataObject(
                               localPath: String,
                               path: Option[String],
                               colsToIgnore: Seq[String] = Seq(),
+                              compressTiles: Boolean = false,
                               metadata: Option[DataObjectMetadata] = None
                             )(@transient implicit val instanceRegistry: InstanceRegistry)
   extends DataObject with CanWriteSparkDataFrame {
@@ -84,7 +88,7 @@ case class PMTilesDataObject(
     }.reduce(_.unionAll(_))
 
     // create MVT-Tiles
-    val udfCreateMvtTile = udf(createMvtTile _)
+    val udfCreateMvtTile = udf(createMvtTile(compressTiles) _)
     val dsTile = dfWithTileZ
       .groupBy($"tile")
       .agg(collect_list(struct(df.columns.map(col):_*)).as("features"))
@@ -98,7 +102,8 @@ case class PMTilesDataObject(
       dsTile.toLocalIterator().asScala,
       localPath, zoomAndFilter.keys.map(_.toInt).toSeq,
       (x: Double) => logger.info(s"Progress: $x"),
-      Map("pps" -> df.schema.filterNot(f => nonFeatureAttributes.contains(f.name)))
+      Map("pps" -> df.schema.filterNot(f => nonFeatureAttributes.contains(f.name))),
+      compressTiles
     )
 
     // copy PMTiles file to hadoop if configured
@@ -112,7 +117,7 @@ case class PMTilesDataObject(
 
   val nonFeatureAttributes: Seq[String] = Seq("geometry", "layer", "id") ++ colsToIgnore
 
-  def createMvtTile(features: Seq[Row], z: Int, x: Long, y: Long): Array[Byte] = {
+  def createMvtTile(compressTiles: Boolean)(features: Seq[Row], z: Int, x: Long, y: Long): Array[Byte] = {
     if (logger.isDebugEnabled()) logger.debug(s"creating tile $z/$x/$y with ${features.size} features")
     val codec = new VectorTileCodec()
     val builder = new VectorTileBuilder()
@@ -151,7 +156,8 @@ case class PMTilesDataObject(
     }
 
     val tile = builder.build()
-    codec.encode(tile)
+    val data = codec.encode(tile)
+    if (compressTiles) TileverseAccessor.compressUsingGzip(data) else data
   }
 
   override def factory: FromConfigFactory[DataObject] = PMTilesDataObject

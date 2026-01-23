@@ -10,7 +10,8 @@ object TileverseAccessor extends SmartDataLakeLogger {
 
   def writeTiles(
                   tiles: Iterator[TileData], localPath: String, zooms: Seq[Int], fnLog: Double => Unit,
-                  layers: Map[String, Seq[StructField]]
+                  layers: Map[String, Seq[StructField]],
+                  compressTiles: Boolean
                 ): Int = {
 
     val vectorLayers = layers.map{
@@ -32,7 +33,7 @@ object TileverseAccessor extends SmartDataLakeLogger {
       .minZoom(zooms.min)
       .tileType(PMTilesHeader.TILETYPE_MVT)
       .internalCompression(PMTilesHeader.COMPRESSION_GZIP)
-      .tileCompression(PMTilesHeader.COMPRESSION_GZIP)
+      .tileCompression(if (compressTiles) PMTilesHeader.COMPRESSION_GZIP else PMTilesHeader.COMPRESSION_NONE)
       .center(46.95112222715324, 7.439325799911505, 15)
       .build()
 
@@ -44,12 +45,13 @@ object TileverseAccessor extends SmartDataLakeLogger {
     tiles.foreach {
       tileData =>
         i += 1
-        val compressedData = CompressionUtil.compress(tileData.data, PMTilesHeader.COMPRESSION_GZIP)
-        writer.addTile(tileData.tile.getIndex, compressedData)
+        writer.addTile(tileData.tile.getIndex, tileData.data)
     }
     writer.complete()
     i
   }
+
+  def compressUsingGzip(data: Array[Byte]): Array[Byte] = CompressionUtil.compress(data, PMTilesHeader.COMPRESSION_GZIP)
 
   def createProgressListener(fnLog: Double => Unit): PMTilesWriter.ProgressListener = {
     new PMTilesWriter.ProgressListener() {
