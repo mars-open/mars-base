@@ -6,7 +6,7 @@ import io.smartdatalake.workflow.action.spark.customlogic.CustomDfsTransformer
 import org.apache.sedona.common.FunctionsGeoTools
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.sedona_sql.expressions.st_functions._
-import org.apache.spark.sql.{DataFrame, Dataset, KeyValueGroupedDataset, SparkSession}
+import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
 import org.locationtech.jts.algorithm.Angle
 import org.locationtech.jts.geom.{Coordinate, Geometry, GeometryFactory}
 

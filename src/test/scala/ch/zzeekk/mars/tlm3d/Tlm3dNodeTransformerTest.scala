@@ -1,5 +1,6 @@
 package ch.zzeekk.mars.tlm3d
 
+import ch.zzeekk.mars.ch.tlm3d.{EdgeMapping, EdgeRef, Switch, Tlm3dNodeTransformer}
 import ch.zzeekk.mars.pp.utils.GeometryCalcUtils.{calcAzimuth, calcCircumRadius}
 import ch.zzeekk.mars.pp.NodePoint
 import org.locationtech.jts.geom.{Coordinate, CoordinateXYZM, GeometryFactory, PrecisionModel}

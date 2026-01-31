@@ -1,6 +1,5 @@
-package ch.zzeekk.mars.tlm3d
+package ch.zzeekk.mars.pp
 
-import ch.zzeekk.mars.pp.NodePoint
 import ch.zzeekk.mars.pp.utils.GeometryCalcUtils
 import io.smartdatalake.workflow.action.spark.customlogic.CustomDfsTransformer
 import org.apache.spark.sql.functions._
@@ -13,7 +12,7 @@ import org.locationtech.jts.geom.{Geometry, GeometryFactory}
  * Create unique nodes from endpoints of edges.
  * Classify the switches.
  */
-class Tlm3dNodeTransformer extends CustomDfsTransformer {
+class NodeTransformer extends CustomDfsTransformer {
 
   def transform(dsSlvTlm3dEdge: Dataset[Edge]): Dataset[Node] = {
     implicit val session: SparkSession = dsSlvTlm3dEdge.sparkSession
@@ -155,7 +154,7 @@ class Tlm3dNodeTransformer extends CustomDfsTransformer {
       .map(t => Angle.normalize(t.endpoint.azimuth - azimuth))
       .filter(t => Math.abs(t) >= Math.PI/180) // smaller than 1grad
       .sorted
-      .map(diff => if (diff < 0) 'L' else 'R')
+      .map(diff => if (diff < 0) 'R' else 'L')
       .mkString
     if (subType.isEmpty) None else Some(subType)
   }

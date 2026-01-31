@@ -1,4 +1,4 @@
-package ch.zzeekk.mars.tlm3d
+package ch.zzeekk.mars.pp
 
 import io.smartdatalake.workflow.action.spark.customlogic.CustomDfsTransformer
 import org.apache.spark.sql.functions._
@@ -14,33 +14,19 @@ import scala.annotation.tailrec
  * Tracks that have been splitted need to be combined again.
  * They are splitted for example because of changing attributes, e.g. beginning of bridges or tunnels.
  */
-class Tlm3dEdgeTransformer extends CustomDfsTransformer {
+class EdgeTransformer extends CustomDfsTransformer {
 
-  def transform(dfSlvTlm3dTrack: DataFrame, isExec: Boolean, trackUuidsToExcludeFromMerge: Option[String] = None): Dataset[Edge] = {
-    implicit val session: SparkSession = dfSlvTlm3dTrack.sparkSession
+  def transform(dsTrack: Dataset[Track], isExec: Boolean, trackUuidsToExcludeFromMerge: Option[String] = None): Dataset[Edge] = {
+    implicit val session: SparkSession = dsTrack.sparkSession
 
     import session.implicits._
 
     // extract tracks
     // filter tracks with at least 2 points, otherwise they make no sense
-    def createTagFromBool(name: String) = when(col(name),lit(name))
-    val dsTrack = dfSlvTlm3dTrack
-      .where(ST_NumPoints($"geometry") > 1)
-      .select(
-        regexp_replace($"uuid", lit("^\\{|\\}$"), lit("")).as("uuid_track"),
-        $"geometry",
-        lit(false).as("reversed"),
-        array_compact(array(
-          $"type", $"subtype",
-          createTagFromBool("museumsbahn"),
-          createTagFromBool("zahnradbahn"),
-          createTagFromBool("standseilbahn"),
-          createTagFromBool("betriebsbahn"),
-          createTagFromBool("achse_dkm"),
-        )).as("tags")
-      ).as[Track]
     val tracks = if(isExec) {
-      dsTrack.collect().toSeq
+      dsTrack
+        .where(ST_NumPoints($"geometry") > 1)
+        .collect().toSeq
     } else Seq()
 
     // create lookup of tracks by point for both direction, to combine splitted tracks

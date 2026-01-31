@@ -1,4 +1,4 @@
-package ch.zzeekk.mars.tlm3d
+package ch.zzeekk.mars.pp
 
 import ch.zzeekk.mars.pp.utils.GeometryCalcUtils._
 import ch.zzeekk.mars.pp.utils.SeqUtils.withPrevAndNext
@@ -11,7 +11,7 @@ import org.locationtech.jts.geom.{Coordinate, CoordinateXYZM, Geometry, Geometry
 
 import scala.collection.mutable
 
-class Tlm3dPpTransformer extends CustomDfsTransformer {
+class CreatePpTransformer extends CustomDfsTransformer {
 
   def transform(
                  dsSlvTlm3dEdge: Dataset[Edge],
@@ -20,7 +20,7 @@ class Tlm3dPpTransformer extends CustomDfsTransformer {
                  wellDefinedPointDistance: Float = 25f,
                  nbOfPartitions: Int = 25,
                  srcCrs: String
-               ): Dataset[Tlm3dPpWithMapping] = {
+               ): Dataset[RawPpWithMapping] = {
     val session = dsSlvTlm3dEdge.sparkSession
     import session.implicits._
 
@@ -55,7 +55,7 @@ class Tlm3dPpTransformer extends CustomDfsTransformer {
       )
       .drop("geometry", "idx")
 
-      dfPoints.as[Tlm3dPpWithMapping]
+      dfPoints.as[RawPpWithMapping]
   }
 
 }
@@ -169,7 +169,7 @@ case class EdgePoint(geometry: Geometry, zoom: Short, radius: Option[Int], grade
  *             Lower priorities get snapped first to existing positionpoints.
  *             This is important for switches, as we want the "main" edge to be merged first, so it has higher priority to create new positionpoints in the region of the "Weichenzunge".
  */
-case class Tlm3dPpWithMapping(x: Double, y: Double, z: Float, zoom: Short, tags: Set[String], uuid_edge: String, position: Double, edge_idx: Int, prio: Short, radius: Option[Int], grade: Option[Float], azimuth: Float, well_defined: Boolean) {
+case class RawPpWithMapping(x: Double, y: Double, z: Float, zoom: Short, tags: Set[String], uuid_edge: String, position: Double, edge_idx: Int, prio: Short, radius: Option[Int], grade: Option[Float], azimuth: Float, well_defined: Boolean) {
   @transient lazy val coordinate: Coordinate = new Coordinate(x,y,z)
   def getGeometry(implicit factory: GeometryFactory): Geometry = factory.createPoint(coordinate)
 }

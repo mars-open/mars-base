@@ -22,7 +22,7 @@ object MarsSparkAccessor {
                              timeZoneId: String
                             ): ArrowBatchIterator = {
     val encoder = Encoders.row(df.schema).asInstanceOf[ExpressionEncoder[Row]].createSerializer()
-    val internalRows = df.toLocalIterator.asScala.map(encoder.apply)
+    val internalRows = df.toLocalIterator().asScala.map(encoder.apply)
     new ArrowBatchIterator(internalRows, df.schema, maxRecordsPerBatch, timeZoneId, errorOnDuplicatedFieldNames = true, context = null)
   }
 }

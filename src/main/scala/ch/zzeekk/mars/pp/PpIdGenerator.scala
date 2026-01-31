@@ -4,7 +4,6 @@ import ch.zzeekk.mars.pp.PpIdGenerator._
 import ch.zzeekk.mars.pp.utils.GeometryCalcUtils.{convertTo4326, getGeoFactory}
 import com.uber.h3core.H3Core
 import org.apache.commons.codec.binary.Base32
-import org.apache.sedona.common.FunctionsGeoTools
 import org.locationtech.jts.geom.Coordinate
 
 import java.nio.{ByteBuffer, ByteOrder}
@@ -42,7 +41,7 @@ object PpIdGenerator {
    */
   def getH3idL15(x: Double, y: Double, srcCrs: String): Long = {
     val geoFactory = getGeoFactory(srcCrs)
-    val wgs84coord = convertTo4326(geoFactory.createPoint(new Coordinate(x,y)), srcCrs).getCoordinate
+    val wgs84coord = convertTo4326(geoFactory.createPoint(new Coordinate(x, y)), srcCrs).getCoordinate
     h3.latLngToCell(wgs84coord.getY, wgs84coord.getX, 15)
   }
 
@@ -59,6 +58,7 @@ object PpIdGenerator {
   /**
    * Represent a Positionpoint Id as a compact String.
    * Base32 encoding is used for this (uppercase characters and numbers).
+   *
    * @param ppId 64bit id of a positionpoint
    * @return String in format XXXX-XXXX-XXXXX using base32 encoding
    */
