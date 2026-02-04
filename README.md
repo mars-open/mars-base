@@ -30,7 +30,8 @@ After evaluation, **H3 geospatial grid library** is used for spatial indexing. K
 - efficient neighbor cell searches
 - hexagonal grid structure reduces neighbors from 8 to 6
 - cell size for finest resolution 15 is about 1m2, which is good to cover single tracks and minimizes local records when joining different sources by cell id
-- coarser resolutions can be tested for potential performance improvements 
+- coarser resolutions can be tested for potential performance improvements
+
 Comparision: [Location-Based Algorithms Comparison](https://medium.com/@sylvain.tiset/breaking-down-location-based-algorithms-r-tree-geohash-s2-and-h3-explained-a65cd10bd3a9)
 H3 documentation: [H3 Documentation](https://h3geo.org/docs/)
 
@@ -74,6 +75,7 @@ Pmtiles format is used for efficient web visualization of large vector datasets,
 As it is a tiled format, only the required tiles are loaded based on the current map view.
 - **Uncompressed format**: Used due to MapLibre compatibility requirements
 - **Sparse zoom levels**: Only selected zoom levels are included to optimize file size and loading times
+
 Details see [PMTiles Discussion](https://github.com/protomaps/PMTiles/discussions/591#discussioncomment-14149097))
 
 Viewer: https://pmtiles.io/
