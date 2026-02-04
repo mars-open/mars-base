@@ -25,11 +25,11 @@ Currently data pipelines for the following countries are implemented:
 
 ### Spatial Indexing: H3 vs S2 vs A5 vs GeoHash
 
-After evaluation, H3 grid library is used for spatial indexing. Key considerations:
+After evaluation, **H3 geospatial grid library** is used for spatial indexing. Key considerations:
 - efficient spacial joins
 - efficient neighbor cell searches
 - hexagonal grid structure reduces neighbors from 8 to 6
-- finest resolution 15 is about 1m2, which is good to cover single tracks
+- cell size for finest resolution 15 is about 1m2, which is good to cover single tracks and minimizes local records when joining different sources by cell id
 - coarser resolutions can be tested for potential performance improvements 
 Comparision: [Location-Based Algorithms Comparison](https://medium.com/@sylvain.tiset/breaking-down-location-based-algorithms-r-tree-geohash-s2-and-h3-explained-a65cd10bd3a9)
 H3 documentation: [H3 Documentation](https://h3geo.org/docs/)
