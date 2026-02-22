@@ -120,7 +120,7 @@ For this repository the GPLv3 is explicitly applied also to AI translations of t
 
 ## Contributors
 
-<img src="https://www.elca.ch/img/logo.svg" style="background-color: #292524; padding: 10px;" alt="ELCA Logo">
+![ELCA AG](/.assets/elca.png)
 
 ## Contributing
 
