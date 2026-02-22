@@ -1,5 +1,6 @@
 package ch.zzeekk.mars.pp
 
+import ch.zzeekk.mars.pp.utils.GeometryCalcUtils
 import io.smartdatalake.workflow.action.spark.customlogic.CustomDfsTransformer
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.sedona_sql.expressions.st_functions._
@@ -8,6 +9,7 @@ import org.locationtech.jts.geom.{Geometry, LineString}
 
 import java.util.UUID
 import scala.annotation.tailrec
+import scala.collection.mutable
 
 /**
  * Build edges of the railway network.
@@ -26,46 +28,20 @@ class EdgeTransformer extends CustomDfsTransformer {
     val tracks = if(isExec) {
       dsTrack
         .where(ST_NumPoints($"geometry") > 1)
+        //.where($"uuid_track".isin("b445d5de-5c44-4650-a2e6-e41217e5b22b","b914120c-be1e-402c-a816-9c43aa2745fa","fed9d4df-4019-4ca3-9e57-2b1a3bdea06a"))
         .collect().toSeq
     } else Seq()
 
-    // create lookup of tracks by point for both direction, to combine splitted tracks
-    // filter for arity==2 only, and check that tags are the same on both tracks
-    val parsedTrackUuidsToExcludeFromMerge = trackUuidsToExcludeFromMerge.toSeq.flatMap(_.split(",").map(_.trim).toSeq).toSet
-    val tracksByPoint = (tracks ++ tracks.map(_.reverse))
-      .groupBy(_.linestring.getStartPoint)
-      .view.mapValues(_.toSet)
-      .filter { case (k,v) =>
-        v.size == 2 && // splitted tracks
-        v.map(_.tags).toSeq.distinct.length == 1 && // with same tags
-        v.map(_.uuid_track).intersect(parsedTrackUuidsToExcludeFromMerge).isEmpty
-      }
-
-    // define recursion to combine with next track
-    @tailrec
-    def combineNext(edge: EdgePrep): EdgePrep = {
-      val next = tracksByPoint.get(edge.linestring.getEndPoint)
-      if (next.isDefined) {
-        val nextTrack = next.get.filter(_.uuid_track != edge.tracks.last.uuid_track)
-        assert(nextTrack.size==1, s"Next track not found for ${edge.tracks.last.uuid_track}. Try to exclude it from merge by setting option trackUuidsToExcludeFromMerge. ($next)")
-        combineNext(edge.add(nextTrack.head))
-      } else edge
-    }
-
-    // create edges
-    // start with tracks where startPoint has no entry in tracksByPoint and combine with following tracks if possible
-    // note that this creates edges in both directions, which will be cleaned up afterwards
-    val edges = tracks
-      .filter(t => !tracksByPoint.contains(t.linestring.getStartPoint) || !tracksByPoint.contains(t.linestring.getEndPoint))
-      .map(t => combineNext(EdgePrep.from(t)))
-    val edgesDeduplicated = edges
-      .groupBy(e => (e.linestring.getStartPoint, e.linestring.getEndPoint, e.linestring.getLength)) // as it is possible that 2 edges have the same start and end point, we take length as additional property for uniqueness
-      .values.map(_.head).toSeq
+    if (isExec) logger.info(s"merging #${tracks.size} tracks to edges...")
+    val parsedTrackUuidsToExcludeFromMerge = trackUuidsToExcludeFromMerge
+      .map(_.split(',').map(_.trim).toSet)
+      .getOrElse(Set.empty[String])
+    val edges = mergeTracks(tracks, parsedTrackUuidsToExcludeFromMerge)
 
     // enrich node uuids
-    val nodeUuids = (edgesDeduplicated.map(_.linestring.getStartPoint) ++ edgesDeduplicated.map(_.linestring.getEndPoint))
+    val nodeUuids = (edges.map(_.linestring.getStartPoint) ++ edges.map(_.linestring.getEndPoint))
       .map(p => (p, UUID.randomUUID().toString)).toMap
-    val edgeEnriched = edgesDeduplicated
+    val edgeEnriched = edges
       .map(e => Edge(
         e.uuid_edge, e.geometry, e.tracks,
         uuid_node_from = nodeUuids(e.linestring.getStartPoint),
@@ -85,6 +61,45 @@ class EdgeTransformer extends CustomDfsTransformer {
     edgeEnriched.toDS()
   }
 
+  def mergeTracks(tracks: Seq[Track], parsedTrackUuidsToExcludeFromMerge: Set[String]): Seq[EdgePrep] = {
+    val tracksBidir = tracks ++ tracks.map(_.reverse)
+    val tracksByPoint = tracksBidir
+      .groupBy(_.linestring.getStartPoint)
+      .view.mapValues(_.toSet)
+      .filter { case (k,v) =>
+        v.size == 2 && // splitted tracks
+          v.map(_.tags).toSeq.distinct.length == 1 && // with same tags
+          v.map(_.uuid_track).intersect(parsedTrackUuidsToExcludeFromMerge).isEmpty
+      }.toMap
+
+    // define recursion to combine with next track
+    @tailrec
+    def combineNext(edge: EdgePrep): EdgePrep = {
+      val next = tracksByPoint.get(edge.linestring.getEndPoint)
+      if (next.isDefined) {
+        val nextTrack = next.get.filter(_.uuid_track != edge.tracks.last.uuid_track)
+        assert(nextTrack.size==1, s"Next track not found for ${edge.tracks.last.uuid_track}. Try to exclude it from merge by setting option trackUuidsToExcludeFromMerge. ($next)")
+        combineNext(edge.add(nextTrack.head))
+      } else edge
+    }
+
+    // create edges
+    // start with tracks where startPoint has no entry in tracksByPoint and combine with following tracks if possible
+    val startTracks = tracksBidir
+      .filter(t => !tracksByPoint.contains(t.linestring.getStartPoint))
+      .toBuffer
+    val mergedGeoms = mutable.Buffer[EdgePrep]()
+    while (startTracks.nonEmpty) {
+      val nextTrack = startTracks.head
+      val mergedGeom = combineNext(EdgePrep.from(nextTrack))
+      mergedGeoms.append(mergedGeom)
+      startTracks.remove(0)
+      val idx = startTracks.indexWhere(t => mergedGeom.tracks.last.uuid_track == t.uuid_track)
+      if (idx >= 0) startTracks.remove(idx)
+    }
+    mergedGeoms.toSeq
+  }
+
 }
 
 case class Edge(uuid_edge: String, geometry: Geometry, tracks: Seq[TrackRef], uuid_node_from: String, uuid_node_to: String, tags: Set[String])
@@ -94,7 +109,7 @@ case class EdgePrep(uuid_edge: String = UUID.randomUUID().toString, geometry: Ge
   def add(track: Track): EdgePrep = {
     val lastPosition = tracks.lastOption.map(_.position_to).getOrElse(0d)
     copy(
-      geometry = geometry.getFactory.createLineString(geometry.getCoordinates ++ track.geometry.getCoordinates.tail),
+      geometry = GeometryCalcUtils.mergeLineStrings(linestring, track.linestring),
       tracks = tracks :+ TrackRef(track.uuid_track, lastPosition, lastPosition + track.length, if(track.reversed) -1 else 1)
     )
   }

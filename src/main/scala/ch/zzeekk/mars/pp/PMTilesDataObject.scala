@@ -21,6 +21,8 @@ import org.apache.spark.sql.{DataFrame, Row, SparkSession}
 import org.locationtech.jts.geom.Geometry
 import org.locationtech.jts.geom.util.AffineTransformation
 
+import java.io.File
+import java.nio.file.Files
 import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
@@ -98,6 +100,9 @@ case class PMTilesDataObject(
 
     // create local PMTiles file
     logger.info(s"Creating local pmtiles file at $localPath")
+    val localFile = new File(localPath)
+    localFile.delete()
+    assert(!localFile.exists(), s"Could not delete $localFile. Is it still open somewhere?")
     val i = TileverseAccessor.writeTiles(
       dsTile.toLocalIterator().asScala,
       localPath, zoomAndFilter.keys.map(_.toInt).toSeq,
@@ -106,10 +111,17 @@ case class PMTilesDataObject(
       compressTiles
     )
 
-    // copy PMTiles file to hadoop if configured
+    // copy local file to hadoop if configured
     if (hadoopPath.isDefined) {
-      logger.info(s"Copying pmtiles file to ${hadoopPath.get}")
-      filesystem.copyFromLocalFile(new Path(localPath), hadoopPath.get)
+      logger.info(s"Copying flatgeobuf file to ${hadoopPath.get}")
+      val out = filesystem.create(hadoopPath.get, true)
+      val in = Files.newInputStream(localFile.toPath)
+      try {
+        in.transferTo(out)
+      } finally {
+        in.close()
+        out.close()
+      }
     }
 
     Map("nbOfTiles" -> i)

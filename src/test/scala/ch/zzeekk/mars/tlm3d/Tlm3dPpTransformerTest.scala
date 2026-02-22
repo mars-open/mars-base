@@ -1,6 +1,6 @@
 package ch.zzeekk.mars.tlm3d
 
-import ch.zzeekk.mars.ch.tlm3d.{EdgePoint, Tlm3dPpTransformer}
+import ch.zzeekk.mars.pp.{EdgePoint, Tlm3dPpTransformer}
 import org.locationtech.jts.geom.{Coordinate, CoordinateXYZM, GeometryFactory, PrecisionModel}
 import org.locationtech.jts.io.WKTReader
 import org.scalatest.funsuite.AnyFunSuite

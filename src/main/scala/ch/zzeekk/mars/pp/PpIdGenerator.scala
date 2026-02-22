@@ -65,6 +65,7 @@ object PpIdGenerator {
   def getToken(ppId: Long): String = {
     base32.encodeAsString(longToBytes(ppId))
       .take(13).patch(4, "-", 0).patch(9, "-", 0)
+      .toLowerCase
   }
 
   private def longToBytes(value: Long): Array[Byte] = {

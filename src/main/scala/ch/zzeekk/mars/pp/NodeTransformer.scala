@@ -14,13 +14,13 @@ import org.locationtech.jts.geom.{Geometry, GeometryFactory}
  */
 class NodeTransformer extends CustomDfsTransformer {
 
-  def transform(dsSlvTlm3dEdge: Dataset[Edge]): Dataset[Node] = {
-    implicit val session: SparkSession = dsSlvTlm3dEdge.sparkSession
+  def transform(dsEdge: Dataset[Edge]): Dataset[Node] = {
+    implicit val session: SparkSession = dsEdge.sparkSession
     import session.implicits._
 
     // extract start- and endpoint of each track, including angle
     val udfExtractStartEndPoint = udf(extractStartEndPoint _)
-    val dfNodePoints = dsSlvTlm3dEdge
+    val dfNodePoints = dsEdge
       .withColumn("points", udfExtractStartEndPoint($"geometry", $"uuid_node_from", $"uuid_node_to"))
       .withColumn("endpoint", explode(array($"points._1", $"points._2")))
       .select(

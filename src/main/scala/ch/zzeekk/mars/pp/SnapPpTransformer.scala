@@ -97,7 +97,7 @@ class SnapPpTransformer extends CustomDfsTransformer {
 
     Map(
       "slv-pp" -> dsPpAppend.toDF(),
-      "slv-pp-tlm3d" -> dfPpTlm3dOverwrite,
+      "slv-pp-mapping" -> dfPpTlm3dOverwrite,
       "pp-mapping"-> dsNewSnapped.toDF()
     )
   }

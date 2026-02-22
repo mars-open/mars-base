@@ -8,6 +8,6 @@ import java.util.UUID
 
 class UDFUuidFromString extends SparkUDFCreator {
   override def get(options: Map[String, String]): UserDefinedFunction = {
-    udf((s: String) => UUID.nameUUIDFromBytes(s.getBytes("UTF-8")).toString)
+    udf((s: Option[String]) => s.map(s => UUID.nameUUIDFromBytes(s.getBytes("UTF-8")).toString))
   }
 }

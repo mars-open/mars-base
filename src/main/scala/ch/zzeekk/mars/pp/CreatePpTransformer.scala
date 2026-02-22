@@ -14,22 +14,22 @@ import scala.collection.mutable
 class CreatePpTransformer extends CustomDfsTransformer {
 
   def transform(
-                 dsSlvTlm3dEdge: Dataset[Edge],
-                 dsSlvTlm3dNode: Dataset[Node],
+                 dsEdge: Dataset[Edge],
+                 dsNode: Dataset[Node],
                  ppDistance: Float = 0.25f,
                  wellDefinedPointDistance: Float = 25f,
                  nbOfPartitions: Int = 25,
                  srcCrs: String
                ): Dataset[RawPpWithMapping] = {
-    val session = dsSlvTlm3dEdge.sparkSession
+    val session = dsEdge.sparkSession
     import session.implicits._
 
     val udfCreatePointsAtFixedInterval = udf(Tlm3dPpTransformer.createPointsAtFixedInterval(ppDistance, wellDefinedPointDistance, srcCrs) _)
 
-    val dfNodes = dsSlvTlm3dNode
+    val dfNodes = dsNode
       .select($"uuid_node", $"edges")
 
-    val dfPoints = dsSlvTlm3dEdge.as("edge")
+    val dfPoints = dsEdge.as("edge")
       .join(dfNodes.as("nodeFrom"), $"edge.uuid_node_from"===$"nodeFrom.uuid_node")
       .withColumn("node_from_mapping", filter($"nodeFrom.edges", e => e("uuid_edge")===$"uuid_edge")(0))
       .join(dfNodes.as("nodeTo"), $"edge.uuid_node_to"===$"nodeTo.uuid_node")
@@ -72,18 +72,17 @@ object Tlm3dPpTransformer extends SmartDataLakeLogger {
       val length = coords.last.getM
       val linePoints = createLinePointsWithRadius(coords, wellDefinedPointDistance)
       val linePointsQueue = mutable.Queue(linePoints:_*)
-      val maxIdx = math.floor(length / interval).toInt // this is the last point given by the end of the line geometry
-      val intervalPoints = (1 until math.floor(length / interval).toInt).map { idx =>
-        // for the second half, calculate position from the end
-        val position = if (idx < maxIdx / 2) round5(idx * interval)
-        else round5(length - (maxIdx - idx) * interval)
+      val maxIdx = math.floor(length / interval).toInt // this is the 1-based index of the last point, given by the length of the line geometry
+      val remainingLength = length - maxIdx * interval
+      val intervalPoints = (1 to maxIdx).map { idx =>
+        // distribute remaining space equally at begin and end, start at interval/2 (idx - 0.5
+        val position = round5(remainingLength / 2 + (idx - 0.5) * interval)
         assert(position >= linePointsQueue(0).geometry.getM)
         while (position > linePointsQueue(1).geometry.getM) linePointsQueue.dequeue()
         assert(linePointsQueue.size >= 2)
         interpolatePoint(linePointsQueue(0), linePointsQueue(1), position, idx)
       }
-      val points = linePoints.head.copy(idx = Some(0)) +: intervalPoints :+ linePoints.last.copy(idx = Some(intervalPoints.length + 1))
-      val edgePoints = createEdgePointsWithGradeAndAzimuth(points, interval)
+      val edgePoints = createEdgePointsWithGradeAndAzimuth(intervalPoints, interval)
       edgePoints
     } else {
       logger.error(s"Edge $uuid_edge has less than 2 points.")
@@ -107,8 +106,8 @@ object Tlm3dPpTransformer extends SmartDataLakeLogger {
   def getZoom(pos: Double, length: Double, interval: Double): Short = {
     val idx = math.floor(pos / interval).toInt
     if (pos == 0d || pos == length) 0
-    else if (idx % (10/interval) == 0) 1
-    else if (idx % (1/interval) == 0) 2
+    else if (idx % (10/interval) == 0) 1 // every 40th point (if interval=0.25)
+    else if (idx % (1/interval) == 0) 2 // every point 4th point (if interval=0.25)
     else 3
   }
 

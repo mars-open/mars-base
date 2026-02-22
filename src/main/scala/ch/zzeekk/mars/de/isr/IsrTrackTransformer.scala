@@ -1,21 +1,27 @@
 package ch.zzeekk.mars.de.isr
 
 import ch.zzeekk.mars.pp.Track
+import ch.zzeekk.mars.pp.utils.GeometryCalcUtils
 import io.smartdatalake.workflow.action.spark.customlogic.CustomDfsTransformer
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.sedona_sql.expressions.st_functions._
 import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
+import org.locationtech.jts.geom.Geometry
 
 /**
  * Creating standardized tracks for further processing.
  */
 class IsrTrackTransformer extends CustomDfsTransformer {
 
-  def transform(dfSlvDeIsrStreckenabschnitt: DataFrame): Map[String, DataFrame] = {
+  def transform(dfSlvDeIsrStreckenabschnitt: DataFrame): Dataset[Track] = {
     implicit val session: SparkSession = dfSlvDeIsrStreckenabschnitt.sparkSession
     import session.implicits._
 
+    val udfSplitAcuteLineStrings = udf((geometry: Geometry) => GeometryCalcUtils.splitAcuteGeometry(geometry))
+
     val dsTrack = dfSlvDeIsrStreckenabschnitt
+      .withColumn("geometry", explode(ST_Dump($"geometry"))) // explode MULTILINESTRING into LINESTRINGs
+      .withColumn("geometry", explode(udfSplitAcuteLineStrings($"geometry"))) // split LINESTRINGs at acute angles into multiple LINESTRINGs
       .where(ST_NumPoints($"geometry") > 1)
       .select(
         $"uuid".as("uuid_track"),
@@ -29,7 +35,8 @@ class IsrTrackTransformer extends CustomDfsTransformer {
         )).as("tags")
       ).as[Track]
 
-    Map("track" -> dsTrack.toDF)
+    dsTrack
   }
+
 
 }

@@ -4,7 +4,7 @@ import org.geotools.api.referencing.operation.MathTransform
 import org.geotools.geometry.jts.JTS
 import org.geotools.referencing.CRS
 import org.locationtech.jts.algorithm.Angle
-import org.locationtech.jts.geom.{Coordinate, CoordinateXYZM, Geometry, GeometryFactory, PrecisionModel}
+import org.locationtech.jts.geom._
 
 import scala.collection.mutable
 
@@ -47,6 +47,22 @@ object GeometryCalcUtils {
   }
 
   /**
+   * Checks if start Azimuth of geom2 is an extension of end Azimuth of geom1, i.e. if the angle between them is smaller than 45°.
+   */
+  def isExtension(geom1: LineString, geom2: LineString): Boolean ={
+    angleDiff(geom1, geom2) < math.Pi / 4
+  }
+
+  /**
+   * Calculate angle between end of geom1 and beginning of geom2
+   */
+  def angleDiff(geom1: LineString, geom2: LineString): Double ={
+    val azimuth1 = calcAzimuth(geom1.getCoordinates.apply(geom1.getCoordinates.length - 2), geom1.getCoordinates.last)
+    val azimuth2 = calcAzimuth(geom2.getCoordinates.head, geom2.getCoordinates.apply(1))
+    Angle.diff(azimuth1, azimuth2)
+  }
+
+  /**
    * Calculates the position of each Coordinate in a line represented as List of Coordinates.
    * The position is stored as the measure value of the Coordinates.
    */
@@ -79,6 +95,29 @@ object GeometryCalcUtils {
       interpolateVal(c1.z, c2.z, fraction),
       pos
     )
+  }
+
+  def splitAcuteGeometry(
+                          geometry: Geometry,
+                          maxAngle: Double = math.Pi / 3,
+                          factoryMethod: (Array[Coordinate], GeometryFactory) => Geometry = (coords, factory) => factory.createLineString(coords)
+                        ): Seq[Geometry] = {
+    val (segments, currSegment) = geometry.getCoordinates.foldLeft(Vector[Vector[Coordinate]](), Vector[Coordinate]()) {
+      case ((segments, currSegment), coord) =>
+        if (currSegment.size < 2) (segments, currSegment :+ coord)
+        else {
+          val angle = Angle.angleBetween(currSegment(currSegment.size - 2), currSegment.last, coord)
+          if (angle <= maxAngle) (segments :+ currSegment, Vector(currSegment.last) :+ coord)
+          else (segments, currSegment :+ coord)
+        }
+    }
+    (segments :+ currSegment)
+      .map(segment => factoryMethod(segment.toArray, geometry.getFactory))
+  }
+
+  def mergeLineStrings(lineString1: LineString, lineString2: LineString): LineString = {
+    assert(lineString1.getEndPoint.equals(lineString2.getStartPoint), s"LineStrings cannot be merged as they are not connected: ${lineString1.getEndPoint} != ${lineString2.getStartPoint}")
+    lineString1.getFactory.createLineString(lineString1.getCoordinates ++ lineString2.getCoordinates.tail)
   }
 
   def getFractionBetweenCoords(c1: Coordinate, c2: Coordinate, pos: Double): Double = {

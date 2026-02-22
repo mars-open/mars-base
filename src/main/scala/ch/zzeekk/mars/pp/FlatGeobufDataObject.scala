@@ -129,6 +129,7 @@ case class FlatGeobufDataObject(
     featureStore.setTransaction(transaction)
     featureStore.addFeatures(featureCollection)
     transaction.commit()
+    transaction.close()
     dataStore.dispose()
 
     // fix with ogr2ogr workaround if configured
@@ -137,13 +138,21 @@ case class FlatGeobufDataObject(
       Files.move(localFile.toPath, localFileOrg.toPath, StandardCopyOption.REPLACE_EXISTING)
       val cmd = Seq("ogr2ogr", "-f", "FlatGeobuf", localFile.toString, localFileOrg.toString, "-skipfailures", "-lco", "SPATIAL_INDEX=YES")
       import scala.sys.process._
-      if (cmd.! == 0) logger.info("OGR has rewritten FGB-File") else logger.info("OGR failed rewriting FGB-File")
+      if (cmd.! == 0) logger.info("OGR has rewritten FGB-File")
+      else throw new RuntimeException("OGR failed rewriting FGB-File")
     }
 
     // copy local file to hadoop if configured
     if (hadoopPath.isDefined) {
       logger.info(s"Copying flatgeobuf file to ${hadoopPath.get}")
-      filesystem.copyFromLocalFile(new Path(localPath), hadoopPath.get)
+      val out = filesystem.create(hadoopPath.get, true)
+      val in = Files.newInputStream(localFile.toPath)
+      try {
+        in.transferTo(out)
+      } finally {
+        in.close()
+        out.close()
+      }
     }
 
     Map("nbOfGeometries" -> featureCollection.size())

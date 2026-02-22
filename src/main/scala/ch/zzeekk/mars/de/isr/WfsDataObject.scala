@@ -8,8 +8,6 @@ import io.smartdatalake.util.hdfs.PartitionValues
 import io.smartdatalake.util.webservice.SttpUtil.{SttpRequestExtension, createDefaultBackend}
 import io.smartdatalake.util.webservice.{HttpProxyConfig, HttpTimeoutConfig, SttpUtil}
 import io.smartdatalake.workflow.ActionPipelineContext
-import io.smartdatalake.workflow.dataframe.GenericSchema
-import io.smartdatalake.workflow.dataframe.spark.{SparkSchema, SparkSubFeed}
 import io.smartdatalake.workflow.dataobject.{CanCreateSparkDataFrame, DataObject, DataObjectMetadata}
 import org.apache.sedona.common.Functions
 import org.apache.sedona.sql.UDT.UdtRegistrator
@@ -26,7 +24,7 @@ import scala.xml.{Elem, Node, XML}
 
 /**
  * Reads a layer from a WFS (WebFeatureService) GIS Endpoint
- * Cares for cutting layer boundaries into smaller squares, using 5% overlap to avoid loosing features.
+ * Cares for cutting layer boundaries into smaller squares, using configurable overlap to avoid loosing features.
  * WFS Service must support output format Json.
  *
  * @param baseUrl Base URL of the WFS endpoint, e.g. http://example.com/geoserver/wfs?service=wfs&version=1.3.0
@@ -38,6 +36,7 @@ import scala.xml.{Elem, Node, XML}
  *             Default is to retrieve bounding box from WFS FeatureType definition.
  * @param tgtCrs Optional target coordinate reference system passed to the WFS service.
  *               Default is EPSG:4326 (WGS84).
+ * @param overlapPct overlap as percentage used when creating smaller square boundaries for WFS queries.
  * @param parallelize Number of tasks to create, that are potentially processed in parallel.
  * @param limit Optional limit of features to read for testing purposes.
  */
@@ -48,6 +47,7 @@ case class WfsDataObject(
                           s2CellLevel: Option[Int] = Some(10),
                           bbox: Option[WGS84BBox] = None,
                           tgtCrs: String = "EPSG:4326",
+                          overlapPct: Float = 0.01f,
                           parallelize: Int = 1,
                           limit: Option[Int] = None,
                           proxy: Option[HttpProxyConfig] = None,
@@ -138,7 +138,7 @@ case class WfsDataObject(
           .addParam("request", "getFeature")
           .addParam("typeNames", feature)
           .addParam("srsName", tgtCrs)
-          .addParam("bbox", req.getBboxParam(0.05, tgtCrs)) // specify CRS for WFS 1.1.0 and higher
+          .addParam("bbox", req.getBboxParam(overlapPct, tgtCrs)) // specify CRS for WFS 1.1.0 and higher
           .addParam("outputFormat", "application/json")
         val json = getContent(url, "application/json", s"getFeature s2id=${req.s2id.getOrElse("full")}")
         WfsResponse(req.s2id, json)
