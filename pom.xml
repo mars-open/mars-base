@@ -18,6 +18,12 @@
     <version>1.0.0-SNAPSHOT</version>
 
     <name>MARS Base</name>
+    <description>Maintenance Applications for Railway Systems</description>
+    <inceptionYear>2026</inceptionYear>
+    <organization>
+        <name>MARS</name>
+        <url>https://github.com/mars-open</url>
+    </organization>
 
     <properties>
         <encoding>UTF-8</encoding>
@@ -33,6 +39,13 @@
         <spark-temporalquery.version>3.0.0</spark-temporalquery.version>
         <spark.version>3.5.7</spark.version>
     </properties>
+
+    <licenses>
+        <license>
+            <name>GNU General Public License (GPL) version 3</name>
+            <url>https://www.gnu.org/licenses/gpl-3.0.html</url>
+        </license>
+    </licenses>
 
     <profiles>
 
@@ -241,6 +254,18 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
+            </plugin>
+
+            <!-- Checks whether source files have the specified license header. -->
+            <plugin>
+                <groupId>com.mycila</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <configuration>
+                    <properties>
+                        <owner>zzeekk</owner>
+                        <email>zach.kull@gmail.com</email>
+                    </properties>
+                </configuration>
             </plugin>
 
             <!-- generate version info properties file -->
