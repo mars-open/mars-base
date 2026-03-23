@@ -1,0 +1,109 @@
+name: Build, Run and Deploy UI
+
+on:
+  push:
+    #The workflow runs for any changes that happen, except in ignored paths.
+    paths-ignore:
+      - 'viz/state/**'
+      - 'viz/schemas/**'
+    branches:
+      - master
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+  # Run every Monday at 5:00
+  schedule:
+    - cron: '0 5 * * 1'
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+    contents: write
+    pages: write
+    id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build_and_run:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v5
+      with:
+        token: ${{ secrets.PAT_ACTIONS }}
+        fetch-depth: 0
+
+    - name: Set up Java JDK
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: Config
+      run:  |
+        echo JAVA_OPTIONS="--add-opens=java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens=java.base/jdk.internal.ref=ALL-UNNAMED --add-opens=java.base/sun.nio.cs=ALL-UNNAMED --add-opens=java.base/sun.security.action=ALL-UNNAMED --add-opens=java.base/sun.util.calendar=ALL-UNNAMED" >> $GITHUB_ENV
+
+    - name: Build using latest SDLB Snapshot
+      # using versions:display-parent-updates instead of versions:update-parent as the later can not filter to include only Snapshots from develop, but not feature branches...
+      run: |
+        LATEST_VERSION_OUT=`mvn -B versions:display-parent-updates -DallowSnapshots '-Dmaven.version.ignore=.*\..*\..*-.*-SNAPSHOT'`
+        if [ $? -eq 0 ]; then LATEST_VERSION=`echo $LATEST_VERSION_OUT | sed -n 's/.*\-> \(.*\)/\1/p'`; fi
+        if [ -n "$LATEST_VERSION" ]; then mvn -B versions:update-parent -DparentVersion=$LATEST_VERSION -DgenerateBackupPoms=false; fi
+        mvn -B clean package
+
+    - name: Run Getting Started
+      run: mvn -B exec:exec -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.app.SparkSmartDataLakeBuilder --feed-sel tlm3d,pp,ch --config ./config,./envConfig/ci.conf --state-path viz/state -n getting-started --parallelism 2"
+
+    - name: Run Schema and Statistics export
+      run: mvn -B exec:exec -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.meta.configexporter.DataObjectSchemaExporter --config ./config,./envConfig/ci.conf --exportPath viz/schema"
+
+    - name: Git Config
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+
+    - name: Commit and Push New State File
+      run: |
+        git pull
+        git add viz/state/
+        git commit -m "Update state file"
+        git push
+
+    - name: Run Export config with additional documentation
+      id: config-json-export
+      if: steps.getting-started1.outcome == 'success' || steps.getting-started2.outcome == 'success'
+      run: mvn -B exec:exec -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.meta.configexporter.ConfigJsonExporter --config ./config,./envConfig/dev.conf --filename viz/exportedConfig.json --descriptionPath viz/description"
+
+    - name: Setup Pages
+      uses: actions/configure-pages@v5
+
+    - name: Download and Unzip Latest UI Snapshot
+      run: wget https://nightly.link/smart-data-lake/sdl-visualization/workflows/build/develop/sdl-visualizer.zip && unzip -n sdl-visualizer.zip -d ./viz
+
+    - name: Run build_index.sh script to create state index
+      run: |
+          chmod +x ./build_index.sh  
+          ./build_index.sh ./state
+      working-directory: viz/
+
+    - name: Remove .venv Folder
+      run: rm -rf viz/.venv/
+
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        # Upload vizualizer repository
+        path: 'viz'
+
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
