@@ -48,16 +48,12 @@ jobs:
         java-version: '17'
 
     - name: Config
-      run:  |
+      run: |
         echo JAVA_OPTIONS="--add-opens=java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.nio=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens=java.base/jdk.internal.ref=ALL-UNNAMED --add-opens=java.base/sun.nio.cs=ALL-UNNAMED --add-opens=java.base/sun.security.action=ALL-UNNAMED --add-opens=java.base/sun.util.calendar=ALL-UNNAMED" >> $GITHUB_ENV
 
     - name: Build using latest SDLB Snapshot
       # using versions:display-parent-updates instead of versions:update-parent as the later can not filter to include only Snapshots from develop, but not feature branches...
-      run: |
-        LATEST_VERSION_OUT=`mvn -B versions:display-parent-updates -DallowSnapshots '-Dmaven.version.ignore=.*\..*\..*-.*-SNAPSHOT'`
-        if [ $? -eq 0 ]; then LATEST_VERSION=`echo $LATEST_VERSION_OUT | sed -n 's/.*\-> \(.*\)/\1/p'`; fi
-        if [ -n "$LATEST_VERSION" ]; then mvn -B versions:update-parent -DparentVersion=$LATEST_VERSION -DgenerateBackupPoms=false; fi
-        mvn -B clean package
+      run: mvn -B clean package
 
     - name: Run Getting Started
       run: mvn -B exec:exec -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.app.SparkSmartDataLakeBuilder --feed-sel tlm3d,pp,ch --config ./config,./envConfig/ci.conf --state-path viz/state -n getting-started --parallelism 2"
