@@ -39,7 +39,6 @@ jobs:
     - name: Checkout Repository
       uses: actions/checkout@v5
       with:
-        token: ${{ secrets.PAT_ACTIONS }}
         fetch-depth: 0
 
     - name: Set up Java JDK
@@ -79,8 +78,6 @@ jobs:
         git push
 
     - name: Run Export config with additional documentation
-      id: config-json-export
-      if: steps.getting-started1.outcome == 'success' || steps.getting-started2.outcome == 'success'
       run: mvn -B exec:exec -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.meta.configexporter.ConfigJsonExporter --config ./config,./envConfig/dev.conf --filename viz/exportedConfig.json --descriptionPath viz/description"
 
     - name: Setup Pages
