@@ -53,13 +53,13 @@ jobs:
 
     - name: Build using latest SDLB Snapshot
       # using versions:display-parent-updates instead of versions:update-parent as the later can not filter to include only Snapshots from develop, but not feature branches...
-      run: mvn -B clean package
+      run: mvn -B clean package -Pscala-2.13
 
     - name: Run Getting Started
-      run: mvn -B exec:exec -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.app.SparkSmartDataLakeBuilder --feed-sel tlm3d,pp,ch --config ./config,./envConfig/ci.conf --state-path viz/state -n getting-started --parallelism 2"
+      run: mvn -B exec:exec -Pscala-2.13 -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.app.SparkSmartDataLakeBuilder --feed-sel tlm3d,pp,ch --config ./config,./envConfig/ci.conf --state-path viz/state -n getting-started --parallelism 2"
 
     - name: Run Schema and Statistics export
-      run: mvn -B exec:exec -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.meta.configexporter.DataObjectSchemaExporter --config ./config,./envConfig/ci.conf --exportPath viz/schema"
+      run: mvn -B exec:exec -Pscala-2.13 -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.meta.configexporter.DataObjectSchemaExporter --config ./config,./envConfig/ci.conf --exportPath viz/schema"
 
     - name: Git Config
       run: |
@@ -74,7 +74,7 @@ jobs:
         git push
 
     - name: Run Export config with additional documentation
-      run: mvn -B exec:exec -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.meta.configexporter.ConfigJsonExporter --config ./config,./envConfig/dev.conf --filename viz/exportedConfig.json --descriptionPath viz/description"
+      run: mvn -B exec:exec -Pscala-2.13 -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.meta.configexporter.ConfigJsonExporter --config ./config,./envConfig/dev.conf --filename viz/exportedConfig.json --descriptionPath viz/description"
 
     - name: Setup Pages
       uses: actions/configure-pages@v5
