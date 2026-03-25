@@ -32,6 +32,7 @@ class Tlm3dNodeTransformerTest extends AnyFunSuite {
   val nodeTransformer = new NodeTransformer()
 
   test("Classify simply right switch") {
+    // in LV95 coordinates, where x is east-west and y is south-north (e.g. y is increasing in north direction)
 
     val pCenter = point(0, 0, 0, 0)
     val p1 = point(-1, 0, 0, 0)
@@ -50,7 +51,7 @@ class Tlm3dNodeTransformerTest extends AnyFunSuite {
       uuid_edge = "e22", edge_length = 30
     )
     val (switch, edgeMapping) = nodeTransformer.classifySimpleSwitch(Seq(e1, e2main, e2turnout)).get
-    val switchExpected = Switch("SS", Some("R"), Some(1))
+    val switchExpected = Switch("SS", Some("L"), Some(1))
     assert(switch == switchExpected)
     val edgeMappingExpected = Seq(
       EdgeMapping("e1", 0, None, None, None),
@@ -81,7 +82,7 @@ class Tlm3dNodeTransformerTest extends AnyFunSuite {
 
     val (switch, edgeMapping) = nodeTransformer.classifySimpleSwitch(Seq(e1, e2main, e2turnout)).get
 
-    val switchExpected = Switch("SS", Some("LR"), Some(2))
+    val switchExpected = Switch("SS", Some("RL"), Some(2))
     assert(switch == switchExpected)
 
     val edgeMappingExpected = Seq(
@@ -114,7 +115,7 @@ class Tlm3dNodeTransformerTest extends AnyFunSuite {
 
     val (switch, edgeMapping) = nodeTransformer.classifySimpleSwitch(Seq(e1, e2main, e2turnout)).get
 
-    val switchExpected = Switch("SS", Some("LL"), Some(1))
+    val switchExpected = Switch("SS", Some("RR"), Some(1))
     assert(switch == switchExpected)
 
     val edgeMappingExpected = Seq(

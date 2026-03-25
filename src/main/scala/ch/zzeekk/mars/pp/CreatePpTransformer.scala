@@ -93,7 +93,7 @@ object Tlm3dPpTransformer extends SmartDataLakeLogger {
       val maxIdx = math.floor(length / interval).toInt // this is the 1-based index of the last point, given by the length of the line geometry
       val remainingLength = length - maxIdx * interval
       val intervalPoints = (1 to maxIdx).map { idx =>
-        // distribute remaining space equally at begin and end, start at interval/2 (idx - 0.5
+        // distribute remaining space equally at begin and end, start at interval/2 (idx - 0.5)
         val position = round5(remainingLength / 2 + (idx - 0.5) * interval)
         assert(position >= linePointsQueue(0).geometry.getM)
         while (position > linePointsQueue(1).geometry.getM) linePointsQueue.dequeue()

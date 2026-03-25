@@ -32,8 +32,8 @@ class PpIdGeneratorTest extends AnyFunSuite {
     val id2 = PpIdGenerator.getH3idL15(2600200.90, 1200191.64, "EPSG:2056")
     println(s"h3id=$id1 baseAndDigits=${PpIdGenerator.getBaseAndDigits(id1)} token=${PpIdGenerator.getToken(id1)}")
     println(s"h3id=$id2 baseAndDigits=${PpIdGenerator.getBaseAndDigits(id2)} token=${PpIdGenerator.getToken(id2)}")
-    assert(id1 >> 8 == id2 >> 8)
-    assert(PpIdGenerator.getBaseAndDigits(id1) >> 8 == PpIdGenerator.getBaseAndDigits(id2) >> 8)
+    assert(id1 >> 12 == id2 >> 12)
+    assert(PpIdGenerator.getBaseAndDigits(id1) >> 10 == PpIdGenerator.getBaseAndDigits(id2) >> 10)
     assert(PpIdGenerator.getToken(id1).take(11) == PpIdGenerator.getToken(id2).take(11))
   }
 

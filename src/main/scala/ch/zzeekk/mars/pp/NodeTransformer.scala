@@ -170,7 +170,7 @@ class NodeTransformer extends CustomDfsTransformer {
   def getSubTypeFromTracks(azimuth: Double, tracks: Seq[EdgeRef]): Option[String] = {
     val subType = tracks
       .map(t => Angle.normalize(t.endpoint.azimuth - azimuth))
-      .filter(t => Math.abs(t) >= Math.PI/180) // smaller than 1grad
+      .filter(t => Math.abs(t) >= Math.PI/180) // bigger than 1grad
       .sorted
       .map(diff => if (diff < 0) 'R' else 'L')
       .mkString
