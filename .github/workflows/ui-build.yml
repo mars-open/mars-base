@@ -65,7 +65,7 @@ jobs:
       env:
         S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
         S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
-      run: mvn -B exec:exec -Pscala-2.13 -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.app.SparkSmartDataLakeBuilder --feed-sel tlm3d,pp,ch --config ./config,./envConfig/ci.conf --state-path viz/state -n getting-started --parallelism 2"
+      run: mvn -B exec:exec -Pscala-2.13 -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.app.SparkSmartDataLakeBuilder --feed-sel tlm3d-ext,tlm3d,pp,ch --config ./config,./envConfig/ci.conf --state-path viz/state -n create-pp --parallelism 2"
 
     - name: Run Schema and Statistics export
       run: mvn -B exec:exec -Pscala-2.13 -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.meta.configexporter.DataObjectSchemaExporter --config ./config,./envConfig/ci.conf --exportPath viz/schema"
