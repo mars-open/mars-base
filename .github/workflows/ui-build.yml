@@ -113,7 +113,7 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v4
       with:
-        # Upload vizualizer directory
+        # Upload visualizer directory
         path: 'viz'
 
     - name: Deploy to GitHub Pages

@@ -19,3 +19,4 @@ viz/*.txt
 viz/*.png
 viz/*.org
 viz/exportedConfig.json
+!viz/state
