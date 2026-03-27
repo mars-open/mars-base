@@ -14,5 +14,6 @@
     "background_color": "#ffffff",
     "backendConfig": "local;./state",
     "baseUrl": "./",
-    "env": "ci"
+    "env": "ci",
+    "configSourceUrl": "https://github.com/mars-open/mars-base/blob/master/config/{filename}#L{lineNumber}"
 }
