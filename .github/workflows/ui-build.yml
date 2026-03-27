@@ -96,7 +96,7 @@ jobs:
       run: mvn -B exec:exec -Pscala-2.13 -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.meta.configexporter.ConfigJsonExporter --config ./config,./envConfig/ci.conf --filename viz/exportedConfig.json --descriptionPath viz/description"
 
     - name: Setup Pages
-      uses: actions/configure-pages@v6
+      uses: actions/configure-pages@v5
 
     - name: Download and Unzip Latest UI Snapshot
       run: wget https://nightly.link/smart-data-lake/sdl-visualization/workflows/build/develop/sdl-visualizer.zip && unzip -n sdl-visualizer.zip -d ./viz
