@@ -20,3 +20,4 @@ viz/*.png
 viz/*.org
 viz/exportedConfig.json
 !viz/state
+!viz/README.md
