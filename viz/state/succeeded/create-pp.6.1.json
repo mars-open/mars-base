@@ -1,0 +1,456 @@
+{
+  "appConfig" : {
+    "feedSel" : "tlm3d-ext,tlm3d,pp,ch",
+    "applicationName" : "create-pp",
+    "configuration" : [ "./config", "./envConfig/ci.conf" ],
+    "configurationValueOverwrite" : { },
+    "master" : "local[*]",
+    "parallelism" : 2,
+    "statePath" : "viz/state",
+    "streaming" : false
+  },
+  "runId" : 6,
+  "attemptId" : 1,
+  "runStartTime" : "2026-03-28T08:15:21.036Z",
+  "attemptStartTime" : "2026-03-28T08:15:21.036Z",
+  "actionsState" : {
+    "load-gld-ch-edge-fgb" : {
+      "executionId" : {
+        "type" : "SDLExecutionId",
+        "runId" : 6,
+        "attemptId" : 1
+      },
+      "state" : "SUCCEEDED",
+      "startTstmpPrepare" : "2026-03-28T08:15:24.068Z",
+      "endTstmpPrepare" : "2026-03-28T08:15:24.069Z",
+      "startTstmpInit" : "2026-03-28T08:15:44.429Z",
+      "endTstmpInit" : "2026-03-28T08:15:44.449Z",
+      "startTstmp" : "2026-03-28T08:16:17.008Z",
+      "endTstmp" : "2026-03-28T08:16:42.201Z",
+      "duration" : "PT25.192627864S",
+      "results" : [ {
+        "type" : "SparkSubFeed",
+        "dataObjectId" : "gld-ch-edge-fgb",
+        "partitionValues" : [ ],
+        "isDAGStart" : false,
+        "isSkipped" : false,
+        "isDummy" : false,
+        "metrics" : {
+          "nbOfGeometries" : 38801
+        }
+      } ],
+      "dataObjectsState" : [ ],
+      "inputIds" : [ "slv-tlm3d-edge" ],
+      "outputIds" : [ "gld-ch-edge-fgb" ]
+    },
+    "load-gld-ch-node-fgb" : {
+      "executionId" : {
+        "type" : "SDLExecutionId",
+        "runId" : 6,
+        "attemptId" : 1
+      },
+      "state" : "SUCCEEDED",
+      "startTstmpPrepare" : "2026-03-28T08:15:24.072Z",
+      "endTstmpPrepare" : "2026-03-28T08:15:24.073Z",
+      "startTstmpInit" : "2026-03-28T08:15:44.721Z",
+      "endTstmpInit" : "2026-03-28T08:15:44.738Z",
+      "startTstmp" : "2026-03-28T08:16:42.236Z",
+      "endTstmp" : "2026-03-28T08:17:45.600Z",
+      "duration" : "PT1M3.363699706S",
+      "results" : [ {
+        "type" : "SparkSubFeed",
+        "dataObjectId" : "gld-ch-node-fgb",
+        "partitionValues" : [ ],
+        "isDAGStart" : false,
+        "isSkipped" : false,
+        "isDummy" : false,
+        "metrics" : {
+          "nbOfGeometries" : 31284
+        }
+      } ],
+      "dataObjectsState" : [ ],
+      "inputIds" : [ "slv-tlm3d-node" ],
+      "outputIds" : [ "gld-ch-node-fgb" ]
+    },
+    "create-slv-tlm3d-edge" : {
+      "executionId" : {
+        "type" : "SDLExecutionId",
+        "runId" : 6,
+        "attemptId" : 1
+      },
+      "state" : "SUCCEEDED",
+      "startTstmpPrepare" : "2026-03-28T08:15:24.063Z",
+      "endTstmpPrepare" : "2026-03-28T08:15:24.064Z",
+      "startTstmpInit" : "2026-03-28T08:15:43.890Z",
+      "endTstmpInit" : "2026-03-28T08:15:44.125Z",
+      "startTstmp" : "2026-03-28T08:16:02.652Z",
+      "endTstmp" : "2026-03-28T08:16:15.727Z",
+      "duration" : "PT13.07498719S",
+      "results" : [ {
+        "type" : "SparkSubFeed",
+        "dataObjectId" : "slv-tlm3d-edge",
+        "partitionValues" : [ ],
+        "isDAGStart" : false,
+        "isSkipped" : false,
+        "isDummy" : false,
+        "metrics" : {
+          "count" : 38801,
+          "num_tasks" : 4,
+          "rows_inserted" : 38801,
+          "records_written" : 38801,
+          "bytes_written" : 16571064
+        }
+      } ],
+      "dataObjectsState" : [ ],
+      "inputIds" : [ "slv-tlm3d-track" ],
+      "outputIds" : [ "slv-tlm3d-edge" ]
+    },
+    "create-slv-tlm3d-pp" : {
+      "executionId" : {
+        "type" : "SDLExecutionId",
+        "runId" : 6,
+        "attemptId" : 1
+      },
+      "state" : "SUCCEEDED",
+      "startTstmpPrepare" : "2026-03-28T08:15:24.070Z",
+      "endTstmpPrepare" : "2026-03-28T08:15:24.071Z",
+      "startTstmpInit" : "2026-03-28T08:15:44.451Z",
+      "endTstmpInit" : "2026-03-28T08:15:44.719Z",
+      "startTstmp" : "2026-03-28T08:16:19.977Z",
+      "endTstmp" : "2026-03-28T08:17:47.308Z",
+      "duration" : "PT1M27.331422338S",
+      "results" : [ {
+        "type" : "SparkSubFeed",
+        "dataObjectId" : "slv-tlm3d-pp",
+        "partitionValues" : [ ],
+        "isDAGStart" : false,
+        "isSkipped" : false,
+        "isDummy" : false,
+        "metrics" : {
+          "count" : 49885598,
+          "num_tasks" : 25,
+          "count#mainInput" : 31284,
+          "rows_inserted" : 49885598,
+          "count#slv-tlm3d-edge" : 38801,
+          "count#slv-tlm3d-node" : 31284,
+          "records_written" : 49885598,
+          "bytes_written" : 1260321752
+        }
+      } ],
+      "dataObjectsState" : [ ],
+      "inputIds" : [ "slv-tlm3d-edge", "slv-tlm3d-node" ],
+      "outputIds" : [ "slv-tlm3d-pp" ]
+    },
+    "create-slv-tlm3d-node" : {
+      "executionId" : {
+        "type" : "SDLExecutionId",
+        "runId" : 6,
+        "attemptId" : 1
+      },
+      "state" : "SUCCEEDED",
+      "startTstmpPrepare" : "2026-03-28T08:15:24.065Z",
+      "endTstmpPrepare" : "2026-03-28T08:15:24.066Z",
+      "startTstmpInit" : "2026-03-28T08:15:44.127Z",
+      "endTstmpInit" : "2026-03-28T08:15:44.392Z",
+      "startTstmp" : "2026-03-28T08:16:15.744Z",
+      "endTstmp" : "2026-03-28T08:16:19.952Z",
+      "duration" : "PT4.208303895S",
+      "results" : [ {
+        "type" : "SparkSubFeed",
+        "dataObjectId" : "slv-tlm3d-node",
+        "partitionValues" : [ ],
+        "isDAGStart" : false,
+        "isSkipped" : false,
+        "isDummy" : false,
+        "metrics" : {
+          "count" : 31284,
+          "num_tasks" : 4,
+          "count#mainInput" : 38801,
+          "rows_inserted" : 31284,
+          "count#slv-tlm3d-edge" : 38801,
+          "records_written" : 31284,
+          "bytes_written" : 4944532
+        }
+      } ],
+      "dataObjectsState" : [ ],
+      "inputIds" : [ "slv-tlm3d-edge" ],
+      "outputIds" : [ "slv-tlm3d-node" ]
+    },
+    "load-gld-ch-pp-pmtiles" : {
+      "executionId" : {
+        "type" : "SDLExecutionId",
+        "runId" : 6,
+        "attemptId" : 1
+      },
+      "state" : "SUCCEEDED",
+      "startTstmpPrepare" : "2026-03-28T08:15:28.446Z",
+      "endTstmpPrepare" : "2026-03-28T08:15:28.483Z",
+      "startTstmpInit" : "2026-03-28T08:15:45.686Z",
+      "endTstmpInit" : "2026-03-28T08:15:45.767Z",
+      "startTstmp" : "2026-03-28T08:23:14.244Z",
+      "endTstmp" : "2026-03-28T08:30:42.651Z",
+      "duration" : "PT7M28.407365731S",
+      "results" : [ {
+        "type" : "SparkSubFeed",
+        "dataObjectId" : "gld-ch-pp-pmtiles",
+        "partitionValues" : [ ],
+        "isDAGStart" : false,
+        "isSkipped" : false,
+        "isDummy" : false,
+        "metrics" : {
+          "nbOfTiles" : 182489
+        }
+      } ],
+      "dataObjectsState" : [ ],
+      "inputIds" : [ "slv-pp", "slv-pp-mapping", "slv-tlm3d-pp" ],
+      "outputIds" : [ "gld-ch-pp-pmtiles" ]
+    },
+    "create-pp" : {
+      "executionId" : {
+        "type" : "SDLExecutionId",
+        "runId" : 6,
+        "attemptId" : 1
+      },
+      "state" : "SUCCEEDED",
+      "startTstmpPrepare" : "2026-03-28T08:15:24.076Z",
+      "endTstmpPrepare" : "2026-03-28T08:15:28.404Z",
+      "startTstmpInit" : "2026-03-28T08:15:44.774Z",
+      "endTstmpInit" : "2026-03-28T08:15:45.574Z",
+      "startTstmp" : "2026-03-28T08:17:47.319Z",
+      "endTstmp" : "2026-03-28T08:23:14.215Z",
+      "duration" : "PT5M26.896110984S",
+      "results" : [ {
+        "type" : "SparkSubFeed",
+        "dataObjectId" : "slv-pp",
+        "partitionValues" : [ ],
+        "isDAGStart" : false,
+        "isSkipped" : false,
+        "isDummy" : false,
+        "metrics" : {
+          "count" : 49234914,
+          "num_output_bytes" : 2519295737,
+          "count#slv-pp" : 0,
+          "num_tasks" : 400,
+          "rows_inserted" : 49234914,
+          "num_files" : 400,
+          "records_written" : 49234914,
+          "count#slv-tlm3d-pp" : 48149277,
+          "bytes_written" : 2519295737
+        }
+      }, {
+        "type" : "SparkSubFeed",
+        "dataObjectId" : "slv-pp-mapping",
+        "partitionValues" : [ ],
+        "isDAGStart" : false,
+        "isSkipped" : false,
+        "isDummy" : false,
+        "metrics" : {
+          "count" : 49885598,
+          "num_output_bytes" : 796447884,
+          "count#slv-pp" : 0,
+          "num_tasks" : 400,
+          "count#mainInput" : 48149277,
+          "rows_inserted" : 49885598,
+          "num_files" : 400,
+          "records_written" : 49885598,
+          "count#slv-tlm3d-pp" : 48149277,
+          "bytes_written" : 796447884
+        }
+      } ],
+      "dataObjectsState" : [ ],
+      "inputIds" : [ "slv-tlm3d-pp", "slv-pp" ],
+      "outputIds" : [ "slv-pp", "slv-pp-mapping" ]
+    },
+    "load-slv-tlm3d-track" : {
+      "executionId" : {
+        "type" : "SDLExecutionId",
+        "runId" : 6,
+        "attemptId" : 1
+      },
+      "state" : "SUCCEEDED",
+      "startTstmpPrepare" : "2026-03-28T08:15:24.061Z",
+      "endTstmpPrepare" : "2026-03-28T08:15:24.062Z",
+      "startTstmpInit" : "2026-03-28T08:15:37.692Z",
+      "endTstmpInit" : "2026-03-28T08:15:43.888Z",
+      "startTstmp" : "2026-03-28T08:15:45.774Z",
+      "endTstmp" : "2026-03-28T08:16:02.638Z",
+      "duration" : "PT16.864234461S",
+      "results" : [ {
+        "type" : "SparkSubFeed",
+        "dataObjectId" : "slv-tlm3d-track",
+        "partitionValues" : [ ],
+        "isDAGStart" : false,
+        "isSkipped" : false,
+        "isDummy" : false,
+        "metrics" : {
+          "count" : 54825,
+          "num_tasks" : 4,
+          "count#mainInput" : 54825,
+          "rows_inserted" : 54825,
+          "records_written" : 54825,
+          "count#ext-tlm3d-track" : 54825,
+          "bytes_written" : 12748365
+        }
+      } ],
+      "dataObjectsState" : [ ],
+      "inputIds" : [ "ext-tlm3d-track" ],
+      "outputIds" : [ "slv-tlm3d-track" ]
+    },
+    "load-gld-ch-node" : {
+      "executionId" : {
+        "type" : "SDLExecutionId",
+        "runId" : 6,
+        "attemptId" : 1
+      },
+      "state" : "SUCCEEDED",
+      "startTstmpPrepare" : "2026-03-28T08:15:24.074Z",
+      "endTstmpPrepare" : "2026-03-28T08:15:24.075Z",
+      "startTstmpInit" : "2026-03-28T08:15:44.741Z",
+      "endTstmpInit" : "2026-03-28T08:15:44.771Z",
+      "startTstmp" : "2026-03-28T08:17:45.613Z",
+      "endTstmp" : "2026-03-28T08:17:46.278Z",
+      "duration" : "PT0.664910446S",
+      "results" : [ {
+        "type" : "SparkSubFeed",
+        "dataObjectId" : "gld-ch-node",
+        "partitionValues" : [ ],
+        "isDAGStart" : false,
+        "isSkipped" : false,
+        "isDummy" : false,
+        "metrics" : {
+          "count" : 31284,
+          "num_tasks" : 4,
+          "count#mainInput" : 31284,
+          "rows_inserted" : 31284,
+          "count#slv-tlm3d-node" : 31284,
+          "records_written" : 31284,
+          "bytes_written" : 4921380
+        }
+      } ],
+      "dataObjectsState" : [ ],
+      "inputIds" : [ "slv-tlm3d-node" ],
+      "outputIds" : [ "gld-ch-node" ]
+    },
+    "load-slv-ocp" : {
+      "executionId" : {
+        "type" : "SDLExecutionId",
+        "runId" : 6,
+        "attemptId" : 1
+      },
+      "state" : "SUCCEEDED",
+      "startTstmpPrepare" : "2026-03-28T08:15:22.458Z",
+      "endTstmpPrepare" : "2026-03-28T08:15:24.060Z",
+      "startTstmpInit" : "2026-03-28T08:15:28.492Z",
+      "endTstmpInit" : "2026-03-28T08:15:37.689Z",
+      "startTstmp" : "2026-03-28T08:15:45.774Z",
+      "endTstmp" : "2026-03-28T08:16:01.385Z",
+      "duration" : "PT15.610238935S",
+      "results" : [ {
+        "type" : "SparkSubFeed",
+        "dataObjectId" : "slv-tlm3d-ocp",
+        "partitionValues" : [ ],
+        "isDAGStart" : false,
+        "isSkipped" : false,
+        "isDummy" : false,
+        "metrics" : {
+          "count" : 3156,
+          "num_tasks" : 1,
+          "count#ext-tlm3d-ocp" : 3156,
+          "count#mainInput" : 3156,
+          "rows_inserted" : 3156,
+          "records_written" : 3156,
+          "bytes_written" : 246380
+        }
+      } ],
+      "dataObjectsState" : [ ],
+      "inputIds" : [ "ext-tlm3d-ocp" ],
+      "outputIds" : [ "slv-tlm3d-ocp" ]
+    },
+    "load-gld-ch-edge" : {
+      "executionId" : {
+        "type" : "SDLExecutionId",
+        "runId" : 6,
+        "attemptId" : 1
+      },
+      "state" : "SUCCEEDED",
+      "startTstmpPrepare" : "2026-03-28T08:15:24.066Z",
+      "endTstmpPrepare" : "2026-03-28T08:15:24.067Z",
+      "startTstmpInit" : "2026-03-28T08:15:44.394Z",
+      "endTstmpInit" : "2026-03-28T08:15:44.427Z",
+      "startTstmp" : "2026-03-28T08:16:15.744Z",
+      "endTstmp" : "2026-03-28T08:16:16.990Z",
+      "duration" : "PT1.245589831S",
+      "results" : [ {
+        "type" : "SparkSubFeed",
+        "dataObjectId" : "gld-ch-edge",
+        "partitionValues" : [ ],
+        "isDAGStart" : false,
+        "isSkipped" : false,
+        "isDummy" : false,
+        "metrics" : {
+          "count" : 38801,
+          "num_tasks" : 4,
+          "count#mainInput" : 38801,
+          "rows_inserted" : 38801,
+          "count#slv-tlm3d-edge" : 38801,
+          "records_written" : 38801,
+          "bytes_written" : 16580919
+        }
+      } ],
+      "dataObjectsState" : [ ],
+      "inputIds" : [ "slv-tlm3d-edge" ],
+      "outputIds" : [ "gld-ch-edge" ]
+    },
+    "load-gld-ch-pp" : {
+      "executionId" : {
+        "type" : "SDLExecutionId",
+        "runId" : 6,
+        "attemptId" : 1
+      },
+      "state" : "SUCCEEDED",
+      "startTstmpPrepare" : "2026-03-28T08:15:28.405Z",
+      "endTstmpPrepare" : "2026-03-28T08:15:28.445Z",
+      "startTstmpInit" : "2026-03-28T08:15:45.577Z",
+      "endTstmpInit" : "2026-03-28T08:15:45.682Z",
+      "startTstmp" : "2026-03-28T08:23:14.243Z",
+      "endTstmp" : "2026-03-28T08:26:36.570Z",
+      "duration" : "PT3M22.326931757S",
+      "results" : [ {
+        "type" : "SparkSubFeed",
+        "dataObjectId" : "gld-ch-pp",
+        "partitionValues" : [ ],
+        "isDAGStart" : false,
+        "isSkipped" : false,
+        "isDummy" : false,
+        "metrics" : {
+          "count" : 49885598,
+          "count#slv-pp" : 49234914,
+          "num_tasks" : 100,
+          "count#mainInput" : 49885598,
+          "count#slv-pp-mapping" : 49885598,
+          "rows_inserted" : 49885598,
+          "records_written" : 49885598,
+          "count#slv-tlm3d-pp" : 49885598,
+          "bytes_written" : 2691557075
+        }
+      } ],
+      "dataObjectsState" : [ ],
+      "inputIds" : [ "slv-pp", "slv-pp-mapping", "slv-tlm3d-pp" ],
+      "outputIds" : [ "gld-ch-pp" ]
+    }
+  },
+  "isFinal" : true,
+  "runStateFormatVersion" : 5,
+  "sdlbVersionInfo" : {
+    "version" : "2.9.0-SNAPSHOT",
+    "user" : "runner",
+    "date" : "2026-03-27T22:56:53.086Z",
+    "revision" : "480340ee4c"
+  },
+  "appVersionInfo" : {
+    "version" : "1.0.0-SNAPSHOT",
+    "user" : "runner",
+    "date" : "2026-03-28T08:15:13.869Z",
+    "revision" : "213231b006"
+  }
+}
