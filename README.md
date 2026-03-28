@@ -8,12 +8,14 @@ This repository contains geospatial data pipelines for generating and managing P
 MARS-Base processes railway network data to create precise positionpoints along tracks. 
 The system uses modern geospatial technologies like H3 and Apache Sedona, and outputs data in optimized formats for web-based visualization.
 
-Declarative data pipelines implemented using Spark and SmartDataLakeBuilder ensure quality and flexibility.
+Declarative data pipelines implemented using Spark and [SmartDataLakeBuilder](https://www.smartdatalake.io) (SDLB) ensure quality and flexibility.
 
 Currently data pipelines for the following countries are implemented:
 - Switzerland: swissTopo TLM3d dataset
 - Germany: Infrastukturregister service; unfortunately data quality is not sufficient for creating PPs
 - OpenRailwayMap: global coverage with promising results in Germany
+
+A documentation of the pipelines and monitoring of weekly test runs can be browsed using SDLB's Visualizer under https://mars-base.zzeekk.ch/.
 
 ## Features
 
