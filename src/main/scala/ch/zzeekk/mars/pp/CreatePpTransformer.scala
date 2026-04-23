@@ -29,6 +29,16 @@ import org.locationtech.jts.geom.{Coordinate, CoordinateXYZM, Geometry, Geometry
 
 import scala.collection.mutable
 
+/**
+ * Create position points at fixed intervals on edges.
+ * The position points are enriched with additional information such as grade and azimuth, which are calculated based on the geometry of the edge and its neighboring points.
+ *
+ * The position points are also enriched with a priority (prio) which is used when creating unique position points and their mapping to edges.
+ * Lower priorities get snapped first to existing position points. This is important for switches, as we want the "main" edge to be merged first, so it has higher priority to create new position points in the region of the "Weichenzunge".
+ *
+ * If the edge geometries are not in a metric CRS, the geometry is converted to EPSG:3857 for the calculation of the position points, and then converted back to the original CRS.
+ * Make sure to set the correct srcCrs parameter when calling the transform method, so the conversion is done correctly.
+ */
 class CreatePpTransformer extends CustomDfsTransformer {
 
   def transform(
@@ -42,7 +52,7 @@ class CreatePpTransformer extends CustomDfsTransformer {
     val session = dsEdge.sparkSession
     import session.implicits._
 
-    val udfCreatePointsAtFixedInterval = udf(Tlm3dPpTransformer.createPointsAtFixedInterval(ppDistance, wellDefinedPointDistance, srcCrs) _)
+    val udfCreatePointsAtFixedInterval = udf(CreatePpTransformer.createPointsAtFixedInterval(ppDistance, wellDefinedPointDistance, srcCrs) _)
 
     val dfNodes = dsNode
       .select($"uuid_node", $"edges")
@@ -77,14 +87,16 @@ class CreatePpTransformer extends CustomDfsTransformer {
   }
 
 }
-object Tlm3dPpTransformer extends SmartDataLakeLogger {
+object CreatePpTransformer extends SmartDataLakeLogger {
 
   /**
    * Create points at given fixed interval.
    * Note that we start counting from both side, creating a potential gap which is somewhat larger than the interval in the middle of the edge.
    */
-  def createPointsAtFixedInterval(interval: Double, wellDefinedPointDistance: Double, srcCrs: String)(uuid_edge: String, geom: Geometry): Seq[EdgePoint] = try {
+  def createPointsAtFixedInterval(interval: Double, wellDefinedPointDistance: Double, srcCrs: String)(uuid_edge: String, inputGeom: Geometry): Seq[EdgePoint] = try {
     implicit val geoFactory: GeometryFactory = getGeoFactory(srcCrs)
+    val needsMetricConversion = !isMetricCrs(srcCrs)
+    val geom = if (needsMetricConversion) convertTo3857(inputGeom, srcCrs) else inputGeom
     if (geom.getNumPoints >= 2) {
       val coords = enrichLinePosition(geom.getCoordinates.toSeq, uuid_edge)
       val length = coords.last.getM
@@ -101,14 +113,14 @@ object Tlm3dPpTransformer extends SmartDataLakeLogger {
         interpolatePoint(linePointsQueue(0), linePointsQueue(1), position, idx)
       }
       val edgePoints = createEdgePointsWithGradeAndAzimuth(intervalPoints, interval)
-      edgePoints
+      edgePoints.map(p => if (needsMetricConversion) p.copy(geometry = convertFrom3857(p.geometry, srcCrs)) else p)
     } else {
       logger.error(s"Edge $uuid_edge has less than 2 points.")
       Seq()
     }
   } catch {
     case e: Throwable =>
-      throw new RuntimeException(s"edge=$uuid_edge: ${e.getClass.getSimpleName}: ${e.getMessage}")
+      throw new RuntimeException(s"edge=$uuid_edge: ${e.getClass.getSimpleName}: ${e.getMessage}", e)
   }
 
   def interpolatePoint(p1: LinePoint, p2: LinePoint, position: Double, idx: Int): LinePoint = {

@@ -18,6 +18,7 @@
  */
 package ch.zzeekk.mars.pp.utils
 
+import org.geotools.api.referencing.crs.ProjectedCRS
 import org.geotools.api.referencing.operation.MathTransform
 import org.geotools.geometry.jts.JTS
 import org.geotools.referencing.CRS
@@ -168,6 +169,16 @@ object GeometryCalcUtils {
   }
 
   @inline
+  def convertTo3857(geometry: Geometry, srcCrs: String): Geometry = {
+    JTS.transform(geometry, getCrsTransform(srcCrs, "EPSG:3857"))
+  }
+
+  @inline
+  def convertFrom3857(geometry: Geometry, tgtCrs: String): Geometry = {
+    JTS.transform(geometry, getCrsTransform("EPSG:3857", tgtCrs))
+  }
+
+  @inline
   def convertCrs(geometry: Geometry, srcCrs: String, tgtCrs: String): Geometry = {
     JTS.transform(geometry, getCrsTransform(srcCrs, tgtCrs))
   }
@@ -177,4 +188,15 @@ object GeometryCalcUtils {
     crsTransforms.getOrElseUpdate((srcCrs,tgtCrs), CRS.findMathTransform(CRS.decode(srcCrs, true), CRS.decode(tgtCrs, true), false))
   }
   @transient private lazy val crsTransforms = mutable.Map[(String,String),MathTransform]()
+
+  def isMetricCrs(crsCode: String): Boolean = {
+    val crs = CRS.decode(crsCode, true)
+    val isProjected = crs.isInstanceOf[ProjectedCRS]
+    val cs = crs.getCoordinateSystem
+    val axesInMeters = (0 until cs.getDimension).forall { i =>
+      val unit = cs.getAxis(i).getUnit
+      unit != null && unit.toString == "m"
+    }
+    isProjected && axesInMeters
+  }
 }

@@ -16,14 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package ch.zzeekk.mars.tlm3d
+package ch.zzeekk.mars.pp
 
-import ch.zzeekk.mars.pp.{EdgePoint, Tlm3dPpTransformer}
 import org.locationtech.jts.geom.{Coordinate, CoordinateXYZM, GeometryFactory, PrecisionModel}
 import org.locationtech.jts.io.WKTReader
 import org.scalatest.funsuite.AnyFunSuite
 
-class Tlm3dPpTransformerTest extends AnyFunSuite {
+class CreatePpTransformerTest extends AnyFunSuite {
 
   val lv95GeomFactory = new GeometryFactory(new PrecisionModel() , 2056)
 
@@ -54,7 +53,7 @@ class Tlm3dPpTransformerTest extends AnyFunSuite {
   def point(x: Double, y: Double, z: Double, m: Double) = lv95GeomFactory.createPoint(new CoordinateXYZM(x,y,z,m))
 
   test("EdgePoints for line1 are created in fixed interval of 0.25 distance. Split left-over space of 0.3m at the each end.") {
-    val result = Tlm3dPpTransformer.createPointsAtFixedInterval(0.25, 25, "EPSG:2056")("line", line1)
+    val result = CreatePpTransformer.createPointsAtFixedInterval(0.25, 25, "EPSG:2056")("line", line1)
     val expected = Seq(
       EdgePoint(point (0, 0.15, 100d, 0.15), 1, None, Some(0.0f), 1.5707964f,true, 1),
       EdgePoint(point (0, 0.4, 100d, 0.4), 3, None, Some(0.0f), 1.5707964f,true, 2),
@@ -82,7 +81,7 @@ class Tlm3dPpTransformerTest extends AnyFunSuite {
   }
 
   test("EdgePoints for square1 are created in fixed interval, including height/radius/grade/azimuth interpolation and position") {1
-    val result = Tlm3dPpTransformer.createPointsAtFixedInterval(0.25, 25, "EPSG:2056")("square", square1)
+    val result = CreatePpTransformer.createPointsAtFixedInterval(0.25, 25, "EPSG:2056")("square", square1)
     val expected = Seq(
       EdgePoint(point (-0.375, -0.5, 100d, 0.125),   1, Some(1), Some(0.0f),           0.0f,        true, 1),
       EdgePoint(point (-0.125, -0.5, 100d, 0.375),   3, Some(1), Some(0.0f),           0.0f,        true, 2),
@@ -123,7 +122,7 @@ class Tlm3dPpTransformerTest extends AnyFunSuite {
     val reader = new WKTReader(lv95GeomFactory)
     val wktLinestring = "LINESTRING (2599549.034000003 1199612.9800117682, 2599515.9340000013 1199609.3600118787, 2599506.7240000004 1199608.5300119098, 2599489.0440000007 1199607.5100119407, 2599473.524000001 1199607.7500119316)"
     val geom = reader.read(wktLinestring)
-    val result = Tlm3dPpTransformer.createPointsAtFixedInterval(0.25, 25, "EPSG:2056")("track", geom)
+    val result = CreatePpTransformer.createPointsAtFixedInterval(0.25, 25, "EPSG:2056")("track", geom)
     assert(result.forall(_.grade.isEmpty)) // no grade as wktLinestring is only 2D
     assert(result.size == math.floor(geom.getLength/0.25).toInt)
   }

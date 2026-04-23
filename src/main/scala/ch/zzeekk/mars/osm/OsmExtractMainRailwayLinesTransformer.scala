@@ -43,8 +43,8 @@ class OsmExtractMainRailwayLinesTransformer extends CustomDfTransformer with Sma
     import session.implicits._
 
     val udfUuidFromString = new UDFUuidFromString().get(Map())
-    val operators = options.getOrElse("operators", "").split(',').map(_.trim)
-    val linesToExclude = options.getOrElse("linesToExclude", "").split(',').map(_.trim)
+    val operators = options.get("operators").toSeq.flatMap(_.split(',').toSeq).map(_.trim)
+    val linesToExclude = options.get("linesToExclude").toSeq.flatMap(_.split(',').toSeq).map(_.trim)
     val toleranceSimplifyVw = options.getOrElse("toleranceSimplifyVW", "100").toDouble
 
     val udfConvert4326to3857 = udf(GeometryCalcUtils.convert4326to3857 _)
@@ -68,7 +68,7 @@ class OsmExtractMainRailwayLinesTransformer extends CustomDfTransformer with Sma
       .groupBy($"line", $"operator")
       // combine tracks of the same line into one geometry (e.g. by merging connected LineStrings and then finding the centerline of the merged geometry)
       .agg(collect_list(ST_Force2D($"geometry")).as("tracks"))
-      .withColumn("lines", udfTracksToLines($"tracks", concat(lit("line "),$"line",lit(" ("),$"operator",lit(")"))))
+      .withColumn("lines", udfTracksToLines($"tracks", concat(lit("line "),coalesce($"line",lit("unknown")),lit(" ("),coalesce($"operator",lit("unknown")),lit(")"))))
       .withColumn("geometry", ST_SimplifyVW(ST_Union($"lines"), lit(toleranceSimplifyVw))) // simplify geometry to reduce size (tolerance in meters)
       .withColumn("tags", array_compact(array(
         createTagWithPrefixFromNumber($"line", "line"),

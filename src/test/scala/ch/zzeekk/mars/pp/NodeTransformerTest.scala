@@ -16,14 +16,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package ch.zzeekk.mars.tlm3d
+package ch.zzeekk.mars.pp
 
 import ch.zzeekk.mars.pp.utils.GeometryCalcUtils.{calcAzimuth, calcCircumRadius}
-import ch.zzeekk.mars.pp.{EdgeMapping, EdgeRef, NodePoint, NodeTransformer, Switch}
-import org.locationtech.jts.geom.{Coordinate, CoordinateXYZM, GeometryFactory, PrecisionModel}
+import org.locationtech.jts.geom.{CoordinateXYZM, GeometryFactory, PrecisionModel}
 import org.scalatest.funsuite.AnyFunSuite
 
-class Tlm3dNodeTransformerTest extends AnyFunSuite {
+class NodeTransformerTest extends AnyFunSuite {
 
   val lv95GeomFactory = new GeometryFactory(new PrecisionModel(), 2056)
 

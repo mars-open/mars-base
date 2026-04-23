@@ -20,9 +20,8 @@ package ch.zzeekk.mars.pp
 
 import ch.zzeekk.mars.pp.utils.GeometryCalcUtils
 import io.smartdatalake.workflow.action.spark.customlogic.CustomDfsTransformer
-import org.apache.spark.sql.functions._
 import org.apache.spark.sql.sedona_sql.expressions.st_functions._
-import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
+import org.apache.spark.sql.{Dataset, SparkSession}
 import org.locationtech.jts.geom.{Geometry, LineString}
 
 import java.util.UUID
@@ -51,10 +50,9 @@ class EdgeTransformer extends CustomDfsTransformer {
     } else Seq()
 
     if (isExec) logger.info(s"merging #${tracks.size} tracks to edges...")
-    val parsedTrackUuidsToExcludeFromMerge = trackUuidsToExcludeFromMerge
-      .map(_.split(',').map(_.trim).toSet)
-      .getOrElse(Set.empty[String])
-    val edges = mergeTracks(tracks, parsedTrackUuidsToExcludeFromMerge)
+    def isCircular(t: Track): Boolean = t.linestring.isRing
+    if (isExec) logger.warn(s"excluding #${tracks.count(isCircular)} circular tracks...")
+    val edges = mergeTracks(tracks.filterNot(isCircular))
 
     // enrich node uuids
     val nodeUuids = (edges.map(_.linestring.getStartPoint) ++ edges.map(_.linestring.getEndPoint))
@@ -76,18 +74,18 @@ class EdgeTransformer extends CustomDfsTransformer {
       |""".stripMargin
     )
 
+    if (isExec) logger.info(s"got #${edgeEnriched.size} edges after merging tracks")
     edgeEnriched.toDS()
   }
 
-  def mergeTracks(tracks: Seq[Track], parsedTrackUuidsToExcludeFromMerge: Set[String]): Seq[EdgePrep] = {
+  def mergeTracks(tracks: Seq[Track]): Seq[EdgePrep] = {
     val tracksBidir = tracks ++ tracks.map(_.reverse)
     val tracksByPoint = tracksBidir
       .groupBy(_.linestring.getStartPoint)
       .view.mapValues(_.toSet)
       .filter { case (k,v) =>
         v.size == 2 && // splitted tracks
-          v.map(_.tags).toSeq.distinct.length == 1 && // with same tags
-          v.map(_.uuid_track).intersect(parsedTrackUuidsToExcludeFromMerge).isEmpty
+          v.map(_.tags).toSeq.distinct.length == 1 // with same tags
       }.toMap
 
     // define recursion to combine with next track
@@ -97,7 +95,10 @@ class EdgeTransformer extends CustomDfsTransformer {
       if (next.isDefined) {
         val nextTrack = next.get.filter(_.uuid_track != edge.tracks.last.uuid_track)
         assert(nextTrack.size==1, s"Next track not found for ${edge.tracks.last.uuid_track}. Try to exclude it from merge by setting option trackUuidsToExcludeFromMerge. ($next)")
-        combineNext(edge.add(nextTrack.head))
+        // avoid circles
+        if (nextTrack.head.linestring.getEndPoint != edge.linestring.getStartPoint) {
+          combineNext(edge.add(nextTrack.head))
+        } else edge
       } else edge
     }
 
@@ -111,7 +112,9 @@ class EdgeTransformer extends CustomDfsTransformer {
       val nextTrack = startTracks.head
       val mergedGeom = combineNext(EdgePrep.from(nextTrack))
       mergedGeoms.append(mergedGeom)
+      // remove start track
       startTracks.remove(0)
+      // remove end track if exists
       val idx = startTracks.indexWhere(t => mergedGeom.tracks.last.uuid_track == t.uuid_track)
       if (idx >= 0) startTracks.remove(idx)
     }
