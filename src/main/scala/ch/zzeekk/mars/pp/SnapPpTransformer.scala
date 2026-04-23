@@ -43,15 +43,15 @@ import org.locationtech.jts.geom.{Coordinate, Geometry, GeometryFactory}
  */
 class SnapPpTransformer extends CustomDfsTransformer {
 
-  def transform(dsSlvPp: Dataset[Pp], dsSlvTlm3dPp: Dataset[PpWithMapping], ppRadius: Float = 0.25f, ppHeightTolerance: Float = 1f, srcCrs: String, isExec: Boolean): Map[String,DataFrame] = {
-    implicit val session: SparkSession = dsSlvTlm3dPp.sparkSession
+  def transform(dsSlvPp: Dataset[Pp], dsPpInput: Dataset[PpWithMapping], ppRadius: Float = 0.25f, ppHeightTolerance: Float = 1f, srcCrs: String, isExec: Boolean): Map[String,DataFrame] = {
+    implicit val session: SparkSession = dsSlvPp.sparkSession
     import session.implicits._
 
     val udfH3idL15 = udf(PpIdGenerator.getH3idL15 _)
 
     // get list of prio values
     val prios = if (isExec) {
-      dsSlvTlm3dPp
+      dsPpInput
         .agg(collect_set($"prio").as("prios"))
         .as[Seq[Short]].head().sorted
     } else Seq(1)
@@ -65,7 +65,7 @@ class SnapPpTransformer extends CustomDfsTransformer {
     val dsNewSnapped = prios.foldLeft(dsExistingSnapped) {
       case (dsExistingSnapped, prio) =>
 
-        val dfNewFiltered =  dsSlvTlm3dPp
+        val dfNewFiltered =  dsPpInput
           .where($"prio" === prio)
           .withColumn("pp_new", struct("*"))
           .withColumn("h3id", udfH3idL15($"x", $"y", lit(srcCrs)))
@@ -105,7 +105,7 @@ class SnapPpTransformer extends CustomDfsTransformer {
       .filter(_.is_new_pp)
       .map(_.snapped_pp)
 
-    val dfPpTlm3dOverwrite = dsNewSnapped
+    val dfPpMappingOverwrite = dsNewSnapped
       .where($"pp".isNotNull) // remove initial existing pps
       .select(
         $"snapped_pp.id_positionpoint", $"direction", $"snapped_pp.zoom",
@@ -115,7 +115,7 @@ class SnapPpTransformer extends CustomDfsTransformer {
 
     Map(
       "slv-pp" -> dsPpAppend.toDF(),
-      "slv-pp-mapping" -> dfPpTlm3dOverwrite,
+      "slv-pp-mapping" -> dfPpMappingOverwrite,
       "pp-mapping"-> dsNewSnapped.toDF()
     )
   }
