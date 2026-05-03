@@ -15,7 +15,7 @@ Currently data pipelines for the following countries are implemented:
 - Germany: Infrastukturregister service; unfortunately data quality is not sufficient for creating PPs
 - OpenRailwayMap: global coverage with promising results in Germany
 
-A documentation of the pipelines and monitoring of weekly test runs can be browsed using SDLB's Visualizer under https://mars-base.zzeekk.ch/.
+A documentation of the pipelines and monitoring of weekly test runs can be browsed using SDLB's Visualizer under https://base-pipelines.mars-open.org/.
 
 To view the created Positionpoints see https://github.com/mars-open/mars-explorer.
 
