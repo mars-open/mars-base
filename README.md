@@ -17,7 +17,7 @@ Currently data pipelines for the following countries are implemented:
 
 A documentation of the pipelines and monitoring of weekly test runs can be browsed using SDLB's Visualizer under https://base-pipelines.mars-open.net/.
 
-To view the created Positionpoints see https://github.com/mars-open/mars-explorer.
+To view the created Positionpoints see [mars-explorer](https://github.com/mars-open/mars-explorer).
 
 ## Features
 
