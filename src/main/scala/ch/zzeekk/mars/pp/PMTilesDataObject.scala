@@ -126,7 +126,7 @@ case class PMTilesDataObject(
       localPath, zoomAndFilter.keys.map(_.toInt).toSeq,
       (x: Double) => logger.info(s"Progress: $x"),
       Map("pps" -> df.schema.filterNot(f => nonFeatureAttributes.contains(f.name))),
-      compressTiles
+      compressTiles, parallelChunkSize = Some(2048)
     )
 
     // copy local file to hadoop if configured

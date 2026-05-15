@@ -58,9 +58,12 @@ object PpIdGenerator {
    * Note: 15 is max h3 resolution
    */
   def getH3idL15(x: Double, y: Double, srcCrs: String): Long = {
+    val resolution15 = 15
     val geoFactory = getGeoFactory(srcCrs)
-    val wgs84coord = convertTo4326(geoFactory.createPoint(new Coordinate(x, y)), srcCrs).getCoordinate
-    h3.latLngToCell(wgs84coord.getY, wgs84coord.getX, 15)
+    if (srcCrs != "EPSG:4326") {
+      val wgs84coord = convertTo4326(geoFactory.createPoint(new Coordinate(x, y)), srcCrs).getCoordinate
+      h3.latLngToCell(wgs84coord.getY, wgs84coord.getX, resolution15)
+    } else h3.latLngToCell(y, x, resolution15)
   }
 
   /**

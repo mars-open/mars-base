@@ -36,8 +36,8 @@ import scala.collection.mutable
  * The position points are also enriched with a priority (prio) which is used when creating unique position points and their mapping to edges.
  * Lower priorities get snapped first to existing position points. This is important for switches, as we want the "main" edge to be merged first, so it has higher priority to create new position points in the region of the "Weichenzunge".
  *
- * If the edge geometries are not in a metric CRS, the geometry is converted to EPSG:3857 for the calculation of the position points, and then converted back to the original CRS.
- * Make sure to set the correct srcCrs parameter when calling the transform method, so the conversion is done correctly.
+ * The edge geometries must have coordinates in a metric CRS.
+ * Make sure to set the correct srcCrs parameter when calling the transform method.
  */
 class CreatePpTransformer extends CustomDfsTransformer {
 
@@ -46,13 +46,15 @@ class CreatePpTransformer extends CustomDfsTransformer {
                  dsNode: Dataset[Node],
                  ppDistance: Float = 0.25f,
                  wellDefinedPointDistance: Float = 25f,
-                 nbOfPartitions: Int = 25,
+                 nbOfPartitions: Int = 100,
                  srcCrs: String
                ): Dataset[RawPpWithMapping] = {
     val session = dsEdge.sparkSession
     import session.implicits._
+    assert(isMetricCrs(srcCrs), "CRS must be metric for distance calculations; got " + srcCrs)
 
     val udfCreatePointsAtFixedInterval = udf(CreatePpTransformer.createPointsAtFixedInterval(ppDistance, wellDefinedPointDistance, srcCrs) _)
+      .asNondeterministic()
 
     val dfNodes = dsNode
       .select($"uuid_node", $"edges")
@@ -67,7 +69,7 @@ class CreatePpTransformer extends CustomDfsTransformer {
       .withColumn("point", explode($"pps"))
       .withColumn("x", ST_X($"point.geometry"))
       .withColumn("y", ST_Y($"point.geometry"))
-      .withColumn("z", ST_Z($"point.geometry").cast("float"))
+      .withColumn("z", when(!isnan(ST_Z($"point.geometry")), ST_Z($"point.geometry").cast("float")))
       .withColumn("position", ST_M($"point.geometry"))
       // TODO: can we somehow detect "Gleisdurchschneidung" and include in priorities?
       .withColumn("prio", when(
@@ -93,16 +95,15 @@ object CreatePpTransformer extends SmartDataLakeLogger {
    * Create points at given fixed interval.
    * Note that we start counting from both side, creating a potential gap which is somewhat larger than the interval in the middle of the edge.
    */
-  def createPointsAtFixedInterval(interval: Double, wellDefinedPointDistance: Double, srcCrs: String)(uuid_edge: String, inputGeom: Geometry): Seq[EdgePoint] = try {
+  def createPointsAtFixedInterval(interval: Double, wellDefinedPointDistance: Double, srcCrs: String)(uuid_edge: String, geom: Geometry): Seq[EdgePoint] = try {
     implicit val geoFactory: GeometryFactory = getGeoFactory(srcCrs)
-    val needsMetricConversion = !isMetricCrs(srcCrs)
-    val geom = if (needsMetricConversion) convertTo3857(inputGeom, srcCrs) else inputGeom
     if (geom.getNumPoints >= 2) {
       val coords = enrichLinePosition(geom.getCoordinates.toSeq, uuid_edge)
       val length = coords.last.getM
       val linePoints = createLinePointsWithRadius(coords, wellDefinedPointDistance)
       val linePointsQueue = mutable.Queue(linePoints:_*)
-      val maxIdx = math.floor(length / interval).toInt // this is the 1-based index of the last point, given by the length of the line geometry
+      // calculate the number of points to create. If interval is bigger than interval / 2, there should be at least 1 point.
+      val maxIdx = if (length > interval / 2) math.max(1, math.floor(length / interval).toInt) else 0 // this is the 1-based index of the last point, given by the length of the line geometry
       val remainingLength = length - maxIdx * interval
       val intervalPoints = (1 to maxIdx).map { idx =>
         // distribute remaining space equally at begin and end, start at interval/2 (idx - 0.5)
@@ -112,8 +113,9 @@ object CreatePpTransformer extends SmartDataLakeLogger {
         assert(linePointsQueue.size >= 2)
         interpolatePoint(linePointsQueue(0), linePointsQueue(1), position, idx)
       }
-      val edgePoints = createEdgePointsWithGradeAndAzimuth(intervalPoints, interval)
-      edgePoints.map(p => if (needsMetricConversion) p.copy(geometry = convertFrom3857(p.geometry, srcCrs)) else p)
+      val globalAzimut = calcAzimuth(coords.head, coords.last)
+      val edgePoints = createEdgePointsWithGradeAndAzimuth(intervalPoints, interval, globalAzimut)
+      edgePoints
     } else {
       logger.error(s"Edge $uuid_edge has less than 2 points.")
       Seq()
@@ -159,7 +161,7 @@ object CreatePpTransformer extends SmartDataLakeLogger {
    * Calculating Azimut on detailed points has the advantage to get the mean azimut at line points,
    * but between line points the azimuth to the next line point
    */
-  def createEdgePointsWithGradeAndAzimuth(points: Seq[LinePoint], interval: Double)(implicit geoFactory: GeometryFactory): Seq[EdgePoint] = {
+  def createEdgePointsWithGradeAndAzimuth(points: Seq[LinePoint], interval: Double, globalAzimuth: Double)(implicit geoFactory: GeometryFactory): Seq[EdgePoint] = {
     withPrevAndNext[LinePoint, EdgePoint](points) {
       case (prev,current,next) =>
         val grade = ((prev, current, next) match {
@@ -172,6 +174,7 @@ object CreatePpTransformer extends SmartDataLakeLogger {
           case (Some(a), _, Some(b)) => calcAzimuth(a.geometry, b.geometry)
           case (Some(a), b, _) => calcAzimuth(a.geometry, b.geometry)
           case (_, a, Some(b)) => calcAzimuth(a.geometry, b.geometry)
+          case _ => globalAzimuth
         }).toFloat
         EdgePoint(geoFactory.createPoint(current.geometry),
           getZoom(current.geometry.getM, points.last.geometry.getM, interval),

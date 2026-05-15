@@ -22,36 +22,89 @@ import ch.zzeekk.mars.pp.Track
 import io.smartdatalake.workflow.action.spark.customlogic.CustomDfsTransformer
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.sedona_sql.expressions.st_functions._
-import org.apache.spark.sql.{Column, DataFrame, SparkSession}
+import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
+import org.locationtech.jts.geom.{Geometry, GeometryFactory, LineString}
+
+import java.util.UUID
 
 /**
  * Creating standardized tracks for further processing.
+ *
+ * OSM tracks might not be split at switches, so this transformer splits tracks at switches.
  */
 class OsmTrackTransformer extends CustomDfsTransformer {
 
-  def transform(dfSlvOsmTrack: DataFrame): Map[String, DataFrame] = {
+  def transform(dfSlvOsmTrack: DataFrame, dfSlvOsmSwitch: DataFrame): Dataset[Track] = {
     implicit val session: SparkSession = dfSlvOsmTrack.sparkSession
-
     import session.implicits._
 
     def createTagFromBool(name: String) = when(col(name), lit(name))
-    def createTagWithPrefixFromNumber(col: Column, prefix: String) = when(col.isNotNull, concat(lit(prefix),col))
 
-    val dsTrack = dfSlvOsmTrack
+    val switchIds = dfSlvOsmSwitch
+      .select($"id".cast("long"))
+      .as[Long]
+      .collect()
+      .toSet
+
+    val udfSplitTrack = udf((geometry: Geometry, nodeIds: Seq[Long], id: Long) => OsmTrackTransformer.splitTrack(geometry, nodeIds, id, switchIds))
+    val udfUuidFromLongs = udf((l1: Long, l2: Long) => new UUID(l1, l2).toString)
+
+    dfSlvOsmTrack
       .where(ST_NumPoints($"geometry") > 1)
+      // split/explode tracks at switches, if necessary
+      .select($"*", posexplode(udfSplitTrack($"geometry", $"node_ids", $"id")).as(Seq("split_idx", "track_split")))
       .select(
-        $"uuid".as("uuid_track"),
-        $"geometry",
+        when(ST_NumPoints($"geometry") === ST_NumPoints($"track_split.geometry"), $"uuid".cast("string"))
+          .otherwise(udfUuidFromLongs($"split_idx", $"id"))
+          .as("uuid_track"),
+        concat($"id".cast("string"), lit(":"), $"split_idx".cast("string")).as("src_id"),
+        $"track_split.nodeFrom".cast("string").as("src_id_node_from"),
+        $"track_split.nodeTo".cast("string").as("src_id_node_to"),
+        $"track_split.geometry".as("geometry"),
         lit(false).as("reversed"),
         array_compact(array(
-          $"type", $"operator",
-          createTagWithPrefixFromNumber($"ref", "line"),
-          createTagWithPrefixFromNumber($"track_ref", "track"),
+          $"type",
           createTagFromBool("main"),
-        )).as("tags")
+          createTagFromBool("bridge"),
+          createTagFromBool("tunnel"),
+        )).as("tags"),
+        map_filter(map(
+          lit("op"), $"operator",
+          lit("line"), $"ref",
+          lit("track"), coalesce($"track_ref", $"preferred_direction"),
+          lit("speed"), $"maxspeed",
+        ), (_, v) => length(v) > 0).as("properties")
       ).as[Track]
+  }
+}
 
-    Map("track" -> dsTrack.toDF)
+case class SplitTrackPart(geometry: Geometry, nodeFrom: Long, nodeTo: Long)
+
+object OsmTrackTransformer {
+
+  def splitTrack(geometry: Geometry, nodeIds: Seq[Long], id: Long, switchIds: Set[Long]): Seq[SplitTrackPart] = {
+    assert(nodeIds.size == geometry.getNumPoints, s"Track $id: nodeIds.size (${nodeIds.size}) != geometry numPoints (${geometry.getNumPoints})")
+    assert(geometry.isInstanceOf[LineString], s"Track $id: geometry must be LineString, got ${geometry.getGeometryType}")
+    val line = geometry.asInstanceOf[LineString]
+
+    val splitIndexes = nodeIds.zipWithIndex.collect {
+      case (nodeId, idx) if idx > 0 && idx < nodeIds.size - 1 && switchIds.contains(nodeId) => idx
+    }
+    val splitBounds = (Seq(0) ++ splitIndexes ++ Seq(nodeIds.size - 1)).distinct.sorted
+
+    splitBounds.sliding(2).collect {
+      case Seq(fromIdx, toIdx) if toIdx > fromIdx =>
+        SplitTrackPart(
+          geometry = createSegment(line, fromIdx, toIdx),
+          nodeFrom = nodeIds(fromIdx),
+          nodeTo = nodeIds(toIdx)
+        )
+    }.toSeq
   }
 
+  private def createSegment(line: LineString, fromIdx: Int, toIdx: Int): LineString = {
+    val geometryFactory = new GeometryFactory(line.getPrecisionModel, line.getSRID)
+    val coords = line.getCoordinates.slice(fromIdx, toIdx + 1).map(_.copy())
+    geometryFactory.createLineString(coords)
+  }
 }

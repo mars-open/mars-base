@@ -29,3 +29,9 @@ class UDFUuidFromString extends SparkUDFCreator {
     udf((s: Option[String]) => s.map(s => UUID.nameUUIDFromBytes(s.getBytes("UTF-8")).toString))
   }
 }
+
+class UDFUuidFromLong extends SparkUDFCreator {
+  override def get(options: Map[String, String]): UserDefinedFunction = {
+    udf((s: Option[Long]) => s.map(s => new UUID(0L, s).toString))
+  }
+}

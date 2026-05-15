@@ -23,13 +23,15 @@ import io.smartdatalake.util.misc.SmartDataLakeLogger
 import org.apache.spark.sql.types.StructField
 
 import java.nio.file.Paths
+import java.util.concurrent.atomic.AtomicInteger
+import scala.collection.parallel.CollectionConverters.IterableIsParallelizable
 
 object TileverseAccessor extends SmartDataLakeLogger {
 
   def writeTiles(
                   tiles: Iterator[TileData], localPath: String, zooms: Seq[Int], fnLog: Double => Unit,
                   layers: Map[String, Seq[StructField]],
-                  compressTiles: Boolean
+                  compressTiles: Boolean, parallelChunkSize: Option[Int] = None
                 ): Int = {
 
     val vectorLayers = layers.map{
@@ -59,14 +61,20 @@ object TileverseAccessor extends SmartDataLakeLogger {
 
     writer.setProgressListener(createProgressListener(fnLog))
 
-    var i = 0
-    tiles.foreach {
-      tileData =>
-        i += 1
-        writer.addTile(tileData.tile.getIndex, tileData.data)
+    val i = new AtomicInteger(0)
+    def addTile(tileData: TileData): Unit = {
+      i.incrementAndGet()
+      writer.addTile(tileData.tile.getIndex, tileData.data)
     }
-    writer.complete()
-    i
+    if (parallelChunkSize.isDefined) {
+      tiles.grouped(parallelChunkSize.get).foreach {
+        chunk => chunk.to(Iterable).par.foreach(addTile)
+      }
+    } else {
+      tiles.foreach(addTile)
+      writer.complete()
+    }
+    i.get()
   }
 
   def compressUsingGzip(data: Array[Byte]): Array[Byte] = CompressionUtil.compress(data, PMTilesHeader.COMPRESSION_GZIP)

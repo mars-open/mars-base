@@ -22,9 +22,9 @@ import ch.zzeekk.mars.pp.utils.GeometryCalcUtils
 import io.smartdatalake.workflow.action.spark.customlogic.CustomDfsTransformer
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.sedona_sql.expressions.st_functions.ST_Length
-import org.apache.spark.sql.{Dataset, SparkSession}
+import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
 import org.locationtech.jts.algorithm.Angle
-import org.locationtech.jts.geom.{Geometry, GeometryFactory}
+import org.locationtech.jts.geom.{Geometry, GeometryFactory, LineString}
 
 /**
  * Create unique nodes from endpoints of edges.
@@ -32,14 +32,14 @@ import org.locationtech.jts.geom.{Geometry, GeometryFactory}
  */
 class NodeTransformer extends CustomDfsTransformer {
 
-  def transform(dsEdge: Dataset[Edge]): Dataset[Node] = {
+  def transform(dsEdge: Dataset[Edge], dsSwitch: Dataset[Switch]): Dataset[Node] = {
     implicit val session: SparkSession = dsEdge.sparkSession
     import session.implicits._
 
     // extract start- and endpoint of each track, including angle
     val udfExtractStartEndPoint = udf(extractStartEndPoint _)
     val dfNodePoints = dsEdge
-      .withColumn("points", udfExtractStartEndPoint($"geometry", $"uuid_node_from", $"uuid_node_to"))
+      .withColumn("points", udfExtractStartEndPoint($"geometry", $"uuid_node_from", $"uuid_node_to", $"src_id_node_from", $"src_id_node_to"))
       .withColumn("endpoint", explode(array($"points._1", $"points._2")))
       .select(
         $"endpoint",
@@ -51,30 +51,32 @@ class NodeTransformer extends CustomDfsTransformer {
     val udfClassifySimpleSwitch = udf(classifySimpleSwitch _)
     val udfClassifyDoubleCrossingSwitch = udf(classifyDoubleSwitch _)
     val dfNodePrep = dfNodePoints
-      // ignore endpoints from edges with only one point (if any...)
-      .where($"endpoint.azimuth".isNotNull)
       // group nodes
-      .groupBy($"endpoint.uuid_node", $"endpoint.geometry")
+      .groupBy($"endpoint.uuid_node", $"endpoint.geometry", $"endpoint.src_id")
       .agg(
         collect_list(struct($"endpoint", $"uuid_edge", $"edge_length")).as("edges"), // collect edge informations
         array_distinct(flatten(collect_list($"tags"))).as("tags") // combine tags from all edges
       )
       .withColumn("arity", size($"edges").cast("short"))
       .withColumn("class",
-        when($"arity" === 3, udfClassifySimpleSwitch($"edges"))
-          .when($"arity" === 4, udfClassifyDoubleCrossingSwitch($"edges"))
+        when($"arity" === 3, udfClassifySimpleSwitch($"edges", coalesce($"src_id", $"uuid_node")))
+          .when($"arity" === 4, udfClassifyDoubleCrossingSwitch($"edges", coalesce($"src_id", $"uuid_node")))
       )
 
-    val dfNode = dfNodePrep
+    val dfNode = dfNodePrep.as("n")
+      .join(dsSwitch.as("s"), Seq("src_id"), "left")
       .select(
-        $"uuid_node", $"geometry", $"arity", $"class._1".as("switch_type"), $"class._2".as("edges"), $"tags"
+        $"n.uuid_node", $"n.geometry", $"arity", $"class._1".as("switch_type"), $"class._2".as("edges"),
+        array_union($"s.tags", $"n.tags").as("tags"),
+        $"s.properties",
+        $"src_id"
       )
       .as[Node]
 
     dfNode
   }
 
-  def classifySimpleSwitch(edges: Seq[EdgeRef]): Option[(Switch, Seq[EdgeMapping])] = {
+  def classifySimpleSwitch(edges: Seq[EdgeRef], id: String): Option[(SwitchType, Seq[EdgeMapping])] = {
     // cluster nodes into two groups
     // c1 is the smaller group on the side of the "tongue"
     val Seq(c1,c2) = clusterEdgesK2(edges).sortBy(_.size)
@@ -87,7 +89,7 @@ class NodeTransformer extends CustomDfsTransformer {
         val turnoutEdge = c2.diff(Seq(mainEdge)).head
         val radius = GeometryCalcUtils.calcCircumRadius(edge1.endpoint.geometry1.getCoordinate, edge1.endpoint.geometry.getCoordinate, turnoutEdge.endpoint.geometry1.getCoordinate).map(_.toInt)
         // define simple switch
-        val switch = Switch(
+        val switch = SwitchType(
           tpe = "SS",
           sub_tpe = getSubTypeFromTracks(switchAzimuth, c2),
           radius = Seq(turnoutEdge.endpoint.radius, radius).flatten.map(Math.abs).minOption
@@ -101,12 +103,12 @@ class NodeTransformer extends CustomDfsTransformer {
             c2.map(t => t.createMapping(side = 1, main_edge = Some(t.uuid_edge == mainEdge.uuid_edge), switch_length = Some(switchLength)))
         Some(switch, edgesExtended)
       case (n1, n2) =>
-        logger.warn(s"Strange simple switch at ${edges.head.endpoint.point.getCoordinate}: clusterEdgesK2=($n1,$n2)")
+        logger.warn(s"Strange simple switch $id at ${edges.head.endpoint.point.getCoordinate}: clusterEdgesK2=($n1,$n2)")
         None
     }
   }
 
-  def classifyDoubleSwitch(edges: Seq[EdgeRef]): Option[(Switch, Seq[EdgeMapping])] = {
+  def classifyDoubleSwitch(edges: Seq[EdgeRef], id: String): Option[(SwitchType, Seq[EdgeMapping])] = {
     // cluster nodes into two groups
     val Seq(c1,c2) = clusterEdgesK2(edges).sortBy(_.size)
 
@@ -121,7 +123,7 @@ class NodeTransformer extends CustomDfsTransformer {
         val mainEdge2 = c2.minBy(e => Angle.diff(switchAzimuth, e.endpoint.azimuth))
         val turnoutEdge2 = c2.diff(Seq(mainEdge2)).head
         val radius = GeometryCalcUtils.calcCircumRadius(mainEdge1.endpoint.geometry1.getCoordinate, mainEdge1.endpoint.geometry.getCoordinate, turnoutEdge2.endpoint.geometry1.getCoordinate).map(_.toInt)
-        val switch = Switch(
+        val switch = SwitchType(
           tpe="DCS",
           sub_tpe = None,
           radius = radius.map(Math.abs)
@@ -142,7 +144,7 @@ class NodeTransformer extends CustomDfsTransformer {
         val mainEdge = c2.minBy(e => Angle.diff(switchAzimuth, e.endpoint.azimuth))
         val turnoutEdge = c2.diff(Seq(mainEdge)).head
         val radius = GeometryCalcUtils.calcCircumRadius(edge1.endpoint.geometry1.getCoordinate, edge1.endpoint.geometry.getCoordinate, turnoutEdge.endpoint.geometry1.getCoordinate).map(_.toInt)
-        val switch = Switch(
+        val switch = SwitchType(
           tpe="DS",
           sub_tpe = getSubTypeFromTracks(switchAzimuth, c2),
           radius = Seq(turnoutEdge.endpoint.radius, radius).flatten.map(Math.abs).minOption
@@ -157,7 +159,7 @@ class NodeTransformer extends CustomDfsTransformer {
         Some(switch, edgesExtended)
 
       case (n1,n2) =>
-        logger.warn(s"Strange double switch at ${edges.head.endpoint.point.getCoordinate}: clusterEdgesK2=($n1,$n2)")
+        logger.warn(s"Strange double switch $id at ${edges.head.endpoint.point.getCoordinate}: clusterEdgesK2=($n1,$n2)")
         None
     }
   }
@@ -193,20 +195,20 @@ class NodeTransformer extends CustomDfsTransformer {
     Seq(c1,c2)
   }
 
-  def extractStartEndPoint(geom: Geometry, uuidNodeFrom: String, uuidNodeTo: String): Option[(NodePoint, NodePoint)] = {
+  def extractStartEndPoint(geom: Geometry, uuidNodeFrom: String, uuidNodeTo: String, srcIdNodeFrom: Option[String], srcIdNodeTo: Option[String]): Option[(NodePoint, NodePoint)] = {
     implicit val factory: GeometryFactory = geom.getFactory
 
     // start
     val startCoord = geom.getCoordinates.apply(0)
     val secondCoord = geom.getCoordinates.apply(1)
     val thirdCoord = if(geom.getNumPoints>2) Some(geom.getCoordinates.apply(2)) else None
-    val startPoint = NodePoint.from(uuidNodeFrom, startCoord, secondCoord, thirdCoord, end=false)
+    val startPoint = NodePoint.from(uuidNodeFrom, startCoord, secondCoord, thirdCoord, end=false, src_id = srcIdNodeFrom)
 
     // end
     val endCoord = geom.getCoordinates.apply(geom.getNumPoints -1)
     val secondLastCoord = geom.getCoordinates.apply(geom.getNumPoints -2)
     val thirdLastCoord = if(geom.getNumPoints>2) Some(geom.getCoordinates.apply(geom.getNumPoints -3)) else None
-    val endPoint = NodePoint.from(uuidNodeTo, endCoord, secondLastCoord, thirdLastCoord, end=true)
+    val endPoint = NodePoint.from(uuidNodeTo, endCoord, secondLastCoord, thirdLastCoord, end=true, src_id = srcIdNodeTo)
 
     Some(startPoint, endPoint)
   }
@@ -220,14 +222,14 @@ class NodeTransformer extends CustomDfsTransformer {
  * @param switch_type classification of the switch
  * @param edges mapping of the switch on the edges
  */
-case class Node(uuid_node: String, geometry: Geometry, arity: Short, switch_type: Switch, edges: Seq[EdgeMapping], tags: Seq[String])
+case class Node(uuid_node: String, geometry: Geometry, arity: Short, switch_type: SwitchType, edges: Seq[EdgeMapping], tags: Seq[String], properties: Map[String,String], src_id: Option[String])
 
 /**
  * @param tpe Basic type of the switch, e.g. SS -> Simple Switch, DS -> Double Switch, DCS -> Double Crossing Switch
  * @param sub_tpe Summary of curve as L/R of the different edges, sorted by radius: LL, L, R, RR
  * @param radius Radius of the switch
  */
-case class Switch(tpe: String, sub_tpe: Option[String], radius: Option[Int])
+case class SwitchType(tpe: String, sub_tpe: Option[String], radius: Option[Int])
 
 case class EdgeRef(endpoint: NodePoint, uuid_edge: String, edge_length: Double) {
   def createMapping(side: Short, main_edge: Option[Boolean] = None, switch_length: Option[Float] = None): EdgeMapping = {
@@ -246,3 +248,5 @@ case class EdgeRef(endpoint: NodePoint, uuid_edge: String, edge_length: Double) 
  * @param main_edge true if this is the main edge of the switch, if false it is a turnout edge.
  */
 case class EdgeMapping(uuid_edge: String, node_side: Short, position_from: Option[Double], position_to: Option[Double], main_edge: Option[Boolean])
+
+case class Switch(uuid_node: String, src_id: Option[String], geometry: Geometry, tags: Set[String], properties: Map[String,String])
