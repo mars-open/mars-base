@@ -1,0 +1,370 @@
+/*
+ * MARS Base - Maintenance Applications for Railway Systems
+ *
+ * Copyright © 2026 zzeekk (<zach.kull@gmail.com>)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+package net.mars.open.pp
+
+import net.mars.open.pp.utils.GeometryCalcUtils.{convertTo3857, convertTo4326, getGeoFactory, isMetricCrs}
+import io.smartdatalake.workflow.action.spark.customlogic.CustomDfsTransformer
+import net.mars.open.pp.utils.SpatialIndex
+import org.apache.sedona.common.FunctionsGeoTools
+import org.apache.spark.sql.functions._
+import org.apache.spark.sql.sedona_sql.expressions.st_functions._
+import org.apache.spark.sql.sedona_sql.expressions.st_constructors._
+import org.apache.spark.sql.sedona_sql.expressions.st_predicates.ST_Contains
+import org.apache.spark.sql.{Column, DataFrame, Dataset, SparkSession}
+import org.json4s.{DefaultFormats, Extraction}
+import org.locationtech.jts.algorithm.Angle
+import org.locationtech.jts.geom.{Coordinate, Geometry, GeometryFactory}
+import org.wololo.geojson.{Feature, GeoJSONFactory}
+
+/**
+ * Lookup and snap Positionpoint candidates created from edges to existing Positionpoints. The
+ * spatial join is organized by H3 cells. To be correct at the border of cells, existing
+ * Positionpoints from neighbor cells need to be included in the search.
+ *
+ * A priority can be given to Positionpoint candidates, to favor some candidates against others,
+ * e.g. the main branch of a switch against the turnout. To avoid creating duplicates, the mapping
+ * and creation of new Positionpoints is done by priority and edge.
+ *
+ * To be correct at the boarder of cells, each priority and edge round has to include newly created
+ * points in neighbor cells as well. The spatial join has therefore to be done multiple times.
+ *
+ * Note: H3 Cell viewer: https://clupasq.github.io/h3-viewer/ or https://h3geo.org/
+ */
+class SnapPpTransformer extends CustomDfsTransformer {
+
+  /**
+   * @param dsSlvPp
+   * @param dsPpInput
+   * @param ppRadius
+   * @param ppHeightTolerance
+   * @param nbOfPartitions
+   * @param srcCrs
+   * @param polygonCoordsFilter
+   *   define a filter the limit the processed region The Polygon must be defined as list of json
+   *   coordinate tuples. Use https://boundingbox.klokantech.com/ to select a region.
+   * @return
+   */
+  def transform(
+      dsSlvPp: Dataset[Pp],
+      dsPpInput: Dataset[PpWithMapping],
+      ppRadius: Float = 0.25f,
+      ppHeightTolerance: Float = 1f,
+      nbOfPartitions: Int = 100,
+      srcCrs: String,
+      polygonCoordsFilter: Option[String] = None,
+      isExec: Boolean
+  ): Map[String, DataFrame] = {
+    implicit val session: SparkSession = dsSlvPp.sparkSession
+    import session.implicits._
+    import org.json4s.jackson.JsonMethods._
+    assert(isMetricCrs(srcCrs), "CRS must be metric for distance calculations; got " + srcCrs)
+
+    val srcRegionPolygon = polygonCoordsFilter.map { geoJson =>
+      implicit val formats: DefaultFormats.type = org.json4s.DefaultFormats
+      val coordinates = Extraction.extract[Seq[Seq[Double]]](parse(geoJson))
+        .map(c => new Coordinate(c.head, c.last))
+      getGeoFactory(srcCrs).createPolygon(coordinates.toArray)
+    }
+    val regionPolygon4326WithBuffer = srcRegionPolygon.map { polygon =>
+      // add buffer of 2x ppRadius to be sure to include all points
+      val buffered = polygon.buffer(ppRadius * 2)
+      convertTo4326(buffered, srcCrs)
+    }
+
+    val udfH3idL15 = udf(PpIdGenerator.getH3idL15 _)
+
+    def ST_Polygon(polygon: Geometry): Column =
+      ST_MakePolygon(ST_MakeLine(array(polygon.getCoordinates.map(coord => ST_Point(lit(coord.x), lit(coord.y))): _*)))
+
+    val dsPpInputRegion = srcRegionPolygon.map(polygon => dsPpInput.filter(ST_Contains(ST_Polygon(polygon), ST_Point($"x", $"y")))).getOrElse(dsPpInput)
+      .cache()
+    val dsPpRegion = regionPolygon4326WithBuffer.map(polygon => dsSlvPp.filter(ST_Contains(ST_Polygon(polygon), ST_Point($"lng", $"lat")))).getOrElse(
+      dsPpInput
+    ) // TODO: infer region from input points if no filter polygon is given, to avoid processing of all existing pps when no filter is given
+      .cache()
+
+    dsPpInputRegion.printSchema
+
+    dsPpRegion.printSchema
+
+    // get list of prio values
+    val prios = if (isExec) {
+      dsPpInputRegion
+        .agg(collect_set($"prio").as("prios"))
+        .as[Seq[Short]].head().sorted
+    } else Seq(1)
+    if (isExec) logger.info(s"prios=${prios.mkString(",")}")
+
+    val dsExistingSnapped = dsPpRegion
+      .withColumn("pp_existing", struct("*"))
+      .select($"pp_existing".as("snapped_pp"), lit(false).as("is_new_pp"), typedlit[PpWithMapping](null).as("pp"), lit(null).as("direction"))
+      .as[PpWithMappingAndSnap]
+
+    val dsNewSnapped = prios.foldLeft(dsExistingSnapped) {
+      case (dsExistingSnapped, prio) =>
+        logger.info(s"Processing prio=$prio")
+        val dfNewFiltered = dsPpInputRegion
+          .where($"prio" === prio)
+          .withColumn("pp_new", struct("*"))
+          .withColumn("h3id", udfH3idL15($"x", $"y", lit(srcCrs)))
+          .groupBy($"h3id")
+          .agg(collect_list($"pp_new").as("pps_new"))
+
+        // TODO: cogroup in snapIteration doesnt work in Scala 2.13 / Spark 3.x
+        // val dsNewFiltered = dfNewFiltered
+        //  .select($"h3id", $"pp_new")
+        //  .as[(Long, PpWithMapping)]
+        // val dsNewSnapped = snapIteration(
+        // dsNewFiltered,
+        // dsExistingSnapped.where($"is_new_pp" || $"pp".isNull),
+        // ppRadius, ppHeightTolerance, srcCrs)
+        // dfNewFiltered.cache.show
+        // dsNewSnapped.cache.select($"pp.*", $"is_new_pp").show
+
+        val dfExisting = dsExistingSnapped
+          .withColumn("pp", struct("snapped_pp.*"))
+          .withColumn("h3id_neighbours",
+            ST_H3KRing($"snapped_pp.h3id", 1, exactRing = false)) // exact=false will include cell 0-kth neighbours, true only kth neighbours
+          .withColumn("h3id", explode($"h3id_neighbours"))
+          .groupBy($"h3id")
+          .agg(collect_list($"pp").as("pps_existing"))
+
+        val udfSnapNewToExistingPps = udf(snapNewToExistingPps(ppRadius, ppHeightTolerance, srcCrs) _)
+          .asNondeterministic()
+        val dsNewSnapped = dfNewFiltered.repartition(nbOfPartitions).hint("merge")
+          .join(dfExisting, Seq("h3id"), "left")
+          .withColumn("pp_snapped", explode(udfSnapNewToExistingPps($"pps_new", $"pps_existing", $"h3id")))
+          .select($"pp_snapped.*")
+          .as[PpWithMappingAndSnap]
+
+        dsExistingSnapped.unionByName(dsNewSnapped)
+    }
+      .cache()
+
+    dsNewSnapped.printSchema
+
+    val dsPpAppend = dsNewSnapped
+      .filter(_.is_new_pp)
+      .map(_.snapped_pp)
+
+    val dfPpMappingOverwrite = dsNewSnapped
+      .where($"pp".isNotNull) // remove initial existing pps
+      .select(
+        $"snapped_pp.id_positionpoint",
+        $"direction",
+        $"snapped_pp.zoom",
+        $"pp.uuid_edge",
+        $"pp.position", // TODO: adapt position when snapped to existing pp
+        $"pp.edge_idx"
+      )
+
+    Map(
+      "slv-pp"         -> dsPpAppend.toDF(),
+      "slv-pp-mapping" -> dfPpMappingOverwrite,
+      "pp-mapping"     -> dsNewSnapped.toDF()
+    )
+  }
+
+  // TODO: doesnt work with Spark 3.5.x and Scala 2.13. Cogroup returns wrong results, see also https://issues.apache.org/jira/browse/SPARK-47061
+  def snapIteration(dsNewH3: Dataset[(Long, PpWithMapping)], dsExisting: Dataset[Pp], ppRadius: Float, ppHeightTolerance: Float, srcCrs: String)(implicit
+      session: SparkSession
+  ): Dataset[PpWithMappingAndSnap] = {
+    import session.implicits._
+
+    // explode existing points for all neighbours
+    val dsExistingH3WithNeighbours = dsExisting
+      .withColumn("pp", struct("*"))
+      .withColumn("h3id_neighbours",
+        ST_H3KRing($"snapped_pp.h3id", 1, exactRing = false)) // exact=false will include cell 0-kth neighbours, true only kth neighbours
+      .withColumn("h3id", explode($"h3id_neighbours"))
+      .select($"h3id", $"pp.snapped_pp")
+      .as[(Long, Pp)]
+      .groupByKey(_._1).mapValues(_._2)
+
+    val dsNewSnapped = dsNewH3
+      .groupByKey(_._1).mapValues(_._2)
+      .cogroup(dsExistingH3WithNeighbours) {
+        case (_, newPps, _) if newPps.isEmpty => Seq()
+        case (h3id, newPps, existingPps)      =>
+          val newPpsSeq = newPps.toSeq
+          logger.info(s"h3id=$h3id ${newPpsSeq.map(_.edge_idx).mkString(",")}")
+          val snappedPps = snapNewToExistingPps(ppRadius, ppHeightTolerance, srcCrs)(newPpsSeq, existingPps.toSeq, h3id)
+          snappedPps
+      }
+
+    dsNewSnapped
+  }
+
+  /**
+   * @param radius
+   *   The radius that a Positionpoint covers of its surroundings
+   * @param heightTolerance
+   *   The tolerance in height before creating a new Positionpoint
+   * @param newPps
+   *   New Positionpoints with their mapping to a topology. All new positionpoints should belong to
+   *   a given h3 cell
+   * @param existingPps
+   *   Existing Positionpoints in the given h3 cell and their direct neighbours.
+   * @param h3id
+   *   The id of the h3 cell that newPps belong to.
+   */
+  def snapNewToExistingPps(
+      radius: Float,
+      heightTolerance: Float,
+      srcCrs: String
+  )(newPps: Seq[PpWithMapping], existingPps: Seq[Pp], h3id: Long): Seq[PpWithMappingAndSnap] = {
+    if (newPps.isEmpty) return Seq()
+    implicit val geoFactory: GeometryFactory = getGeoFactory(srcCrs)
+    assert(isMetricCrs(srcCrs), "CRS must be metric for distance calculations; got " + srcCrs)
+
+    // build index of existing pps
+    val index = new SpatialIndex(existingPps, (pp: Pp) => pp.getGeometry)
+
+    // initialize id generator
+    val cntPpsInTargetH3id = index.count(_.h3id == h3id)
+    val ppIdGenerator = new PpIdGenerator(cntPpsInTargetH3id, h3id)
+
+    // lookup existing pp within xy=25cm/z=1m for every new pp
+    // process new pp mappings grouped by edges to minimize potential for creating duplicate pp.
+    val snappedPps = newPps.groupBy(pp => pp.uuid_edge).toSeq.sortBy(_._1).flatMap {
+      case (uuid_edge, pps) =>
+        if (logger.isDebugEnabled) logger.debug(s"mapping ${pps.size} Positionpoints for edge $uuid_edge ($h3id)")
+        val snappedPps = pps.map {
+          ppMapping =>
+            // lookup existing pp in range
+            val ppsInRange = index.queryInRangeOf(ppMapping.getGeometry, radius) // this filters x/y
+              .filter { pp =>
+                (pp.z, ppMapping.z, pp.level, ppMapping.level) match {
+                  case (Some(ppZ), Some(ppmZ), _, _)         => Math.abs(ppZ - ppmZ) <= heightTolerance
+                  case (_, _, Some(ppLevel), Some(ppmLevel)) => ppLevel == ppmLevel
+                  case _                                     => true // if no height or level information is available, ignore height for snapping
+                }
+              }
+            // create new if pp not found
+            val pp = if (ppsInRange.isEmpty) {
+              val ppCreated = Pp.from(ppMapping, h3id, ppIdGenerator.nextPpId, srcCrs)
+              if (logger.isDebugEnabled) logger.debug(s"created Positionpoint ${ppCreated.id_positionpoint} ($h3id)")
+              ppCreated
+            } else ppsInRange.head
+            // calculate mapping direction
+            val azimuthDiff = Angle.diff(ppMapping.azimuth, pp.azimuth)
+            val direction = if (azimuthDiff < 45) Some(1.toShort) else if (azimuthDiff > 180 - 45) Some(-1.toShort) else Option.empty[Short]
+            PpWithMappingAndSnap(Some(ppMapping), pp, direction, is_new_pp = ppsInRange.isEmpty)
+        }
+        index.insert(snappedPps.filter(_.is_new_pp).map(_.snapped_pp)) // add created pps to index for next priority group
+        snappedPps
+    }
+    snappedPps
+  }
+}
+
+/**
+ * @param id_positionpoint
+ *   64bit unique id of the Positionpoint
+ * @param x
+ *   native coordinate 1
+ * @param y
+ *   native coordinate 2
+ * @param z
+ *   Height in m
+ * @param level
+ *   level of the track, e.g. for bridges or tunnels.
+ * @param zoom
+ *   Zoom level of the Positionpoint 0: point from node 1: additional 10m points 2: additional 1m
+ *   points 3: additional 0.25cm points
+ * @param h3id
+ *   Id of the h3 cell
+ * @param lat
+ *   GPS coordinate latitude
+ * @param lng
+ *   GPS coordinate longitude
+ * @param azimuth
+ *   Direction of edge that triggered creation of this Positionpoint. This is used to manage
+ *   direction sensitive values.
+ * @param token
+ *   Base32 unique token of the Positionpoint in format XXXX-XXXX-XXXXX. This is a human friendly
+ *   representation of the id.
+ */
+case class Pp(
+    id_positionpoint: Long,
+    zoom: Short,
+    h3id: Long,
+    x: Double,
+    y: Double,
+    z: Option[Float],
+    level: Option[Short],
+    lng: Double,
+    lat: Double,
+    azimuth: Float,
+    token: String
+) {
+  @transient lazy val coordinate: Coordinate = new Coordinate(x, y, z.map(_.toDouble).getOrElse(Double.NaN))
+  def getGeometry(implicit factory: GeometryFactory): Geometry = factory.createPoint(coordinate)
+}
+
+object Pp {
+  def from(ppm: PpWithMapping, h3id: Long, id: Long, srcCrs: String): Pp = {
+    implicit val geoFactory: GeometryFactory = getGeoFactory(srcCrs)
+    val wgs84coord = if (srcCrs != "EPSG:4326") convertTo4326(ppm.getGeometry, srcCrs).getCoordinate
+    else ppm.coordinate
+    Pp(id, ppm.zoom, h3id, ppm.x, ppm.y, ppm.z, ppm.level, lng = wgs84coord.getX, lat = wgs84coord.getY, azimuth = ppm.azimuth,
+      token = PpIdGenerator.getToken(id))
+  }
+}
+
+/**
+ * @param x
+ *   native coordinate 1
+ * @param y
+ *   native coordinate 2
+ * @param z
+ *   Height in m
+ * @param level
+ *   level of the track, e.g. for bridges or tunnels.
+ * @param zoom
+ *   the zoom level of this Positionpoint
+ * @param uuid_edge
+ *   edge that this positionpoint is created from
+ * @param position
+ *   position on edge of this positionpoint
+ * @param edge_idx
+ *   number of point on edge
+ * @param prio
+ *   priority when creating unique positionpoints and their mapping to edges. Lower priorities get
+ *   snapped first to existing positionpoints. This is important for switches, as we want the "main"
+ *   edge to be merged first, so it has higher priority to create new positionpoints in the region
+ *   of the "Weichenzunge".
+ */
+case class PpWithMapping(
+    x: Double,
+    y: Double,
+    z: Option[Float],
+    level: Option[Short],
+    zoom: Short,
+    position: Double,
+    uuid_edge: String,
+    prio: Short,
+    azimuth: Float,
+    edge_idx: Int = 0
+) {
+  @transient lazy val coordinate: Coordinate = new Coordinate(x, y, z.map(_.toDouble).getOrElse(Double.NaN))
+  def getGeometry(implicit factory: GeometryFactory): Geometry = factory.createPoint(coordinate)
+}
+
+case class PpWithMappingAndSnap(pp: Option[PpWithMapping], snapped_pp: Pp, direction: Option[Short], is_new_pp: Boolean)

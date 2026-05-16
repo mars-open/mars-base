@@ -18,8 +18,8 @@
  */
 package io.tileverse.pmtiles
 
-import ch.zzeekk.mars.pp.TileData
 import io.smartdatalake.util.misc.SmartDataLakeLogger
+import net.mars.open.pp.TileData
 import org.apache.spark.sql.types.StructField
 
 import java.nio.file.Paths
