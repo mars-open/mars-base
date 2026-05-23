@@ -70,14 +70,11 @@ class OsmExtractMainRailwayLinesTransformer extends CustomDfTransformer with Sma
       .agg(collect_list(ST_Force2D($"geometry")).as("tracks"))
       .withColumn("lines", udfTracksToLines($"tracks", concat(lit("line "),coalesce($"line",lit("unknown")),lit(" ("),coalesce($"operator",lit("unknown")),lit(")"))))
       .withColumn("geometry", ST_SimplifyVW(ST_Union($"lines"), lit(toleranceSimplifyVw))) // simplify geometry to reduce size (tolerance in meters)
-      .withColumn("tags", array_compact(array(
-        createTagWithPrefixFromNumber($"line", "line"),
-        $"operator"
-      )).as("tags"))
       .select(
         udfUuidFromString(ST_AsText($"geometry")).as("uuid_line"),
         udfConvert3857to4326($"geometry").as("geometry"),
-        $"tags"
+        $"line",
+        $"operator"
       )
 
     dfOut
