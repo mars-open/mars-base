@@ -75,7 +75,16 @@ class OsmTrackTransformer extends CustomDfsTransformer {
           lit("track"), coalesce($"track_ref", $"preferred_direction"),
           lit("speed"), $"maxspeed",
         ), (_, v) => length(v) > 0).as("properties")
-      ).as[Track]
+      )
+      // enrich level if not present, based on tags for bridge and tunnel
+      .withColumn("level",
+        when($"level".isNotNull, $"level")
+          .when(array_contains($"tags", "bridge"), lit(1))
+          .when(array_contains($"tags", "tunnel"), lit(-1))
+          .otherwise(lit(0))
+          .cast("short")
+      )
+      .as[Track]
   }
 }
 

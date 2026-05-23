@@ -20,7 +20,7 @@ package net.mars.open.pp.utils
 
 import org.geotools.api.referencing.crs.ProjectedCRS
 import org.geotools.api.referencing.operation.MathTransform
-import org.geotools.geometry.jts.JTS
+import org.geotools.geometry.jts.{JTS, ReferencedEnvelope}
 import org.geotools.referencing.CRS
 import org.locationtech.jts.algorithm.Angle
 import org.locationtech.jts.geom._
@@ -169,6 +169,11 @@ object GeometryCalcUtils {
   }
 
   @inline
+  def convertFrom4326(geometry: Geometry, tgtCrs: String): Geometry = {
+    JTS.transform(geometry, getCrsTransform("EPSG:4326", tgtCrs))
+  }
+
+  @inline
   def convertTo3857(geometry: Geometry, srcCrs: String): Geometry = {
     JTS.transform(geometry, getCrsTransform(srcCrs, "EPSG:3857"))
   }
@@ -198,5 +203,11 @@ object GeometryCalcUtils {
       unit != null && unit.toString == "m"
     }
     isProjected && axesInMeters
+  }
+
+  def isValidWithinCrs(crsCode: String, geometry: Geometry): Boolean = {
+    val crs = CRS.decode(crsCode, true)
+    val srcBBox = convertFrom4326(JTS.toGeometry(new ReferencedEnvelope(CRS.getEnvelope(crs))), crsCode)
+    srcBBox.contains(geometry)
   }
 }

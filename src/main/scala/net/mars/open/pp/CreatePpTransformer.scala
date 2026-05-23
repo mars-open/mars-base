@@ -74,7 +74,11 @@ class CreatePpTransformer extends CustomDfsTransformer {
       .withColumn("y", ST_Y($"point.geometry"))
       .withColumn("z", when(!isnan(ST_Z($"point.geometry")), ST_Z($"point.geometry").cast("float")))
       .withColumn("position", ST_M($"point.geometry"))
-      .withColumn("level", filter($"tracks", t => t("position_from") <= $"position" and  $"position" < t("position_to"))(0)("level"))
+      .as("pp")
+      .withColumn("track", filter($"tracks", t => t("position_from") <= $"position" and  $"position" < t("position_to"))(0))
+      .withColumn("tags", array_union($"tags", $"track.tags"))
+      .withColumn("properties", map_concat($"properties", $"track.properties"))
+      .withColumn("level", $"track.level")
       // TODO: can we somehow detect "Gleisdurchschneidung" and include in priorities?
       .withColumn("prio", when(
           ($"node_from_mapping.main_edge" and $"position".between($"node_from_mapping.position_from", $"node_from_mapping.position_to")) or
@@ -91,7 +95,8 @@ class CreatePpTransformer extends CustomDfsTransformer {
         $"uuid_edge",
         $"position",
         $"idx".as("edge_idx"),
-        $"tags", // TODO: take from track, include Properties!
+        $"tags",
+        $"properties",
         $"prio"
       )
       .drop("geometry", "idx")
@@ -237,6 +242,7 @@ case class RawPpWithMapping(
     level: Option[Short],
     zoom: Short,
     tags: Set[String],
+    properties: Map[String, String],
     uuid_edge: String,
     position: Double,
     edge_idx: Int,

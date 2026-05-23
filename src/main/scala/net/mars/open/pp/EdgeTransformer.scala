@@ -83,6 +83,7 @@ class EdgeTransformer extends CustomDfsTransformer {
           uuid_node_from = nodeUuids(e.linestring.getStartPoint),
           uuid_node_to = nodeUuids(e.linestring.getEndPoint),
           e.tags,
+          e.properties,
           src_id_node_from = e.src_id_node_from,
           src_id_node_to = e.src_id_node_to
         )
@@ -202,6 +203,7 @@ case class Edge(
     uuid_node_from: String,
     uuid_node_to: String,
     tags: Set[String],
+    properties: Map[String, String],
     src_id_node_from: Option[String],
     src_id_node_to: Option[String]
 )
@@ -209,15 +211,27 @@ case class Edge(
 /**
  * Internal mutable-like representation of an edge.
  */
-case class EdgePrep(geometry: Geometry, tracks: Seq[TrackRef], tags: Set[String], src_id_node_from: Option[String], src_id_node_to: Option[String]) {
+case class EdgePrep(
+    geometry: Geometry,
+    tracks: Seq[TrackRef],
+    tags: Set[String],
+    properties: Map[String, String],
+    src_id_node_from: Option[String],
+    src_id_node_to: Option[String]
+) {
   def linestring: LineString = geometry.asInstanceOf[LineString]
+  def combineProperties(p1: Map[String, String], p2: Map[String, String]): Map[String, String] = {
+    // keep properties that have the same value in both maps
+    p1.toSet.intersect(p2.toSet).toMap
+  }
   def add(track: Track, tagsToIgnore: Set[String]): EdgePrep = {
     val lastPosition = tracks.lastOption.map(_.position_to).getOrElse(0d)
     copy(
       geometry = GeometryCalcUtils.mergeLineStrings(linestring, track.linestring),
       tracks = tracks :+ TrackRef.from(track, lastPosition),
       src_id_node_to = track.src_id_node_to,
-      tags = tags ++ track.tags.diff(tagsToIgnore)
+      tags = tags ++ track.tags.diff(tagsToIgnore),
+      properties = combineProperties(properties, track.properties)
     )
   }
   def startPointAndId: (Point, Option[String]) = (linestring.getStartPoint, src_id_node_from)
@@ -229,6 +243,7 @@ object EdgePrep {
       geometry = track.geometry,
       tracks = Seq(TrackRef.from(track)),
       tags = track.tags.diff(tagsToIgnore),
+      properties = track.properties,
       src_id_node_from = track.src_id_node_from,
       src_id_node_to = track.src_id_node_to
     )
@@ -247,12 +262,23 @@ object EdgePrep {
  *   orientation relative to the merged edge (+1 same, -1 reversed)
  * @param level
  *   optional vertical level (e.g. tunnel/bridge stacking level)
+ * @param tags
+ *   semantic tags used for matching/filtering/aggregation, including tunnel and bridge
+ * @param properties
+ *   additional source attributes as key-value pairs*, e.g. operator and line
  */
-case class TrackRef(uuid_track: String, position_from: Double, position_to: Double, direction: Short, level: Option[Short])
+case class TrackRef(
+    uuid_track: String,
+    position_from: Double,
+    position_to: Double,
+    direction: Short,
+    level: Option[Short],
+    tags: Set[String],
+    properties: Map[String, String]
+)
 object TrackRef {
-  def from(track: Track, startPos: Double = 0d): TrackRef = {
-    TrackRef(track.uuid_track, startPos, startPos + track.length, if (track.reversed) -1 else 1, track.level)
-  }
+  def from(track: Track, startPos: Double = 0d): TrackRef =
+    TrackRef(track.uuid_track, startPos, startPos + track.length, if (track.reversed) -1 else 1, track.level, track.tags, track.properties)
 }
 
 /**

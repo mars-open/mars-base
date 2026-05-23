@@ -18,19 +18,17 @@
  */
 package net.mars.open.pp
 
-import net.mars.open.pp.utils.GeometryCalcUtils.{convertTo3857, convertTo4326, getGeoFactory, isMetricCrs}
 import io.smartdatalake.workflow.action.spark.customlogic.CustomDfsTransformer
+import net.mars.open.pp.utils.GeometryCalcUtils._
 import net.mars.open.pp.utils.SpatialIndex
-import org.apache.sedona.common.FunctionsGeoTools
 import org.apache.spark.sql.functions._
-import org.apache.spark.sql.sedona_sql.expressions.st_functions._
 import org.apache.spark.sql.sedona_sql.expressions.st_constructors._
+import org.apache.spark.sql.sedona_sql.expressions.st_functions._
 import org.apache.spark.sql.sedona_sql.expressions.st_predicates.ST_Contains
 import org.apache.spark.sql.{Column, DataFrame, Dataset, SparkSession}
 import org.json4s.{DefaultFormats, Extraction}
 import org.locationtech.jts.algorithm.Angle
 import org.locationtech.jts.geom.{Coordinate, Geometry, GeometryFactory}
-import org.wololo.geojson.{Feature, GeoJSONFactory}
 
 /**
  * Lookup and snap Positionpoint candidates created from edges to existing Positionpoints. The
@@ -49,20 +47,25 @@ import org.wololo.geojson.{Feature, GeoJSONFactory}
 class SnapPpTransformer extends CustomDfsTransformer {
 
   /**
-   * @param dsSlvPp
-   * @param dsPpInput
+   * @param dsPpExisting
+   *   Dataset of existing Positionpoints. This is used to lookup existing points to snap to and to
+   *   avoid creating duplicates. It contains coordinates in srcCrs (x,y) and EPSG:4326 (lat,lng).
+   * @param dsPpNew
+   *   Dataset of Positionpoint candidates with their mapping to edges. The coordinates are in the
+   *   same CRS as srcCrs.
    * @param ppRadius
    * @param ppHeightTolerance
    * @param nbOfPartitions
    * @param srcCrs
    * @param polygonCoordsFilter
-   *   define a filter the limit the processed region The Polygon must be defined as list of json
-   *   coordinate tuples. Use https://boundingbox.klokantech.com/ to select a region.
+   *   Define a filter to limit the processed region. The Polygon must be defined as list of json
+   *   coordinate tuples. Use https://boundingbox.klokantech.com/ to select a region. Coordinates
+   *   can be EPSG:4326 or in the same CRS as the input data (srcCrs).
    * @return
    */
   def transform(
-      dsSlvPp: Dataset[Pp],
-      dsPpInput: Dataset[PpWithMapping],
+      dsPpExisting: Dataset[Pp],
+      dsPpNew: Dataset[PpWithMapping],
       ppRadius: Float = 0.25f,
       ppHeightTolerance: Float = 1f,
       nbOfPartitions: Int = 100,
@@ -70,16 +73,20 @@ class SnapPpTransformer extends CustomDfsTransformer {
       polygonCoordsFilter: Option[String] = None,
       isExec: Boolean
   ): Map[String, DataFrame] = {
-    implicit val session: SparkSession = dsSlvPp.sparkSession
-    import session.implicits._
+    implicit val session: SparkSession = dsPpExisting.sparkSession
     import org.json4s.jackson.JsonMethods._
+    import session.implicits._
     assert(isMetricCrs(srcCrs), "CRS must be metric for distance calculations; got " + srcCrs)
 
     val srcRegionPolygon = polygonCoordsFilter.map { geoJson =>
       implicit val formats: DefaultFormats.type = org.json4s.DefaultFormats
       val coordinates = Extraction.extract[Seq[Seq[Double]]](parse(geoJson))
         .map(c => new Coordinate(c.head, c.last))
-      getGeoFactory(srcCrs).createPolygon(coordinates.toArray)
+      val polygon = getGeoFactory(srcCrs).createPolygon(coordinates.toArray)
+      // check CRS, and convert from EPSG:4326 to srcCrs if needed.
+      if (isValidWithinCrs("EPSG:4326", polygon)) convertFrom4326(polygon, srcCrs)
+      else if (isValidWithinCrs(srcCrs, polygon)) polygon
+      else throw new IllegalArgumentException(s"Invalid filter polygon: Coordinates must be valid in CRS $srcCrs or EPSG:4326: " + geoJson)
     }
     val regionPolygon4326WithBuffer = srcRegionPolygon.map { polygon =>
       // add buffer of 2x ppRadius to be sure to include all points
@@ -92,34 +99,31 @@ class SnapPpTransformer extends CustomDfsTransformer {
     def ST_Polygon(polygon: Geometry): Column =
       ST_MakePolygon(ST_MakeLine(array(polygon.getCoordinates.map(coord => ST_Point(lit(coord.x), lit(coord.y))): _*)))
 
-    val dsPpInputRegion = srcRegionPolygon.map(polygon => dsPpInput.filter(ST_Contains(ST_Polygon(polygon), ST_Point($"x", $"y")))).getOrElse(dsPpInput)
+    val dsPpNewFiltered = srcRegionPolygon.map(polygon => dsPpNew.filter(ST_Contains(ST_Polygon(polygon), ST_Point($"x", $"y"))))
+      .getOrElse(dsPpNew)
       .cache()
-    val dsPpRegion = regionPolygon4326WithBuffer.map(polygon => dsSlvPp.filter(ST_Contains(ST_Polygon(polygon), ST_Point($"lng", $"lat")))).getOrElse(
-      dsPpInput
-    ) // TODO: infer region from input points if no filter polygon is given, to avoid processing of all existing pps when no filter is given
-      .cache()
-
-    dsPpInputRegion.printSchema
-
-    dsPpRegion.printSchema
+    val dsPpExistingFiltered = regionPolygon4326WithBuffer.map(polygon => dsPpExisting.filter(ST_Contains(ST_Polygon(polygon), ST_Point($"lng", $"lat"))))
+      .getOrElse(
+        dsPpExisting
+      ) // TODO: infer region from input points if no filter polygon is given, to avoid processing of all existing pps when no filter is given
 
     // get list of prio values
     val prios = if (isExec) {
-      dsPpInputRegion
+      dsPpNewFiltered
         .agg(collect_set($"prio").as("prios"))
         .as[Seq[Short]].head().sorted
     } else Seq(1)
-    if (isExec) logger.info(s"prios=${prios.mkString(",")}")
+    if (isExec) logger.info(s"Found prios ${prios.mkString(",")}")
+    assert(prios.nonEmpty, "No prio values found in input data, input count is " + dsPpNewFiltered.count())
 
-    val dsExistingSnapped = dsPpRegion
+    val dsExistingSnapped = dsPpExistingFiltered
       .withColumn("pp_existing", struct("*"))
       .select($"pp_existing".as("snapped_pp"), lit(false).as("is_new_pp"), typedlit[PpWithMapping](null).as("pp"), lit(null).as("direction"))
       .as[PpWithMappingAndSnap]
 
     val dsNewSnapped = prios.foldLeft(dsExistingSnapped) {
       case (dsExistingSnapped, prio) =>
-        logger.info(s"Processing prio=$prio")
-        val dfNewFiltered = dsPpInputRegion
+        val dfNewFiltered = dsPpNewFiltered
           .where($"prio" === prio)
           .withColumn("pp_new", struct("*"))
           .withColumn("h3id", udfH3idL15($"x", $"y", lit(srcCrs)))
@@ -155,9 +159,7 @@ class SnapPpTransformer extends CustomDfsTransformer {
 
         dsExistingSnapped.unionByName(dsNewSnapped)
     }
-      .cache()
-
-    dsNewSnapped.printSchema
+      .persist()
 
     val dsPpAppend = dsNewSnapped
       .filter(_.is_new_pp)

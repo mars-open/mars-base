@@ -55,7 +55,8 @@ import scala.jdk.CollectionConverters._
  * Note that geometries are expected in WGS84 / EPSG:4326 coordinate reference system.
  *
  * @param compressTiles if true tiles are compressed using gzip.
- *                      Unfortunately this doesnt seem to work with maplibre online, but it works when accessing a local file (pmtiles.io viewer)
+ *                      Unfortunately this doesnt seem to work with maplibre online, but it works when accessing a local file (pmtiles.io viewer)*
+ * @param tempCalculationPath if set, intermediate tiles are precalculated to this path. This forces parallel creation of tiles, which is the is a main driver for performance.
  */
 case class PMTilesDataObject(
                               id: DataObjectId,
@@ -64,6 +65,7 @@ case class PMTilesDataObject(
                               path: Option[String],
                               colsToIgnore: Seq[String] = Seq(),
                               compressTiles: Boolean = false,
+                              tempCalculationPath: Option[String] = None,
                               metadata: Option[DataObjectMetadata] = None
                             )(@transient implicit val instanceRegistry: InstanceRegistry)
   extends DataObject with CanWriteSparkDataFrame {
@@ -108,7 +110,7 @@ case class PMTilesDataObject(
     }.reduce(_.unionAll(_))
 
     // create MVT-Tiles
-    val udfCreateMvtTile = udf(createMvtTile(compressTiles) _)
+    val udfCreateMvtTile = udf(createMvtTile(compressTiles) _).asNondeterministic() // avoid unnecessary re-calculation of tiles (asNondeterministic)
     val dsTile = dfWithTileZ
       .groupBy($"tile")
       .agg(collect_list(struct(df.columns.map(col):_*)).as("features"))
@@ -121,17 +123,30 @@ case class PMTilesDataObject(
     val localFile = new File(localPath)
     localFile.delete()
     assert(!localFile.exists(), s"Could not delete $localFile. Is it still open somewhere?")
+
+    // calculation of tiles is the performance intensive part.
+    // force parallel calculation of tiles into temp files, as later toLocalIterator call doesn't launch parallel spark tasks
+    val dsTilePrepared = tempCalculationPath.map(new Path(_)).map { path =>
+      val filesystem = HdfsUtil.getHadoopFsFromSpark(path)
+      HdfsUtil.deletePath(path, doWarn = false)(filesystem)
+      logger.info(s"Precalculating tiles to $path to force parallel calculation")
+      dsTile.write.format("parquet").save(path.toString)
+      logger.info(s"Precalculating tiles finished")
+      session.read.parquet(path.toString).as[TileData]
+    }.getOrElse(dsTile)
+
+    // write tiles to local file
     val i = TileverseAccessor.writeTiles(
-      dsTile.toLocalIterator().asScala,
+      dsTilePrepared.toLocalIterator().asScala,
       localPath, zoomAndFilter.keys.map(_.toInt).toSeq,
       (x: Double) => logger.info(s"Progress: $x"),
       Map("pps" -> df.schema.filterNot(f => nonFeatureAttributes.contains(f.name))),
-      compressTiles, parallelChunkSize = Some(2048)
+      compressTiles
     )
 
     // copy local file to hadoop if configured
     if (hadoopPath.isDefined) {
-      logger.info(s"Copying flatgeobuf file to ${hadoopPath.get}")
+      logger.info(s"Copying pmtiles file to ${hadoopPath.get}")
       val out = filesystem.create(hadoopPath.get, true)
       val in = Files.newInputStream(localFile.toPath)
       try {

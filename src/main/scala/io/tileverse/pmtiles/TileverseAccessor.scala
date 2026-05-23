@@ -31,7 +31,7 @@ object TileverseAccessor extends SmartDataLakeLogger {
   def writeTiles(
                   tiles: Iterator[TileData], localPath: String, zooms: Seq[Int], fnLog: Double => Unit,
                   layers: Map[String, Seq[StructField]],
-                  compressTiles: Boolean, parallelChunkSize: Option[Int] = None
+                  compressTiles: Boolean
                 ): Int = {
 
     val vectorLayers = layers.map{
@@ -54,7 +54,7 @@ object TileverseAccessor extends SmartDataLakeLogger {
       .tileType(PMTilesHeader.TILETYPE_MVT)
       .internalCompression(PMTilesHeader.COMPRESSION_GZIP)
       .tileCompression(if (compressTiles) PMTilesHeader.COMPRESSION_GZIP else PMTilesHeader.COMPRESSION_NONE)
-      .center(46.95112222715324, 7.439325799911505, 15)
+      //.center(46.95112222715324, 7.439325799911505, 15)
       .build()
 
     writer.setMetadata(metadata)
@@ -62,18 +62,13 @@ object TileverseAccessor extends SmartDataLakeLogger {
     writer.setProgressListener(createProgressListener(fnLog))
 
     val i = new AtomicInteger(0)
-    def addTile(tileData: TileData): Unit = {
+    def addTile(tileData: TileData): Unit = synchronized {
+      if (i.get % 1000 == 0) logger.info(s"Adding tile: ${i.get()}")
       i.incrementAndGet()
       writer.addTile(tileData.tile.getIndex, tileData.data)
     }
-    if (parallelChunkSize.isDefined) {
-      tiles.grouped(parallelChunkSize.get).foreach {
-        chunk => chunk.to(Iterable).par.foreach(addTile)
-      }
-    } else {
-      tiles.foreach(addTile)
-      writer.complete()
-    }
+    tiles.foreach(addTile)
+    writer.complete()
     i.get()
   }
 
