@@ -37,7 +37,7 @@ Configuration:
     logger:
 
       # INFO:
-      - name: ch.zzeekk
+      - name: net.mars.open
         level: INFO
       - name: io.smartdatalake
         level: INFO

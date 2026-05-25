@@ -200,7 +200,7 @@ class OsmExtractMainRailwayLinesTransformer extends CustomDfTransformer with Sma
       mergedTracks --= matchedTracks.filter{ case (t,cnt) => cnt > t.getLength / rasterDistance / 2 }.keys // remove matched tracks that have more than half of their length intersecting with the centerline)
     }
 
-    logger.info(s"finished processing $line, created ${centerLines.size} center lines from ${tracks.size} tracks")
+    logger.debug(s"finished processing $line, created ${centerLines.size} center lines from ${tracks.size} tracks")
     centerLines.toSeq
   }
 }
