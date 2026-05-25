@@ -12,8 +12,7 @@ Declarative data pipelines implemented using Spark and [SmartDataLakeBuilder](ht
 
 Currently data pipelines for the following countries are implemented:
 - Switzerland: swissTopo TLM3d dataset
-- Germany: Infrastukturregister service; unfortunately data quality is not sufficient for creating PPs
-- OpenRailwayMap: global coverage with promising results in Germany
+- OpenRailwayMap: global coverage with promising results in Germany. Elevation information is mostly missing, but can be compensated with bridge/tunnel information for creating PPs.
 
 A documentation of the pipelines and monitoring of weekly test runs can be browsed using SDLB's Visualizer under https://base-pipelines.mars-open.net/.
 

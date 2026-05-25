@@ -1,3 +1,6 @@
+# this configurations are disabled for now.
+# ISR data has quality issues with the topology that make it difficult to create something consistent.
+
 dataObjects {
 
   ext-de-isr-streckenabschnitt {
