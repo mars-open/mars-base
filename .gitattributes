@@ -1,0 +1,13 @@
+# Store text files with LF in the repository and check them out with LF on all platforms (Windows, WSL, CI).
+* text=auto eol=lf
+
+# Windows-only scripts keep CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary data
+*.pbf binary
+*.gpkg binary
+*.parquet binary
+*.fgb binary
+*.pmtiles binary
