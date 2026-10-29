@@ -25,8 +25,9 @@ import io.smartdatalake.lab.{LabSparkDfActionWrapper, LabSparkDfsActionWrapper}
 import io.smartdatalake.util.misc.SmartDataLakeLogger
 import io.smartdatalake.workflow.ActionPipelineContext
 import io.smartdatalake.workflow.action.{CustomDataFrameAction, DataFrameOneToOneActionImpl}
-import io.smartdatalake.workflow.dataframe.spark.SparkSubFeed
+import io.smartdatalake.workflow.dataframe.spark.{SparkDataFrame, SparkSubFeed}
 import io.smartdatalake.workflow.dataobject._
+import io.smartdatalake.workflow.dataobject.generic.{CanCreateDataFrame, TransactionalTableDataObject}
 import io.smartdatalake.workflow.dataobject.spark.CanCreateSparkDataFrame
 import org.apache.sedona.sql.UDT.UdtRegistrator
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
@@ -47,27 +48,34 @@ object Sandbox extends App with SmartDataLakeLogger {
   import org.apache.spark.sql.functions._
 
   // reading a DataFrame from a DataObject
-  def dfs[T <: DataObject with CanCreateSparkDataFrame : TypeTag : ClassTag](objectId: String, filter: Column = lit(true)): DataFrame = registry.get[T](DataObjectId(objectId)).getSparkDataFrame().where(filter)
+  def dfs(objectId: String, filter: Column = lit(true)): DataFrame = registry.get[DataObject with CanCreateDataFrame](DataObjectId(objectId)).getDataFrame()
+    .asInstanceOf[SparkDataFrame].inner.where(filter)
 
   // Action wrappers (as known from notebook)
   def dfActionWrapper(actionId: String) = LabSparkDfActionWrapper(registry.get[DataFrameOneToOneActionImpl](ActionId(actionId)), context)
   def dfsActionWrapper(actionId: String) = LabSparkDfsActionWrapper(registry.get[CustomDataFrameAction](ActionId(actionId)), context)
 
   import spark.implicits._
-  //dfs[ParquetFileDataObject]("slv-de-isr-streckenabschnitt")
+  //dfs("slv-de-isr-streckenabschnitt")
   //  .printSchema()
 
-  //dfs[JsonFileDataObject]("ext-osm-track")
-  //  .printSchema()
-  def createTagWithPrefixFromNumber(col: Column, prefix: String) = when(col.isNotNull, concat(lit(prefix),col))
+  //val df = dfs("slv-osm-edge")
+  //  .where($"uuid_edge"==="468d0e61-29b9-3329-a9af-7bb0e5029814")
 
-  dfs[SparkFileDataObject]("slv-tlm3d-node")
-    .where($"uuid_node".isin("b00ad96b-a9d5-4ae4-89d2-4a90bcb83621"))
-    .show(false)
-  //val df = dfs[DeltaLakeTableDataObject]("slv-pp")
-    //.where($"uuid_edge".isin("b4e05052-30de-4d99-9ac1-81d3bb5ca657"))
-  //  .where($"uuid_edge".startsWith("5b681701-7769-45e"))
-  //df.printSchema()
+  //val df = dfs("slv-osm-switch")
+  //  .where($"id".isin(3893521084L, 3893521085L, 3893520406L, 3893521088L, 3893521086L, 3893521082L, 3893521078L, 3893521076L, 13322955917L, 3893520746L, 13322955916L, 3893520741L))
+  //dfs("slv-tlm3d-node")
+  //  .where($"uuid_node".isin("b00ad96b-a9d5-4ae4-89d2-4a90bcb83621"))
+  //val df = dfs("slv-osm-edge")
+    //.where($"tracks.uuid_track"(0).like("%-0000-000017020338")) // -> 468d0e61-29b9-3329-a9af-7bb0e5029814, 8291331f-e2ba-30f6-9d1d-1cc4cd219e46
+  //  .where($"src_id_node_to" === "3893521078") // -> 37a99c53-3ebf-3e82-a94b-bae82b6e2bc3
+  //  .where($"uuid_node".isin("b00ad96b-a9d5-4ae4-89d2-4a90bcb83621"))
+  //val dfTrack = dfs("slv-osm-track")
+  //  .where($"uuid".like("%-0000-000017020338"))
+  val df = dfs("slv-de-pp-mapping-osm")
+  df.printSchema()
+  df.show(10, false)
+  //print("Count="+df.count)
   //df.groupBy($"objektart").count.show
   //df.orderBy($"uuid_edge", $"edge_idx").show()
   //df.show
