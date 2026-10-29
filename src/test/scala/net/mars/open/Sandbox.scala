@@ -25,7 +25,9 @@ import io.smartdatalake.lab.{LabSparkDfActionWrapper, LabSparkDfsActionWrapper}
 import io.smartdatalake.util.misc.SmartDataLakeLogger
 import io.smartdatalake.workflow.ActionPipelineContext
 import io.smartdatalake.workflow.action.{CustomDataFrameAction, DataFrameOneToOneActionImpl}
+import io.smartdatalake.workflow.dataframe.spark.SparkSubFeed
 import io.smartdatalake.workflow.dataobject._
+import io.smartdatalake.workflow.dataobject.spark.CanCreateSparkDataFrame
 import org.apache.sedona.sql.UDT.UdtRegistrator
 import org.apache.spark.sql.{Column, DataFrame, SparkSession}
 import org.slf4j.Logger
@@ -40,8 +42,8 @@ object Sandbox extends App with SmartDataLakeLogger {
 
   private implicit lazy val loggImp: Logger = logger
   private implicit val (registry: InstanceRegistry, globalConfig: GlobalConfig) = ConfigToolbox.loadAndParseConfig(Seq(s"file:///$workingDir/config", s"file:///$workingDir/envConfig/$env.conf"))
-  private implicit val spark: SparkSession = globalConfig.sparkSession("test", Some("local[*]"))
-  private implicit val context: ActionPipelineContext = ConfigToolbox.getDefaultActionPipelineContext(spark, registry)
+  private implicit val context: ActionPipelineContext = ConfigToolbox.getDefaultActionPipelineContext(registry)
+  private implicit val spark: SparkSession = SparkSubFeed.getSparkSession(context)
   import org.apache.spark.sql.functions._
 
   // reading a DataFrame from a DataObject

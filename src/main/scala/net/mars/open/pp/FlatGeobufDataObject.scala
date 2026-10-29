@@ -26,7 +26,8 @@ import io.smartdatalake.definitions.SaveModeOptions
 import io.smartdatalake.util.hdfs.{HdfsUtil, PartitionValues}
 import io.smartdatalake.workflow.ActionPipelineContext
 import io.smartdatalake.workflow.action.ActionSubFeedsImpl.MetricsMap
-import io.smartdatalake.workflow.dataobject.{CanWriteSparkDataFrame, DataObject, DataObjectMetadata}
+import io.smartdatalake.workflow.dataobject.spark.CanWriteSparkDataFrame
+import io.smartdatalake.workflow.dataobject.{DataObject, DataObjectMetadata}
 import org.apache.hadoop.fs.{FileSystem, Path}
 import org.apache.spark.sql.types._
 import org.apache.spark.sql.{DataFrame, SparkSession}
@@ -175,8 +176,6 @@ case class FlatGeobufDataObject(
 
     Map("nbOfGeometries" -> featureCollection.size())
   }
-
-  override def factory: FromConfigFactory[DataObject] = FlatGeobufDataObject
 }
 
 object FlatGeobufDataObject extends FromConfigFactory[DataObject] {

@@ -25,7 +25,9 @@ import io.smartdatalake.util.hdfs.PartitionValues
 import io.smartdatalake.util.webservice.SttpUtil.{SttpRequestExtension, createDefaultBackend}
 import io.smartdatalake.util.webservice.{HttpProxyConfig, HttpTimeoutConfig, SttpUtil}
 import io.smartdatalake.workflow.ActionPipelineContext
-import io.smartdatalake.workflow.dataobject.{CanCreateSparkDataFrame, DataObject, DataObjectMetadata}
+import io.smartdatalake.workflow.dataframe.spark.SparkSubFeed
+import io.smartdatalake.workflow.dataobject.spark.CanCreateSparkDataFrame
+import io.smartdatalake.workflow.dataobject.{DataObject, DataObjectMetadata}
 import net.mars.open.pp.utils.GeometryCalcUtils
 import org.apache.sedona.common.Functions
 import org.apache.sedona.sql.UDT.UdtRegistrator
@@ -130,7 +132,7 @@ case class WfsDataObject(
   }
 
   override def getSparkDataFrame(partitionValues: Seq[PartitionValues])(implicit context: ActionPipelineContext): DataFrame = {
-    val session = context.sparkSession
+    val session = SparkSubFeed.getSparkSession(context)
     import session.implicits._
     assert(getFeatures.contains(feature), s"($id) Feature $feature not existing in WFS Service. Available features are ${getFeatures.mkString(", ")}")
 
@@ -173,8 +175,6 @@ case class WfsDataObject(
     //if (context.isExecPhase) dfResult.cache.show
     dfResult
   }
-
-  override def factory: FromConfigFactory[DataObject] = WfsDataObject
 }
 
 object WfsDataObject extends FromConfigFactory[DataObject] {

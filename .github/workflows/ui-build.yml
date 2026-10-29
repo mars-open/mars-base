@@ -63,19 +63,19 @@ jobs:
 
     - name: Build using latest SDLB Snapshot
       # using versions:display-parent-updates instead of versions:update-parent as the later can not filter to include only Snapshots from develop, but not feature branches...
-      run: mvn -B clean package -Pscala-2.13
+      run: mvn -B clean package
 
     - name: Run pp generation
       env:
         S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
         S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
-      run: mvn -B exec:exec -Pscala-2.13 -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.app.SparkSmartDataLakeBuilder --feed-sel tlm3d-ext,tlm3d,pp,ch --config ./config,./envConfig/ci.conf --state-path viz/state -n create-pp --parallelism 2"
+      run: mvn -B exec:exec -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.app.DefaultSmartDataLakeBuilder --feed-sel tlm3d-ext,tlm3d,pp,ch --config ./config,./envConfig/ci.conf --state-path viz/state -n create-pp --parallelism 2"
 
     - name: Run Schema and Statistics export
       env:
         S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
         S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
-      run: mvn -B exec:exec -Pscala-2.13 -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.meta.configexporter.DataObjectSchemaExporter --config ./config,./envConfig/ci.conf --exportPath viz/schema"
+      run: mvn -B exec:exec -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.meta.configexporter.DataObjectSchemaExporter --config ./config,./envConfig/ci.conf --exportPath viz/schema"
 
     - name: Git Config
       run: |
@@ -93,7 +93,7 @@ jobs:
       env:
         S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
         S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
-      run: mvn -B exec:exec -Pscala-2.13 -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.meta.configexporter.ConfigJsonExporter --config ./config,./envConfig/ci.conf --target localfile:viz/exportedConfig.json --descriptionPath viz/description"
+      run: mvn -B exec:exec -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.meta.configexporter.ConfigJsonExporter --config ./config,./envConfig/ci.conf --target localfile:viz/exportedConfig.json --descriptionPath viz/description"
 
     - name: Setup Pages
       uses: actions/configure-pages@v5

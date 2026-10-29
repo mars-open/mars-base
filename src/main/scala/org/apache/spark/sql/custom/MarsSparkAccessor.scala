@@ -32,7 +32,7 @@ object MarsSparkAccessor {
                                    out: OutputStream,
                                    timeZoneId: String,
                                    errorOnDuplicatedFieldNames: Boolean): ArrowBatchStreamWriter = {
-    new ArrowBatchStreamWriter(schema, out, timeZoneId, errorOnDuplicatedFieldNames)
+    new ArrowBatchStreamWriter(schema, out, timeZoneId, errorOnDuplicatedFieldNames, largeVarTypes = false)
   }
 
   def dfToArrowBatchIterator(df: DataFrame,
@@ -41,6 +41,6 @@ object MarsSparkAccessor {
                             ): ArrowBatchIterator = {
     val encoder = Encoders.row(df.schema).asInstanceOf[ExpressionEncoder[Row]].createSerializer()
     val internalRows = df.toLocalIterator().asScala.map(encoder.apply)
-    new ArrowBatchIterator(internalRows, df.schema, maxRecordsPerBatch, timeZoneId, errorOnDuplicatedFieldNames = true, context = null)
+    new ArrowBatchIterator(internalRows, df.schema, maxRecordsPerBatch, timeZoneId, errorOnDuplicatedFieldNames = true, largeVarTypes = false, context = null)
   }
 }

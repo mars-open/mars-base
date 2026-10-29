@@ -24,10 +24,11 @@ import com.typesafe.config.Config
 import io.smartdatalake.config.SdlConfigObject.DataObjectId
 import io.smartdatalake.config.{FromConfigFactory, InstanceRegistry}
 import io.smartdatalake.definitions.SaveModeOptions
-import io.smartdatalake.util.hdfs.{HdfsUtil, PartitionValues}
+import io.smartdatalake.util.hdfs.{HdfsUtil, PartitionValues, SparkHdfsUtil}
 import io.smartdatalake.workflow.ActionPipelineContext
 import io.smartdatalake.workflow.action.ActionSubFeedsImpl.MetricsMap
-import io.smartdatalake.workflow.dataobject.{CanWriteSparkDataFrame, DataObject, DataObjectMetadata}
+import io.smartdatalake.workflow.dataobject.spark.CanWriteSparkDataFrame
+import io.smartdatalake.workflow.dataobject.{DataObject, DataObjectMetadata}
 import io.tileverse.pmtiles.{CompressionUtil, PMTilesHeader, TileverseAccessor}
 import io.tileverse.tiling.common.{Coordinate => TLCoordinate}
 import io.tileverse.tiling.matrix.{DefaultTileMatrixSets, TileMatrix}
@@ -127,7 +128,7 @@ case class PMTilesDataObject(
     // calculation of tiles is the performance intensive part.
     // force parallel calculation of tiles into temp files, as later toLocalIterator call doesn't launch parallel spark tasks
     val dsTilePrepared = tempCalculationPath.map(new Path(_)).map { path =>
-      val filesystem = HdfsUtil.getHadoopFsFromSpark(path)
+      val filesystem = SparkHdfsUtil.getHadoopFsFromSpark(path)
       HdfsUtil.deletePath(path, doWarn = false)(filesystem)
       logger.info(s"Precalculating tiles to $path to force parallel calculation")
       dsTile.write.format("parquet").save(path.toString)
@@ -204,8 +205,6 @@ case class PMTilesDataObject(
     val data = codec.encode(tile)
     if (compressTiles) TileverseAccessor.compressUsingGzip(data) else data
   }
-
-  override def factory: FromConfigFactory[DataObject] = PMTilesDataObject
 }
 
 object PMTilesDataObject extends FromConfigFactory[DataObject] {
