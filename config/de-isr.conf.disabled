@@ -98,7 +98,6 @@ actions {
       type = ScalaClassSparkDfsTransformer
       className = net.mars.open.pp.EdgeTransformer
     }]
-    breakDataFrameLineage = true
     metadata.feed = de-isr
   }
 
@@ -113,7 +112,6 @@ actions {
         slv-de-isr-edge: edge
       }
     }]
-    breakDataFrameLineage = true
     metadata.feed = de-isr
   }
 
@@ -132,7 +130,6 @@ actions {
         srcCrs = "EPSG:3857"
       }
     }]
-    breakDataFrameLineage = true
     metadata.feed = de-isr
   }
 

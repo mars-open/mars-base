@@ -10,7 +10,7 @@
           Set the smartdatalake version to use here.
           If version cannot be resolved, make sure maven central repository is defined in settings.xml and the corresponding profile activated.
         -->
-        <version>2.9.0-SNAPSHOT</version>
+        <version>3.0.0</version>
     </parent>
 
     <groupId>ch.sbb.mars</groupId>
@@ -34,13 +34,11 @@
 
         <exec-maven-plugin.version>3.6.2</exec-maven-plugin.version>
         <scala.compat.version>2.13</scala.compat.version>
-        <scala.version>${scala.compat.version}.12</scala.version>
         <scala-maven-plugin.version>4.9.6</scala-maven-plugin.version>
         <scalatest.version>3.2.19</scalatest.version>
         <scalatestplus.version>${scalatest.version}.0</scalatestplus.version>
-        <sedona.version>1.9.0</sedona.version>
-        <spark-temporalquery.version>3.0.0</spark-temporalquery.version>
-        <spark.version>3.5.7</spark.version>
+        <sedona.version>1.9.1</sedona.version>
+        <spark-temporalquery.version>4.0.0</spark-temporalquery.version>
     </properties>
 
     <licenses>
@@ -230,7 +228,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>io.smartdatalake.app.LocalSmartDataLakeBuilder</mainClass>
+                            <mainClass>io.smartdatalake.app.DefaultSmartDataLakeBuilder</mainClass>
                         </manifest>
                         <manifestEntries>
                             <Implementation-Version>${project.version}</Implementation-Version>
@@ -339,6 +337,12 @@
 
         <dependency>
             <groupId>io.smartdatalake</groupId>
+            <artifactId>sdl-spark_${scala.compat.version}</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.smartdatalake</groupId>
             <artifactId>sdl-deltalake_${scala.compat.version}</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
@@ -363,7 +367,7 @@
 
         <dependency>
             <groupId>org.apache.sedona</groupId>
-            <artifactId>sedona-spark-3.5_${scala.compat.version}</artifactId>
+            <artifactId>sedona-spark-${spark.minor.version}_${scala.compat.version}</artifactId>
             <version>${sedona.version}</version>
         </dependency>
 

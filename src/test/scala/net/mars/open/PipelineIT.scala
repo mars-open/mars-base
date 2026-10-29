@@ -35,7 +35,7 @@ class PipelineIT extends SmartDataLakeLogger with AnyFlatSpecLike with Matchers 
     val envConfig = sys.env.getOrElse("ENV_CONFIG", "ci.conf")
     logger.info(s"START dry-run: feedSel = $feedSel , envConfig = $envConfig")
     val config = SmartDataLakeBuilderConfig(feedSel,
-      applicationName = Some("debug"), master = Some("local[2]"), deployMode = Some("client"), test = Some(TestMode.DryRun),
+      applicationName = Some("debug"), test = Some(TestMode.DryRun),
       configuration = Seq(s"file:///$workingDir/config", s"file:///$workingDir/envConfig/$envConfig"))
     val sdlb = DefaultSmartDataLakeBuilder
     sdlb.run(config)
