@@ -2,10 +2,9 @@ name: Build, Run and Deploy UI
 
 on:
   push:
-    #The workflow runs for any changes that happen, except in ignored paths.
     paths-ignore:
       - 'viz/state/**'
-      - 'viz/schemas/**'
+      - 'viz/schema/**'
     branches:
       - master
 
@@ -61,8 +60,7 @@ jobs:
         sudo apt-get install -y gdal-bin
         ogr2ogr --version
 
-    - name: Build using latest SDLB Snapshot
-      # using versions:display-parent-updates instead of versions:update-parent as the later can not filter to include only Snapshots from develop, but not feature branches...
+    - name: Build
       run: mvn -B clean package
 
     - name: Run pp generation
@@ -71,29 +69,44 @@ jobs:
         S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
       run: mvn -B exec:exec -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.app.DefaultSmartDataLakeBuilder --feed-sel tlm3d-ext,tlm3d,pp,ch --config ./config,./envConfig/ci.conf --state-path viz/state -n create-pp --parallelism 2"
 
-    - name: Run Schema and Statistics export
+    - name: Run Schema and Column Lineage export
+      # A dry-run exports the schemas, merged with the @column descriptions of global.descriptionPath,
+      # and the column lineage of all output DataObjects to global.dataObjectsSchemaSource.
       env:
         S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
         S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
-      run: mvn -B exec:exec -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.meta.configexporter.DataObjectSchemaExporter --config ./config,./envConfig/ci.conf --exportPath viz/schema"
+        SDLB_SCHEMA_SOURCE: "localfile:viz/schema"
+      run: |
+        mkdir -p viz/schema
+        mvn -B exec:exec -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.app.DefaultSmartDataLakeBuilder --feed-sel tlm3d-ext,tlm3d,pp,ch --config ./config,./envConfig/ci.conf -n create-pp --test dry-run-with-lineage-export"
+
+    - name: Run Statistics export
+      # The dry-run exports no statistics, so CatalogStatsExporter adds them.
+      env:
+        S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
+        S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
+      run: mvn -B exec:exec -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.meta.configexporter.CatalogStatsExporter --config ./config,./envConfig/ci.conf --target localfile:viz/schema"
 
     - name: Git Config
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
 
-    - name: Commit and Push New State File
+    - name: Commit and Push New State, Schema, Lineage and Statistics Files
       run: |
         git pull
         git add viz/state/
-        git commit -m "Update state file"
+        git add -A viz/schema/
+        git diff-index --quiet HEAD || git commit -m "Update state, schema, lineage and statistics files" # only if there is something to commit
         git push
 
     - name: Run Export config with additional documentation
+      # ConfigJsonExporter was replaced by ExportSync in SDLB 3. Descriptions are read from global.descriptionPath.
+      # The localfile: scheme writes viz/exportedConfig.json as a single file where the UI expects it.
       env:
         S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
         S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
-      run: mvn -B exec:exec -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.meta.configexporter.ConfigJsonExporter --config ./config,./envConfig/ci.conf --target localfile:viz/exportedConfig.json --descriptionPath viz/description"
+      run: mvn -B exec:exec -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.meta.configexporter.ExportSync --config ./config,./envConfig/ci.conf --target localfile:./viz --types configJson"
 
     - name: Setup Pages
       uses: actions/configure-pages@v5

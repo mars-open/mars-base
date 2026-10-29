@@ -131,15 +131,14 @@
                                         <argument>-Dlog4j.configurationFile=log4j2.yml</argument>
                                         <argument>-classpath</argument>
                                         <classpath/>
-                                        <argument>
-                                            io.smartdatalake.meta.configexporter.ConfigJsonExporter
-                                        </argument>
+                                        <!-- ExportSync replaces ConfigJsonExporter since SDLB 3; descriptions are read from global.descriptionPath -->
+                                        <argument>io.smartdatalake.meta.configexporter.ExportSync</argument>
                                         <argument>--config</argument>
                                         <argument>./config,./envConfig/ci.conf</argument>
                                         <argument>--target</argument>
-                                        <argument>uiBackend</argument>
-                                        <argument>--descriptionPath</argument>
-                                        <argument>./description</argument>
+                                        <argument>localfile:./viz</argument>
+                                        <argument>--types</argument>
+                                        <argument>configJson</argument>
                                     </arguments>
                                     <classpathScope>test</classpathScope>
                                 </configuration>
