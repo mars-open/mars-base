@@ -1,6 +1,7 @@
 .venv
 data
 metastore_db
+spark-warehouse
 .idea
 target
 state
