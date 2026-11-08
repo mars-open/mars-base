@@ -23,7 +23,7 @@ Each PP represents a small section of track (±12.5cm) and gets a permanent, uni
 
 The following animation shows the principle:
 
-![Tracks change. History lost? How Positionpoints help keeping historical track information retrievable.](docs/position-points-animation.gif)
+![Tracks change. History lost? How Positionpoints help keeping historical track information retrievable.](position-points-animation.gif)
 
 1. **2008**: Track 701 is described by Positionpoints, fixed georeferenced locations along the line.
 2. **2015**: A new track and switch S7 are built. Track 701 is renamed to Track 1: the name changes, its points do not. Only the new track gets new points.
