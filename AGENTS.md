@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 MARS-Base builds **Positionpoints (PPs)** — stable, uniquely identified points at fixed spacing (default 25cm) along railway tracks — from public railway network data (Swiss swissTopo TLM3D, OpenStreetMap/OpenRailwayMap for Germany and others). 
 Pipelines are declarative [SmartDataLakeBuilder](https://www.smartdatalake.io) (SDLB) configs (HOCON in `config/`) that call custom Scala/Spark transformers and DataObjects in `src/main/scala`. 
-Geospatial work uses Apache Sedona (JTS geometries) and H3 indexing. README.md holds the design rationale (H3 choice, PP ID layout, token, zoom levels, edge spacing rules) — read it before changing PP creation or ID logic.
+Geospatial work uses Apache Sedona (JTS geometries) and H3 indexing. `docs/architecture-decisions.md` holds the design rationale (H3 choice, PP ID layout, token, zoom levels, edge spacing rules) — read it before changing PP creation or ID logic. `docs/motivation.md` explains the business purpose, `docs/build.md` the build and run steps.
 
 ## Build & test
 
