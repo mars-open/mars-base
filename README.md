@@ -1,4 +1,4 @@
-# MARS-Base
+# MARS-Base - Positionpoints
 
 **Positionpoints (PPs)** are stable, georeferenced, uniquely identified points at a fixed spacing (25cm by default) along railway tracks.
 They give every small piece of track a permanent, georeferenced address that survives renamed tracks, new switches and changed topology systems.
