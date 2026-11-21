@@ -55,7 +55,7 @@ class SnapPpTransformer extends CustomDfsTransformer {
    *   same CRS as srcCrs.
    * @param ppRadius
    * @param ppHeightTolerance
-   * @param nbOfPartitions
+   * @param nbOfSparkPartitions
    * @param srcCrs
    * @param polygonCoordsFilter
    *   Define a filter to limit the processed region. The Polygon must be defined as list of json
@@ -64,14 +64,14 @@ class SnapPpTransformer extends CustomDfsTransformer {
    * @return
    */
   def transform(
-      dsPpExisting: Dataset[Pp],
-      dsPpNew: Dataset[PpWithMapping],
-      ppRadius: Float = 0.25f,
-      ppHeightTolerance: Float = 1f,
-      nbOfPartitions: Int = 100,
-      srcCrs: String,
-      polygonCoordsFilter: Option[String] = None,
-      isExec: Boolean
+                 dsPpExisting: Dataset[Pp],
+                 dsPpNew: Dataset[PpWithMapping],
+                 ppRadius: Float = 0.25f,
+                 ppHeightTolerance: Float = 1f,
+                 nbOfSparkPartitions: Int = 100,
+                 srcCrs: String,
+                 polygonCoordsFilter: Option[String] = None,
+                 isExec: Boolean
   ): Map[String, DataFrame] = {
     implicit val session: SparkSession = dsPpExisting.sparkSession
     import org.json4s.jackson.JsonMethods._
@@ -151,7 +151,7 @@ class SnapPpTransformer extends CustomDfsTransformer {
 
         val udfSnapNewToExistingPps = udf(snapNewToExistingPps(ppRadius, ppHeightTolerance, srcCrs) _)
           .asNondeterministic()
-        val dsNewSnapped = dfNewFiltered.repartition(nbOfPartitions).hint("merge")
+        val dsNewSnapped = dfNewFiltered.repartition(nbOfSparkPartitions).hint("merge")
           .join(dfExisting, Seq("h3id"), "left")
           .withColumn("pp_snapped", explode(udfSnapNewToExistingPps($"pps_new", $"pps_existing", $"h3id")))
           .select($"pp_snapped.*")

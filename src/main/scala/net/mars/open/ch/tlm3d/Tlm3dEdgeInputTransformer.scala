@@ -40,8 +40,12 @@ class Tlm3dEdgeInputTransformer extends CustomDfsTransformer {
       .where(ST_NumPoints($"geometry") > 1)
       .select(
         $"uuid".as("uuid_track"),
+        lit(null).cast("string").as("src_id"),
+        lit(null).cast("string").as("src_id_node_from"),
+        lit(null).cast("string").as("src_id_node_to"),
         $"geometry",
         lit(false).as("reversed"),
+        lit(null).cast("short").as("level"),
         array_compact(array(
           $"type", $"subtype",
           createTagFromBool("main"),
@@ -50,7 +54,8 @@ class Tlm3dEdgeInputTransformer extends CustomDfsTransformer {
           createTagFromBool("standseilbahn"),
           createTagFromBool("betriebsbahn"),
           createTagFromBool("achse_dkm"),
-        )).as("tags")
+        )).as("tags"),
+        typedLit(Map.empty[String, String]).as("properties")
       ).as[Track]
 
     dsTrack

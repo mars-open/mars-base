@@ -45,12 +45,12 @@ import scala.collection.mutable
 class CreatePpTransformer extends CustomDfsTransformer {
 
   def transform(
-      dsEdge: Dataset[Edge],
-      dsNode: Dataset[Node],
-      ppDistance: Float = 0.25f,
-      wellDefinedPointDistance: Float = 25f,
-      nbOfPartitions: Int = 100,
-      srcCrs: String
+                 dsEdge: Dataset[Edge],
+                 dsNode: Dataset[Node],
+                 ppDistance: Float = 0.25f,
+                 wellDefinedPointDistance: Float = 25f,
+                 nbOfSparkPartitions: Int = 100,
+                 srcCrs: String
   ): Dataset[RawPpWithMapping] = {
     val session = dsEdge.sparkSession
     import session.implicits._
@@ -67,7 +67,7 @@ class CreatePpTransformer extends CustomDfsTransformer {
       .withColumn("node_from_mapping", filter($"nodeFrom.edges", e => e("uuid_edge") === $"uuid_edge")(0))
       .join(dfNodes.as("nodeTo"), $"edge.uuid_node_to" === $"nodeTo.uuid_node")
       .withColumn("node_to_mapping", filter($"nodeTo.edges", e => e("uuid_edge") === $"uuid_edge")(0))
-      .repartition(nbOfPartitions)
+      .repartition(nbOfSparkPartitions)
       .withColumn("pps", udfCreatePointsAtFixedInterval($"uuid_edge", $"geometry"))
       .withColumn("point", explode($"pps"))
       .withColumn("x", ST_X($"point.geometry"))

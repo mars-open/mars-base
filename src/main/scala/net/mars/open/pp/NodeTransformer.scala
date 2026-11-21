@@ -24,7 +24,7 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.sedona_sql.expressions.st_functions.ST_Length
 import org.apache.spark.sql.{DataFrame, Dataset, SparkSession}
 import org.locationtech.jts.algorithm.Angle
-import org.locationtech.jts.geom.{Geometry, GeometryFactory, LineString}
+import org.locationtech.jts.geom.{Geometry, GeometryFactory}
 
 /**
  * Create unique nodes from endpoints of edges.
@@ -32,9 +32,12 @@ import org.locationtech.jts.geom.{Geometry, GeometryFactory, LineString}
  */
 class NodeTransformer extends CustomDfsTransformer {
 
-  def transform(dsEdge: Dataset[Edge], dsSwitch: Dataset[Switch]): Dataset[Node] = {
+  def transform(dsEdge: Dataset[Edge], dfs: Map[String, DataFrame]): Dataset[Node] = {
     implicit val session: SparkSession = dsEdge.sparkSession
     import session.implicits._
+
+    // optional input for additional switch properties
+    val dsSwitch = dfs.get("switch").map(_.as[Switch])
 
     // extract start- and endpoint of each track, including angle
     val udfExtractStartEndPoint = udf(extractStartEndPoint _)
@@ -63,8 +66,9 @@ class NodeTransformer extends CustomDfsTransformer {
           .when($"arity" === 4, udfClassifyDoubleCrossingSwitch($"edges", coalesce($"src_id", $"uuid_node")))
       )
 
+    val dsSwitchResolved = dsSwitch.getOrElse(session.emptyDataset[Switch])
     val dfNode = dfNodePrep.as("n")
-      .join(dsSwitch.as("s"), Seq("src_id"), "left")
+      .join(dsSwitchResolved.as("s"), Seq("src_id"), "left")
       .select(
         $"n.uuid_node", $"n.geometry", $"arity", $"class._1".as("switch_type"), $"class._2".as("edges"),
         array_union($"s.tags", $"n.tags").as("tags"),
