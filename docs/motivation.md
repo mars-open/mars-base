@@ -79,11 +79,10 @@ Measurement train runs record samples at equidistant traveled distance. Mapping 
 
 **Dont discard the original equidistant recording.** Frequency filters can only be applied to equidistant data; once it is gone, it cannot be recovered from PP-mapped values. 
 
-The link between a measurement train run and the PPs is a **route** from a train location system:
-  - every measurement sample is assigned to one PP (measurement view), and
-  - every PP can have one or more samples assigned (infrastructure view).
-
-Keep this route together with the measurement data, so asset data can also be transferred back to the view of the train run.
+The link between a measurement train run and the PPs is a **route** from a train location system.
+There are two views on this mapping:
+  - measurement view: every measurement sample is assigned to one PP on the route
+  - infrastructure view: every PP of the route is assigned to one measurement sample
 
 ## Scale and visualisation
 
