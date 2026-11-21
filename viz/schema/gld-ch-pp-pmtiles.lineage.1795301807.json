@@ -1,0 +1,187 @@
+{
+  "actionId" : "load-gld-ch-pp-pmtiles",
+  "dataObjectId" : "gld-ch-pp-pmtiles",
+  "columnLineage" : {
+    "fields" : {
+      "azimuth" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-pp",
+          "field" : "azimuth",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "direction" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-ch-pp-mapping-tlm3d",
+          "field" : "direction",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "geometry" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "lat",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "st_pointz(pp.lng, pp.lat, CAST(pp.z AS DOUBLE), 0)",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "lng",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "st_pointz(pp.lng, pp.lat, CAST(pp.z AS DOUBLE), 0)",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "z",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "st_pointz(pp.lng, pp.lat, CAST(pp.z AS DOUBLE), 0)",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "grade" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-ch-pp-mapping-tlm3d",
+          "field" : "direction",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(CAST(org.grade AS DOUBLE) * CAST(ppm.direction AS DOUBLE))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-pp",
+          "field" : "grade",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(CAST(org.grade AS DOUBLE) * CAST(ppm.direction AS DOUBLE))",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "id_positionpoint" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "id_positionpoint",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "layer" : {
+        "inputFields" : [ ],
+        "expression" : "'pps'"
+      },
+      "position" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-ch-pp-mapping-tlm3d",
+          "field" : "position",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "radius" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-ch-pp-mapping-tlm3d",
+          "field" : "direction",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(org.radius * CAST(ppm.direction AS INT))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-pp",
+          "field" : "radius",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(org.radius * CAST(ppm.direction AS INT))",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "tags" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-pp",
+          "field" : "tags",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "token" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "token",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "uuid_edge" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-ch-pp-mapping-tlm3d",
+          "field" : "uuid_edge",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "zoom" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "zoom",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      }
+    }
+  }
+}

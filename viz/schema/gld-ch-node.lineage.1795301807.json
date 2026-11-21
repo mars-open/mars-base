@@ -1,0 +1,104 @@
+{
+  "actionId" : "load-gld-ch-node",
+  "dataObjectId" : "gld-ch-node",
+  "columnLineage" : {
+    "fields" : {
+      "arity" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-node",
+          "field" : "arity",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "edges" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-node",
+          "field" : "edges",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "geometry" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-node",
+          "field" : "geometry",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "properties" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-node",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "src_id" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-node",
+          "field" : "src_id",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "switch_type" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-node",
+          "field" : "switch_type",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "tags" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-node",
+          "field" : "tags",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "uuid_node" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-node",
+          "field" : "uuid_node",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      }
+    }
+  }
+}

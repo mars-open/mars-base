@@ -1,0 +1,117 @@
+{
+  "actionId" : "load-gld-ch-edge-fgb",
+  "dataObjectId" : "gld-ch-edge-fgb",
+  "columnLineage" : {
+    "fields" : {
+      "geometry" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-edge",
+          "field" : "geometry",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "UDF(geometry)",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "properties" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-edge",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "src_id_node_from" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-edge",
+          "field" : "src_id_node_from",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "src_id_node_to" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-edge",
+          "field" : "src_id_node_to",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "tags" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-edge",
+          "field" : "tags",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "tracks" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-edge",
+          "field" : "tracks",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "uuid_edge" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-edge",
+          "field" : "uuid_edge",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "uuid_node_from" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-edge",
+          "field" : "uuid_node_from",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "uuid_node_to" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-edge",
+          "field" : "uuid_node_to",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      }
+    }
+  }
+}

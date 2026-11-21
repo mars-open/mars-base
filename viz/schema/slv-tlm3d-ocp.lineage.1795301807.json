@@ -1,0 +1,83 @@
+{
+  "actionId" : "load-slv-ocp",
+  "dataObjectId" : "slv-tlm3d-ocp",
+  "columnLineage" : {
+    "fields" : {
+      "changed" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-tlm3d-ocp",
+          "field" : "datum_aenderung",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "CAST(ext_tlm3d_ocp_sdltemp.datum_aenderung AS DATE)",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "created" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-tlm3d-ocp",
+          "field" : "datum_erstellung",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "CAST(ext_tlm3d_ocp_sdltemp.datum_erstellung AS DATE)",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "geometry" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-tlm3d-ocp",
+          "field" : "geometry",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "name" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-tlm3d-ocp",
+          "field" : "name",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "number" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-tlm3d-ocp",
+          "field" : "dienststellen_nummer",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "CAST(ext_tlm3d_ocp_sdltemp.dienststellen_nummer AS INT)",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "uuid" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-tlm3d-ocp",
+          "field" : "uuid",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      }
+    }
+  }
+}

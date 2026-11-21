@@ -1,0 +1,103 @@
+{
+  "schema" : [ {
+    "name" : "uuid_edge",
+    "dataType" : "string",
+    "nullable" : true,
+    "comment" : "edge UUID"
+  }, {
+    "name" : "geometry",
+    "dataType" : "geometry",
+    "nullable" : true,
+    "comment" : "merged edge geometry as LineString"
+  }, {
+    "name" : "tracks",
+    "dataType" : {
+      "dataType" : "array",
+      "elementType" : {
+        "dataType" : "struct",
+        "fields" : [ {
+          "name" : "uuid_track",
+          "dataType" : "string",
+          "nullable" : true,
+          "comment" : "source track UUID"
+        }, {
+          "name" : "position_from",
+          "dataType" : "double",
+          "nullable" : false,
+          "comment" : "begin position of this track along the merged edge"
+        }, {
+          "name" : "position_to",
+          "dataType" : "double",
+          "nullable" : false,
+          "comment" : "end position of this track along the merged edge"
+        }, {
+          "name" : "direction",
+          "dataType" : "short",
+          "nullable" : false,
+          "comment" : "orientation relative to the merged edge (+1 same, -1 reversed)"
+        }, {
+          "name" : "level",
+          "dataType" : "short",
+          "nullable" : true,
+          "comment" : "optional vertical level (e.g. tunnel/bridge stacking level)"
+        }, {
+          "name" : "tags",
+          "dataType" : {
+            "dataType" : "array",
+            "elementType" : "string"
+          },
+          "nullable" : true,
+          "comment" : "semantic tags used for matching/filtering/aggregation, including tunnel and bridge"
+        }, {
+          "name" : "properties",
+          "dataType" : {
+            "dataType" : "map",
+            "keyType" : "string",
+            "valueType" : "string"
+          },
+          "nullable" : true,
+          "comment" : "additional source attributes as key-value pairs*, e.g. operator and line"
+        } ]
+      }
+    },
+    "nullable" : true,
+    "comment" : "ordered source track references that build this edge"
+  }, {
+    "name" : "uuid_node_from",
+    "dataType" : "string",
+    "nullable" : true,
+    "comment" : "UUID of the start node"
+  }, {
+    "name" : "uuid_node_to",
+    "dataType" : "string",
+    "nullable" : true,
+    "comment" : "UUID of the end node"
+  }, {
+    "name" : "tags",
+    "dataType" : {
+      "dataType" : "array",
+      "elementType" : "string"
+    },
+    "nullable" : true,
+    "comment" : "aggregated edge tags (after ignoring configured tags)"
+  }, {
+    "name" : "properties",
+    "dataType" : {
+      "dataType" : "map",
+      "keyType" : "string",
+      "valueType" : "string"
+    },
+    "nullable" : true
+  }, {
+    "name" : "src_id_node_from",
+    "dataType" : "string",
+    "nullable" : true,
+    "comment" : "optional source-system identifier of the start node"
+  }, {
+    "name" : "src_id_node_to",
+    "dataType" : "string",
+    "nullable" : true,
+    "comment" : "optional source-system identifier of the end node"
+  } ],
+  "subFeedType" : "SparkSubFeed"
+}

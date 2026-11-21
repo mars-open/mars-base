@@ -1,0 +1,223 @@
+{
+  "actionId" : "load-slv-tlm3d-track",
+  "dataObjectId" : "slv-tlm3d-track",
+  "columnLineage" : {
+    "fields" : {
+      "achse_dkm" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-tlm3d-track",
+          "field" : "achse_dkm",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(lower(ext_tlm3d_track_sdltemp.achse_dkm) = 'wahr')",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "betriebsbahn" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-tlm3d-track",
+          "field" : "betriebsbahn",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(lower(ext_tlm3d_track_sdltemp.betriebsbahn) = 'wahr')",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "changed" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-tlm3d-track",
+          "field" : "datum_aenderung",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "CAST(ext_tlm3d_track_sdltemp.datum_aenderung AS DATE)",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "created" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-tlm3d-track",
+          "field" : "datum_erstellung",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "CAST(ext_tlm3d_track_sdltemp.datum_erstellung AS DATE)",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "geometry" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-tlm3d-track",
+          "field" : "geometry",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "main" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-tlm3d-track",
+          "field" : "anschlussgleis",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(NOT (lower(ext_tlm3d_track_sdltemp.anschlussgleis) = 'wahr'))",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "museumsbahn" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-tlm3d-track",
+          "field" : "museumsbahn",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(lower(ext_tlm3d_track_sdltemp.museumsbahn) = 'wahr')",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "nb_of_tracks" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-tlm3d-track",
+          "field" : "anzahl_spuren",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "CAST(ext_tlm3d_track_sdltemp.anzahl_spuren AS SMALLINT)",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "standseilbahn" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-tlm3d-track",
+          "field" : "standseilbahn",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(lower(ext_tlm3d_track_sdltemp.standseilbahn) = 'wahr')",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "structure" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-tlm3d-track",
+          "field" : "kunstbaute",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "CASE WHEN (NOT (lower(ext_tlm3d_track_sdltemp.kunstbaute) = 'keine')) THEN ext_tlm3d_track_sdltemp.kunstbaute ELSE CAST(NULL AS STRING) END",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "structure_name" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-tlm3d-track",
+          "field" : "name",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "structure_uuid" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-tlm3d-track",
+          "field" : "tlm_oev_name_uuid",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "stufe" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-tlm3d-track",
+          "field" : "stufe",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "subtype" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-tlm3d-track",
+          "field" : "verkehrsmittel",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "type" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-tlm3d-track",
+          "field" : "objektart",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "uuid" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-tlm3d-track",
+          "field" : "uuid",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "lower(regexp_replace(ext_tlm3d_track_sdltemp.uuid, '\\\\{|\\\\}', '', 1))",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "zahnradbahn" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-tlm3d-track",
+          "field" : "zahnradbahn",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(lower(ext_tlm3d_track_sdltemp.zahnradbahn) = 'wahr')",
+            "masking" : false
+          } ]
+        } ]
+      }
+    }
+  }
+}

@@ -1,0 +1,3 @@
+{
+  "info" : "[DELTA_MISSING_DELTA_TABLE] `default`.`osm_track_prep` is not a Delta table."
+}
