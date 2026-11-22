@@ -77,6 +77,7 @@ jobs:
         SDLB_SCHEMA_SOURCE: "localfile:viz/schema"
       run: |
         mkdir -p viz/schema
+        rm -f viz/schema/*.schema.*
         mvn -B exec:exec -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.app.DefaultSmartDataLakeBuilder --feed-sel '.*' --config ./config,./envConfig/ci.conf -n create-pp --test dry-run-with-lineage-export"
 
     - name: Run Statistics export
@@ -95,7 +96,7 @@ jobs:
       run: |
         git pull
         git add viz/state/
-        git add -A viz/schema/
+        git add --ignore-removal viz/schema/
         git diff-index --quiet HEAD || git commit -m "Update state, schema, lineage and statistics files" # only if there is something to commit
         git push
 
