@@ -36,13 +36,13 @@ Input data is prepared outside of Spark and placed under `data/ext`:
 
 Pipelines are configured in HOCON files:
 
-- `config/`: pipeline definitions. `global.conf` selects the active country with `parameters = ${parametersXX}`; `ch.conf` and `de.conf` hold the country parameters.
+- `config/`: pipeline definitions for CH. `ch.conf` hold the country parameters. For DE the files are located in a separate directory `configDE` to keep things simpler. To use it, exchange move them to `config` and remove CH files there.
 - `envConfig/dev.conf`: local development environment. Data under `./data`, geometries uploaded to S3, S3 credentials read from `~/.key/s3`.
 - `envConfig/ci.conf`: CI environment. Inputs read from S3, credentials from environment variables `S3_ACCESS_KEY` / `S3_SECRET_KEY`.
 
 ## Run pipelines
 
-Pipelines run with SDLB's `DefaultSmartDataLakeBuilder`, selecting actions by feed name (`tlm3d-ext`, `tlm3d`, `osm`, `osm-line`, `pp`, `ch`, `de`, ...).
+Pipelines run with SDLB's `DefaultSmartDataLakeBuilder`, selecting actions by feed name (`tlm3d-ext`, `tlm3d`, `osm`, `osm-line`, `pp`, `ch`, ...).
 Spark on Java 17+ needs a set of `--add-opens` JVM flags; copy the full `JAVA_OPTIONS` from [.github/workflows/ui-build.yml](../.github/workflows/ui-build.yml).
 
 Example: create the Swiss Positionpoints from swissTopo TLM3D, as CI does:
