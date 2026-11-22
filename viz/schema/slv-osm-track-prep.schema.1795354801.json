@@ -1,0 +1,56 @@
+{
+  "schema" : [ {
+    "name" : "uuid_track",
+    "dataType" : "string",
+    "nullable" : true,
+    "comment" : "unique identifier of this track segment"
+  }, {
+    "name" : "src_id",
+    "dataType" : "string",
+    "nullable" : true,
+    "comment" : "optional source-system identifier for the segment"
+  }, {
+    "name" : "src_id_node_from",
+    "dataType" : "string",
+    "nullable" : true,
+    "comment" : "optional source-system identifier of the first node"
+  }, {
+    "name" : "src_id_node_to",
+    "dataType" : "string",
+    "nullable" : true,
+    "comment" : "optional source-system identifier of the last node"
+  }, {
+    "name" : "geometry",
+    "dataType" : "geometry",
+    "nullable" : true,
+    "comment" : "track geometry (expected to be a LineString)"
+  }, {
+    "name" : "reversed",
+    "dataType" : "boolean",
+    "nullable" : false,
+    "comment" : "true when this segment was generated in reverse orientation"
+  }, {
+    "name" : "level",
+    "dataType" : "short",
+    "nullable" : true,
+    "comment" : "optional vertical level (e.g. tunnel/bridge stacking level)"
+  }, {
+    "name" : "tags",
+    "dataType" : {
+      "dataType" : "array",
+      "elementType" : "string"
+    },
+    "nullable" : false,
+    "comment" : "semantic tags used for matching/filtering/aggregation"
+  }, {
+    "name" : "properties",
+    "dataType" : {
+      "dataType" : "map",
+      "keyType" : "string",
+      "valueType" : "string"
+    },
+    "nullable" : false,
+    "comment" : "additional source attributes as key-value pairs"
+  } ],
+  "subFeedType" : "SparkSubFeed"
+}

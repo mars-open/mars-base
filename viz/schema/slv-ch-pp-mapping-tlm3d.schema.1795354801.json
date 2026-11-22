@@ -1,0 +1,28 @@
+{
+  "schema" : [ {
+    "name" : "id_positionpoint",
+    "dataType" : "long",
+    "nullable" : true
+  }, {
+    "name" : "direction",
+    "dataType" : "short",
+    "nullable" : true
+  }, {
+    "name" : "zoom",
+    "dataType" : "short",
+    "nullable" : true
+  }, {
+    "name" : "uuid_edge",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "position",
+    "dataType" : "double",
+    "nullable" : true
+  }, {
+    "name" : "edge_idx",
+    "dataType" : "integer",
+    "nullable" : true
+  } ],
+  "subFeedType" : "SparkSubFeed"
+}

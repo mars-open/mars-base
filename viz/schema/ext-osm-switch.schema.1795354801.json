@@ -1,0 +1,20 @@
+{
+  "schema" : [ {
+    "name" : "type",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "geometry",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "properties",
+    "dataType" : {
+      "dataType" : "map",
+      "keyType" : "string",
+      "valueType" : "string"
+    },
+    "nullable" : true
+  } ],
+  "subFeedType" : "SparkSubFeed"
+}

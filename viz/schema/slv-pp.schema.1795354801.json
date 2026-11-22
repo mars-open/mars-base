@@ -1,0 +1,48 @@
+{
+  "schema" : [ {
+    "name" : "id_positionpoint",
+    "dataType" : "long",
+    "nullable" : false
+  }, {
+    "name" : "zoom",
+    "dataType" : "short",
+    "nullable" : false
+  }, {
+    "name" : "h3id",
+    "dataType" : "long",
+    "nullable" : false
+  }, {
+    "name" : "x",
+    "dataType" : "double",
+    "nullable" : false
+  }, {
+    "name" : "y",
+    "dataType" : "double",
+    "nullable" : false
+  }, {
+    "name" : "z",
+    "dataType" : "float",
+    "nullable" : true
+  }, {
+    "name" : "level",
+    "dataType" : "short",
+    "nullable" : true
+  }, {
+    "name" : "lng",
+    "dataType" : "double",
+    "nullable" : false
+  }, {
+    "name" : "lat",
+    "dataType" : "double",
+    "nullable" : false
+  }, {
+    "name" : "azimuth",
+    "dataType" : "float",
+    "nullable" : false
+  }, {
+    "name" : "token",
+    "dataType" : "string",
+    "nullable" : true
+  } ],
+  "subFeedType" : "SparkSubFeed"
+}
