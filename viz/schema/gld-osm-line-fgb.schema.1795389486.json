@@ -1,0 +1,20 @@
+{
+  "schema" : [ {
+    "name" : "uuid_line",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "geometry",
+    "dataType" : "geometry",
+    "nullable" : true
+  }, {
+    "name" : "line",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "operator",
+    "dataType" : "string",
+    "nullable" : true
+  } ],
+  "subFeedType" : "SparkSubFeed"
+}

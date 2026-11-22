@@ -1,0 +1,97 @@
+{
+  "schema" : [ {
+    "name" : "uuid_node",
+    "dataType" : "string",
+    "nullable" : true,
+    "comment" : "generated id of the node"
+  }, {
+    "name" : "geometry",
+    "dataType" : "geometry",
+    "nullable" : true,
+    "comment" : "point geometry of the node"
+  }, {
+    "name" : "arity",
+    "dataType" : "short",
+    "nullable" : false,
+    "comment" : "number of connected edges"
+  }, {
+    "name" : "switch_type",
+    "dataType" : {
+      "dataType" : "struct",
+      "fields" : [ {
+        "name" : "tpe",
+        "dataType" : "string",
+        "nullable" : true,
+        "comment" : "Basic type of the switch, e.g. SS → Simple Switch, DS → Double Switch, DCS → Double Crossing Switch"
+      }, {
+        "name" : "sub_tpe",
+        "dataType" : "string",
+        "nullable" : true,
+        "comment" : "Summary of curve as L/R of the different edges, sorted by radius: LL, L, R, RR"
+      }, {
+        "name" : "radius",
+        "dataType" : "integer",
+        "nullable" : true,
+        "comment" : "Radius of the switch"
+      } ]
+    },
+    "nullable" : true,
+    "comment" : "classification of the switch"
+  }, {
+    "name" : "edges",
+    "dataType" : {
+      "dataType" : "array",
+      "elementType" : {
+        "dataType" : "struct",
+        "fields" : [ {
+          "name" : "uuid_edge",
+          "dataType" : "string",
+          "nullable" : true,
+          "comment" : "id of the edge"
+        }, {
+          "name" : "node_side",
+          "dataType" : "short",
+          "nullable" : false,
+          "comment" : "side of the node this edge got assigned to.  \nNote: the graph traversal rule is that at a node the side needs to be switched, e.g. the next edge must start on the other side of the node."
+        }, {
+          "name" : "position_from",
+          "dataType" : "double",
+          "nullable" : true,
+          "comment" : "start position of the switch on this edge (this is always the smaller position value)"
+        }, {
+          "name" : "position_to",
+          "dataType" : "double",
+          "nullable" : true,
+          "comment" : "end position of the switch on this edge (this is always the larger position value)"
+        }, {
+          "name" : "main_edge",
+          "dataType" : "boolean",
+          "nullable" : true,
+          "comment" : "true if this is the main edge of the switch, if false it is a turnout edge."
+        } ]
+      }
+    },
+    "nullable" : true,
+    "comment" : "mapping of the switch on the edges"
+  }, {
+    "name" : "tags",
+    "dataType" : {
+      "dataType" : "array",
+      "elementType" : "string"
+    },
+    "nullable" : true
+  }, {
+    "name" : "properties",
+    "dataType" : {
+      "dataType" : "map",
+      "keyType" : "string",
+      "valueType" : "string"
+    },
+    "nullable" : true
+  }, {
+    "name" : "src_id",
+    "dataType" : "string",
+    "nullable" : true
+  } ],
+  "subFeedType" : "SparkSubFeed"
+}

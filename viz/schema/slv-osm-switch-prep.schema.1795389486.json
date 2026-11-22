@@ -1,0 +1,31 @@
+{
+  "schema" : [ {
+    "name" : "uuid_node",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "src_id",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "geometry",
+    "dataType" : "geometry",
+    "nullable" : true
+  }, {
+    "name" : "tags",
+    "dataType" : {
+      "dataType" : "array",
+      "elementType" : "string"
+    },
+    "nullable" : false
+  }, {
+    "name" : "properties",
+    "dataType" : {
+      "dataType" : "map",
+      "keyType" : "string",
+      "valueType" : "string"
+    },
+    "nullable" : false
+  } ],
+  "subFeedType" : "SparkSubFeed"
+}

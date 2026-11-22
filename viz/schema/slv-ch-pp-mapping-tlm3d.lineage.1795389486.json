@@ -1,0 +1,8 @@
+{
+  "actionId" : "create-slv-ch-pp",
+  "dataObjectId" : "slv-ch-pp-mapping-tlm3d",
+  "columnLineage" : {
+    "fields" : { }
+  },
+  "unresolvedFields" : [ "direction", "edge_idx", "id_positionpoint", "position", "uuid_edge", "zoom" ]
+}

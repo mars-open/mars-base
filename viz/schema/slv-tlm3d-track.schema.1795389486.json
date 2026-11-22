@@ -1,0 +1,72 @@
+{
+  "schema" : [ {
+    "name" : "uuid",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "changed",
+    "dataType" : "date",
+    "nullable" : true
+  }, {
+    "name" : "created",
+    "dataType" : "date",
+    "nullable" : true
+  }, {
+    "name" : "type",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "subtype",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "main",
+    "dataType" : "boolean",
+    "nullable" : true
+  }, {
+    "name" : "structure",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "structure_uuid",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "structure_name",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "stufe",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "museumsbahn",
+    "dataType" : "boolean",
+    "nullable" : true
+  }, {
+    "name" : "zahnradbahn",
+    "dataType" : "boolean",
+    "nullable" : true
+  }, {
+    "name" : "standseilbahn",
+    "dataType" : "boolean",
+    "nullable" : true
+  }, {
+    "name" : "betriebsbahn",
+    "dataType" : "boolean",
+    "nullable" : true
+  }, {
+    "name" : "achse_dkm",
+    "dataType" : "boolean",
+    "nullable" : true
+  }, {
+    "name" : "nb_of_tracks",
+    "dataType" : "short",
+    "nullable" : true
+  }, {
+    "name" : "geometry",
+    "dataType" : "geometry",
+    "nullable" : true
+  } ],
+  "subFeedType" : "SparkSubFeed"
+}
