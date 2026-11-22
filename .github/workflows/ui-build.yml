@@ -70,15 +70,14 @@ jobs:
       run: mvn -B exec:exec -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.app.DefaultSmartDataLakeBuilder --feed-sel tlm3d-ext,tlm3d,pp,ch --config ./config,./envConfig/ci.conf --state-path viz/state -n create-pp --parallelism 2"
 
     - name: Run Schema and Column Lineage export
-      # A dry-run exports the schemas, merged with the @column descriptions of global.descriptionPath,
-      # and the column lineage of all output DataObjects to global.dataObjectsSchemaSource.
+      # export the schemas, merged with the @column descriptions and the column lineage of all output DataObjects.
       env:
         S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
         S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
         SDLB_SCHEMA_SOURCE: "localfile:viz/schema"
       run: |
         mkdir -p viz/schema
-        mvn -B exec:exec -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.app.DefaultSmartDataLakeBuilder --feed-sel tlm3d-ext,tlm3d,pp,ch --config ./config,./envConfig/ci.conf -n create-pp --test dry-run-with-lineage-export"
+        mvn -B exec:exec -Dexec.executable="java" -Dexec.args="$JAVA_OPTIONS -cp %classpath io.smartdatalake.app.DefaultSmartDataLakeBuilder --feed-sel '.*' --config ./config,./envConfig/ci.conf -n create-pp --test dry-run-with-lineage-export"
 
     - name: Run Statistics export
       # The dry-run exports no statistics, so CatalogStatsExporter adds them.
@@ -101,8 +100,7 @@ jobs:
         git push
 
     - name: Run Export config with additional documentation
-      # ConfigJsonExporter was replaced by ExportSync in SDLB 3. Descriptions are read from global.descriptionPath.
-      # The localfile: scheme writes viz/exportedConfig.json as a single file where the UI expects it.
+      # writes viz/exportedConfig.json
       env:
         S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
         S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
