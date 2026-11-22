@@ -1,0 +1,8 @@
+{
+  "actionId" : "create-slv-osm-edge",
+  "dataObjectId" : "slv-osm-edge",
+  "columnLineage" : {
+    "fields" : { }
+  },
+  "unresolvedFields" : [ "geometry", "properties", "src_id_node_from", "src_id_node_to", "tags", "tracks", "uuid_edge", "uuid_node_from", "uuid_node_to" ]
+}

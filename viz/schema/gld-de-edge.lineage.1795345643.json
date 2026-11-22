@@ -1,0 +1,104 @@
+{
+  "actionId" : "load-gld-de-edge",
+  "dataObjectId" : "gld-de-edge",
+  "columnLineage" : {
+    "fields" : {
+      "geometry" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-edge",
+          "field" : "geometry",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "properties" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-edge",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "src_id_node_from" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-edge",
+          "field" : "src_id_node_from",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "src_id_node_to" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-edge",
+          "field" : "src_id_node_to",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "tags" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-edge",
+          "field" : "tags",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "uuid_edge" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-edge",
+          "field" : "uuid_edge",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "uuid_node_from" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-edge",
+          "field" : "uuid_node_from",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "uuid_node_to" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-edge",
+          "field" : "uuid_node_to",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      }
+    }
+  }
+}

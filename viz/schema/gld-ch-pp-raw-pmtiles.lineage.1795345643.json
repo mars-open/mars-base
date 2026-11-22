@@ -1,0 +1,104 @@
+{
+  "actionId" : "load-gld-ch-pp-raw-pmtiles",
+  "dataObjectId" : "gld-ch-pp-raw-pmtiles",
+  "columnLineage" : {
+    "fields" : {
+      "geometry" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-pp",
+          "field" : "x",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "st_transform(st_pointz(pp.x, pp.y, CAST(pp.z AS DOUBLE), 0), 'EPSG:2056', 'EPSG:4326')",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-pp",
+          "field" : "y",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "st_transform(st_pointz(pp.x, pp.y, CAST(pp.z AS DOUBLE), 0), 'EPSG:2056', 'EPSG:4326')",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-pp",
+          "field" : "z",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "st_transform(st_pointz(pp.x, pp.y, CAST(pp.z AS DOUBLE), 0), 'EPSG:2056', 'EPSG:4326')",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "layer" : {
+        "inputFields" : [ ],
+        "expression" : "'pps'"
+      },
+      "position" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-pp",
+          "field" : "position",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "token" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-pp",
+          "field" : "edge_idx",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "concat(pp.uuid_edge, '#', CAST(pp.edge_idx AS STRING))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-pp",
+          "field" : "uuid_edge",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "concat(pp.uuid_edge, '#', CAST(pp.edge_idx AS STRING))",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "uuid_edge" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-pp",
+          "field" : "uuid_edge",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "zoom" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-tlm3d-pp",
+          "field" : "zoom",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      }
+    }
+  }
+}

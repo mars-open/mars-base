@@ -1,0 +1,50 @@
+{
+  "schema" : [ {
+    "name" : "uuid_edge",
+    "dataType" : "string",
+    "nullable" : true,
+    "comment" : "edge UUID"
+  }, {
+    "name" : "geometry",
+    "dataType" : "geometry",
+    "nullable" : true,
+    "comment" : "merged edge geometry as LineString"
+  }, {
+    "name" : "uuid_node_from",
+    "dataType" : "string",
+    "nullable" : true,
+    "comment" : "UUID of the start node"
+  }, {
+    "name" : "uuid_node_to",
+    "dataType" : "string",
+    "nullable" : true,
+    "comment" : "UUID of the end node"
+  }, {
+    "name" : "src_id_node_from",
+    "dataType" : "string",
+    "nullable" : true,
+    "comment" : "optional source-system identifier of the start node"
+  }, {
+    "name" : "src_id_node_to",
+    "dataType" : "string",
+    "nullable" : true,
+    "comment" : "optional source-system identifier of the end node"
+  }, {
+    "name" : "tags",
+    "dataType" : {
+      "dataType" : "array",
+      "elementType" : "string"
+    },
+    "nullable" : true,
+    "comment" : "aggregated edge tags (after ignoring configured tags)"
+  }, {
+    "name" : "properties",
+    "dataType" : {
+      "dataType" : "map",
+      "keyType" : "string",
+      "valueType" : "string"
+    },
+    "nullable" : true
+  } ],
+  "subFeedType" : "SparkSubFeed"
+}

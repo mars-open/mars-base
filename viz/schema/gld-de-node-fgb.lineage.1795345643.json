@@ -1,0 +1,134 @@
+{
+  "actionId" : "load-gld-de-node-fgb",
+  "dataObjectId" : "gld-de-node-fgb",
+  "columnLineage" : {
+    "fields" : {
+      "arity" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-node",
+          "field" : "arity",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "geometry" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-node",
+          "field" : "geometry",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "UDF(geometry)",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "maxspeed_diverging" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-node",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "gld_de_node_sdltemp.properties['maxspeed_diverging']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "maxspeed_straight" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-node",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "gld_de_node_sdltemp.properties['maxspeed_straight']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "nb" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-node",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "gld_de_node_sdltemp.properties['nb']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "radius" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-node",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "gld_de_node_sdltemp.properties['radius']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "switch_type" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-node",
+          "field" : "switch_type",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "tags" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-node",
+          "field" : "tags",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "turnout_side" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-node",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "gld_de_node_sdltemp.properties['turnout_side']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "uuid_node" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-node",
+          "field" : "uuid_node",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      }
+    }
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "actionId" : "load-gld-de-edge-fgb",
+  "dataObjectId" : "gld-de-edge-fgb",
+  "columnLineage" : {
+    "fields" : {
+      "geometry" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-edge",
+          "field" : "geometry",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "UDF(geometry)",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "line" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-edge",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "gld_de_edge_sdltemp.properties['line']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "op" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-edge",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "gld_de_edge_sdltemp.properties['op']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "speed" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-edge",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "gld_de_edge_sdltemp.properties['speed']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "tags" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-edge",
+          "field" : "tags",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "track" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-edge",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "gld_de_edge_sdltemp.properties['track']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "uuid_edge" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-edge",
+          "field" : "uuid_edge",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "uuid_node_from" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-edge",
+          "field" : "uuid_node_from",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "uuid_node_to" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-edge",
+          "field" : "uuid_node_to",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      }
+    }
+  }
+}

@@ -1,0 +1,231 @@
+{
+  "actionId" : "load-gld-de-pp-pmtiles",
+  "dataObjectId" : "gld-de-pp-pmtiles",
+  "columnLineage" : {
+    "fields" : {
+      "azimuth" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-pp",
+          "field" : "azimuth",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "direction" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-pp",
+          "field" : "direction",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "geometry" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-pp",
+          "field" : "lat",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "st_point(gld_de_pp_sdltemp.lng, gld_de_pp_sdltemp.lat)",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "gld-de-pp",
+          "field" : "lng",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "st_point(gld_de_pp_sdltemp.lng, gld_de_pp_sdltemp.lat)",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "grade" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-pp",
+          "field" : "grade",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "h3id" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-pp",
+          "field" : "h3id",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "id_positionpoint" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-pp",
+          "field" : "id_positionpoint",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "layer" : {
+        "inputFields" : [ ],
+        "expression" : "'pps'"
+      },
+      "level" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-pp",
+          "field" : "level",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "line" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-pp",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "gld_de_pp_sdltemp.properties['line']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "op" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-pp",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "gld_de_pp_sdltemp.properties['op']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "position" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-pp",
+          "field" : "position",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "radius" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-pp",
+          "field" : "radius",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "speed" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-pp",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "gld_de_pp_sdltemp.properties['speed']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "tags" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-pp",
+          "field" : "tags",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "token" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-pp",
+          "field" : "token",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "track" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-pp",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "gld_de_pp_sdltemp.properties['track']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "uuid_edge" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-pp",
+          "field" : "uuid_edge",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "zoom" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "gld-de-pp",
+          "field" : "zoom",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      }
+    }
+  }
+}

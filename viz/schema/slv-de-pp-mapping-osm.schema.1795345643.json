@@ -1,0 +1,52 @@
+{
+  "schema" : [ {
+    "name" : "id_positionpoint",
+    "dataType" : "long",
+    "nullable" : false
+  }, {
+    "name" : "zoom",
+    "dataType" : "short",
+    "nullable" : false
+  }, {
+    "name" : "uuid_edge",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "position",
+    "dataType" : "double",
+    "nullable" : true
+  }, {
+    "name" : "direction",
+    "dataType" : "short",
+    "nullable" : true
+  }, {
+    "name" : "edge_idx",
+    "dataType" : "integer",
+    "nullable" : true
+  }, {
+    "name" : "radius",
+    "dataType" : "integer",
+    "nullable" : true
+  }, {
+    "name" : "grade",
+    "dataType" : "double",
+    "nullable" : true
+  }, {
+    "name" : "tags",
+    "dataType" : {
+      "dataType" : "array",
+      "elementType" : "string"
+    },
+    "nullable" : true,
+    "comment" : "additional information"
+  }, {
+    "name" : "properties",
+    "dataType" : {
+      "dataType" : "map",
+      "keyType" : "string",
+      "valueType" : "string"
+    },
+    "nullable" : true
+  } ],
+  "subFeedType" : "SparkSubFeed"
+}

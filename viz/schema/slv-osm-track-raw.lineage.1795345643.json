@@ -1,0 +1,190 @@
+{
+  "actionId" : "load-slv-osm-track",
+  "dataObjectId" : "slv-osm-track-raw",
+  "columnLineage" : {
+    "fields" : {
+      "bridge" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-track",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "coalesce((ext_osm_track_sdltemp.properties['bridge'] = 'yes'), false)",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "geometry" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-track",
+          "field" : "geometry",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "UDF(geometry)",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "id" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-track",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "ext_osm_track_sdltemp.properties['@id']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "level" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-track",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "ext_osm_track_sdltemp.properties['level']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "main" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-track",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(ext_osm_track_sdltemp.properties['usage'] = 'main')",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "maxspeed" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-track",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "ext_osm_track_sdltemp.properties['maxspeed']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "node_ids" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-track",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "from_json(ext_osm_track_sdltemp.properties['@way_nodes'])",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "operator" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-track",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "ext_osm_track_sdltemp.properties['operator']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "preferred_direction" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-track",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "ext_osm_track_sdltemp.properties['railway:preferred_direction']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "ref" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-track",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "ext_osm_track_sdltemp.properties['ref']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "track_ref" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-track",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "ext_osm_track_sdltemp.properties['track_ref']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "tunnel" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-track",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "coalesce((ext_osm_track_sdltemp.properties['tunnel'] = 'yes'), false)",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "type" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-track",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "ext_osm_track_sdltemp.properties['railway']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "uuid" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-track",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "udfUuidFromLong(cast(properties[@id] as bigint))",
+            "masking" : false
+          } ]
+        } ]
+      }
+    }
+  }
+}

@@ -1,0 +1,81 @@
+{
+  "schema" : [ {
+    "name" : "zoom",
+    "dataType" : "short",
+    "nullable" : true,
+    "comment" : "the zoom level of this Positionpoint"
+  }, {
+    "name" : "radius",
+    "dataType" : "integer",
+    "nullable" : true
+  }, {
+    "name" : "grade",
+    "dataType" : "float",
+    "nullable" : true
+  }, {
+    "name" : "azimuth",
+    "dataType" : "float",
+    "nullable" : true
+  }, {
+    "name" : "well_defined",
+    "dataType" : "boolean",
+    "nullable" : true
+  }, {
+    "name" : "x",
+    "dataType" : "double",
+    "nullable" : true,
+    "comment" : "native coordinate 1"
+  }, {
+    "name" : "y",
+    "dataType" : "double",
+    "nullable" : true,
+    "comment" : "native coordinate 2"
+  }, {
+    "name" : "z",
+    "dataType" : "float",
+    "nullable" : true,
+    "comment" : "Height in m"
+  }, {
+    "name" : "level",
+    "dataType" : "short",
+    "nullable" : true,
+    "comment" : "optional vertical level (e.g. tunnel/bridge stacking level)"
+  }, {
+    "name" : "uuid_edge",
+    "dataType" : "string",
+    "nullable" : true,
+    "comment" : "edge UUID"
+  }, {
+    "name" : "position",
+    "dataType" : "double",
+    "nullable" : true,
+    "comment" : "position on edge of this positionpoint"
+  }, {
+    "name" : "edge_idx",
+    "dataType" : "integer",
+    "nullable" : true,
+    "comment" : "number of point on edge"
+  }, {
+    "name" : "tags",
+    "dataType" : {
+      "dataType" : "array",
+      "elementType" : "string"
+    },
+    "nullable" : true,
+    "comment" : "additional information"
+  }, {
+    "name" : "properties",
+    "dataType" : {
+      "dataType" : "map",
+      "keyType" : "string",
+      "valueType" : "string"
+    },
+    "nullable" : true
+  }, {
+    "name" : "prio",
+    "dataType" : "short",
+    "nullable" : false,
+    "comment" : "priority when creating unique positionpoints and their mapping to edges. Lower priorities get\nsnapped first to existing positionpoints. This is important for switches, as we want the \"main\"\nedge to be merged first, so it has higher priority to create new positionpoints in the region\nof the \"Weichenzunge\"."
+  } ],
+  "subFeedType" : "SparkSubFeed"
+}

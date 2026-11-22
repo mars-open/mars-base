@@ -1,0 +1,1756 @@
+{
+  "actionId" : "create-slv-de-pp",
+  "dataObjectId" : "slv-de-pp-mapping-osm",
+  "columnLineage" : {
+    "fields" : {
+      "direction" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "azimuth",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`direction`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "edge_idx",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`direction`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "level",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`direction`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "position",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`direction`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "prio",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`direction`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "uuid_edge",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`direction`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "x",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`direction`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "y",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`direction`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "z",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`direction`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "zoom",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`direction`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "azimuth",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`direction`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "h3id",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`direction`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "id_positionpoint",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`direction`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "lat",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`direction`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "level",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`direction`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "lng",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`direction`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "token",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`direction`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "x",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`direction`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "y",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`direction`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "z",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`direction`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "zoom",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`direction`",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "edge_idx" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "azimuth",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`edge_idx`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "edge_idx",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`edge_idx`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "level",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`edge_idx`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "position",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`edge_idx`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "prio",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`edge_idx`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "uuid_edge",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`edge_idx`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "x",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`edge_idx`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "y",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`edge_idx`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "z",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`edge_idx`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "zoom",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`edge_idx`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "azimuth",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`edge_idx`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "h3id",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`edge_idx`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "id_positionpoint",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`edge_idx`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "lat",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`edge_idx`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "level",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`edge_idx`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "lng",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`edge_idx`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "token",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`edge_idx`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "x",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`edge_idx`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "y",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`edge_idx`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "z",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`edge_idx`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "zoom",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`edge_idx`",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "grade" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "azimuth",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(CAST(org.grade AS DOUBLE) * CAST(ppm.direction AS DOUBLE))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "edge_idx",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(CAST(org.grade AS DOUBLE) * CAST(ppm.direction AS DOUBLE))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "grade",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(CAST(org.grade AS DOUBLE) * CAST(ppm.direction AS DOUBLE))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "level",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(CAST(org.grade AS DOUBLE) * CAST(ppm.direction AS DOUBLE))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "position",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(CAST(org.grade AS DOUBLE) * CAST(ppm.direction AS DOUBLE))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "prio",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(CAST(org.grade AS DOUBLE) * CAST(ppm.direction AS DOUBLE))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "uuid_edge",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(CAST(org.grade AS DOUBLE) * CAST(ppm.direction AS DOUBLE))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "x",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(CAST(org.grade AS DOUBLE) * CAST(ppm.direction AS DOUBLE))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "y",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(CAST(org.grade AS DOUBLE) * CAST(ppm.direction AS DOUBLE))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "z",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(CAST(org.grade AS DOUBLE) * CAST(ppm.direction AS DOUBLE))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "zoom",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(CAST(org.grade AS DOUBLE) * CAST(ppm.direction AS DOUBLE))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "azimuth",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(CAST(org.grade AS DOUBLE) * CAST(ppm.direction AS DOUBLE))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "h3id",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(CAST(org.grade AS DOUBLE) * CAST(ppm.direction AS DOUBLE))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "id_positionpoint",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(CAST(org.grade AS DOUBLE) * CAST(ppm.direction AS DOUBLE))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "lat",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(CAST(org.grade AS DOUBLE) * CAST(ppm.direction AS DOUBLE))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "level",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(CAST(org.grade AS DOUBLE) * CAST(ppm.direction AS DOUBLE))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "lng",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(CAST(org.grade AS DOUBLE) * CAST(ppm.direction AS DOUBLE))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "token",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(CAST(org.grade AS DOUBLE) * CAST(ppm.direction AS DOUBLE))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "x",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(CAST(org.grade AS DOUBLE) * CAST(ppm.direction AS DOUBLE))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "y",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(CAST(org.grade AS DOUBLE) * CAST(ppm.direction AS DOUBLE))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "z",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(CAST(org.grade AS DOUBLE) * CAST(ppm.direction AS DOUBLE))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "zoom",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(CAST(org.grade AS DOUBLE) * CAST(ppm.direction AS DOUBLE))",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "id_positionpoint" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "azimuth",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "edge_idx",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "level",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "position",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "prio",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "uuid_edge",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "x",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "y",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "z",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "zoom",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "azimuth",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "h3id",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "id_positionpoint",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "lat",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "level",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "lng",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "token",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "x",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "y",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "z",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "zoom",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "position" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "azimuth",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`position`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "edge_idx",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`position`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "level",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`position`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "position",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`position`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "prio",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`position`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "uuid_edge",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`position`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "x",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`position`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "y",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`position`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "z",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`position`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "zoom",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`position`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "azimuth",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`position`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "h3id",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`position`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "id_positionpoint",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`position`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "lat",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`position`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "level",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`position`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "lng",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`position`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "token",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`position`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "x",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`position`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "y",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`position`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "z",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`position`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "zoom",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`position`",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "properties" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "radius" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "azimuth",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(org.radius * CAST(ppm.direction AS INT))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "edge_idx",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(org.radius * CAST(ppm.direction AS INT))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "level",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(org.radius * CAST(ppm.direction AS INT))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "position",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(org.radius * CAST(ppm.direction AS INT))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "prio",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(org.radius * CAST(ppm.direction AS INT))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "radius",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(org.radius * CAST(ppm.direction AS INT))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "uuid_edge",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(org.radius * CAST(ppm.direction AS INT))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "x",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(org.radius * CAST(ppm.direction AS INT))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "y",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(org.radius * CAST(ppm.direction AS INT))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "z",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(org.radius * CAST(ppm.direction AS INT))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "zoom",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(org.radius * CAST(ppm.direction AS INT))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "azimuth",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(org.radius * CAST(ppm.direction AS INT))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "h3id",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(org.radius * CAST(ppm.direction AS INT))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "id_positionpoint",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(org.radius * CAST(ppm.direction AS INT))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "lat",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(org.radius * CAST(ppm.direction AS INT))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "level",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(org.radius * CAST(ppm.direction AS INT))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "lng",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(org.radius * CAST(ppm.direction AS INT))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "token",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(org.radius * CAST(ppm.direction AS INT))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "x",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(org.radius * CAST(ppm.direction AS INT))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "y",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(org.radius * CAST(ppm.direction AS INT))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "z",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(org.radius * CAST(ppm.direction AS INT))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "zoom",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "(org.radius * CAST(ppm.direction AS INT))",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "tags" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "tags",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "uuid_edge" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "azimuth",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`uuid_edge`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "edge_idx",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`uuid_edge`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "level",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`uuid_edge`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "position",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`uuid_edge`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "prio",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`uuid_edge`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "uuid_edge",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`uuid_edge`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "x",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`uuid_edge`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "y",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`uuid_edge`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "z",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`uuid_edge`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "zoom",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`uuid_edge`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "azimuth",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`uuid_edge`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "h3id",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`uuid_edge`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "id_positionpoint",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`uuid_edge`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "lat",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`uuid_edge`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "level",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`uuid_edge`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "lng",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`uuid_edge`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "token",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`uuid_edge`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "x",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`uuid_edge`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "y",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`uuid_edge`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "z",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`uuid_edge`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "zoom",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp.`uuid_edge`",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "zoom" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "azimuth",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "edge_idx",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "level",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "position",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "prio",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "uuid_edge",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "x",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "y",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "z",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-pp",
+          "field" : "zoom",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "azimuth",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "h3id",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "id_positionpoint",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "lat",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "level",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "lng",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "token",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "x",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "y",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "z",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "zoom",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "pp_snapped.`snapped_pp`",
+            "masking" : false
+          } ]
+        } ]
+      }
+    }
+  }
+}

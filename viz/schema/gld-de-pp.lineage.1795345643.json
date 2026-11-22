@@ -1,0 +1,211 @@
+{
+  "actionId" : "load-gld-de-pp",
+  "dataObjectId" : "gld-de-pp",
+  "columnLineage" : {
+    "fields" : {
+      "azimuth" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "azimuth",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "direction" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-de-pp-mapping-osm",
+          "field" : "direction",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "geometry" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "x",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "st_point(pp.x, pp.y)",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "y",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "st_point(pp.x, pp.y)",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "grade" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-de-pp-mapping-osm",
+          "field" : "grade",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "h3id" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "h3id",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "id_positionpoint" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "id_positionpoint",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "lat" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "lat",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "level" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "level",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "lng" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "lng",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "position" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-de-pp-mapping-osm",
+          "field" : "position",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "properties" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-de-pp-mapping-osm",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "radius" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-de-pp-mapping-osm",
+          "field" : "radius",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "tags" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-de-pp-mapping-osm",
+          "field" : "tags",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "token" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "token",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "uuid_edge" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-de-pp-mapping-osm",
+          "field" : "uuid_edge",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "zoom" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-pp",
+          "field" : "zoom",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      }
+    }
+  }
+}

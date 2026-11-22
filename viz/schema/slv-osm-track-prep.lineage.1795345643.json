@@ -1,0 +1,336 @@
+{
+  "actionId" : "prepare-slv-osm-track",
+  "dataObjectId" : "slv-osm-track-prep",
+  "columnLineage" : {
+    "fields" : {
+      "geometry" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "geometry",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "track_split.`geometry`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "id",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "track_split.`geometry`",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "node_ids",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "track_split.`geometry`",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "level" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "bridge",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "CAST(CASE WHEN (level IS NOT NULL) THEN CAST(level AS INT) WHEN array_contains(tags, 'bridge') THEN 1 WHEN array_contains(tags, 'tunnel') THEN -1 ELSE 0 END AS SMALLINT)",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "level",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "CAST(CASE WHEN (level IS NOT NULL) THEN CAST(level AS INT) WHEN array_contains(tags, 'bridge') THEN 1 WHEN array_contains(tags, 'tunnel') THEN -1 ELSE 0 END AS SMALLINT)",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "main",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "CAST(CASE WHEN (level IS NOT NULL) THEN CAST(level AS INT) WHEN array_contains(tags, 'bridge') THEN 1 WHEN array_contains(tags, 'tunnel') THEN -1 ELSE 0 END AS SMALLINT)",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "tunnel",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "CAST(CASE WHEN (level IS NOT NULL) THEN CAST(level AS INT) WHEN array_contains(tags, 'bridge') THEN 1 WHEN array_contains(tags, 'tunnel') THEN -1 ELSE 0 END AS SMALLINT)",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "type",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "CAST(CASE WHEN (level IS NOT NULL) THEN CAST(level AS INT) WHEN array_contains(tags, 'bridge') THEN 1 WHEN array_contains(tags, 'tunnel') THEN -1 ELSE 0 END AS SMALLINT)",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "properties" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "maxspeed",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "map_filter(map('op', operator, 'line', ref, 'track', coalesce(track_ref, preferred_direction), 'speed', maxspeed), lambdafunction((length(namedlambdavariable()) > 0), namedlambdavariable(), namedla...",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "operator",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "map_filter(map('op', operator, 'line', ref, 'track', coalesce(track_ref, preferred_direction), 'speed', maxspeed), lambdafunction((length(namedlambdavariable()) > 0), namedlambdavariable(), namedla...",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "preferred_direction",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "map_filter(map('op', operator, 'line', ref, 'track', coalesce(track_ref, preferred_direction), 'speed', maxspeed), lambdafunction((length(namedlambdavariable()) > 0), namedlambdavariable(), namedla...",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "ref",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "map_filter(map('op', operator, 'line', ref, 'track', coalesce(track_ref, preferred_direction), 'speed', maxspeed), lambdafunction((length(namedlambdavariable()) > 0), namedlambdavariable(), namedla...",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "track_ref",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "map_filter(map('op', operator, 'line', ref, 'track', coalesce(track_ref, preferred_direction), 'speed', maxspeed), lambdafunction((length(namedlambdavariable()) > 0), namedlambdavariable(), namedla...",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "reversed" : {
+        "inputFields" : [ ],
+        "expression" : "false"
+      },
+      "src_id" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "geometry",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "concat(CAST(id AS STRING), ':', CAST(split_idx AS STRING))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "id",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "concat(CAST(id AS STRING), ':', CAST(split_idx AS STRING))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "node_ids",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "concat(CAST(id AS STRING), ':', CAST(split_idx AS STRING))",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "src_id_node_from" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "geometry",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "CAST(track_split.`nodeFrom` AS STRING)",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "id",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "CAST(track_split.`nodeFrom` AS STRING)",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "node_ids",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "CAST(track_split.`nodeFrom` AS STRING)",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "src_id_node_to" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "geometry",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "CAST(track_split.`nodeTo` AS STRING)",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "id",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "CAST(track_split.`nodeTo` AS STRING)",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "node_ids",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "CAST(track_split.`nodeTo` AS STRING)",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "tags" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "bridge",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "array_compact(array(type, CASE WHEN main THEN 'main' END, CASE WHEN bridge THEN 'bridge' END, CASE WHEN tunnel THEN 'tunnel' END))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "main",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "array_compact(array(type, CASE WHEN main THEN 'main' END, CASE WHEN bridge THEN 'bridge' END, CASE WHEN tunnel THEN 'tunnel' END))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "tunnel",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "array_compact(array(type, CASE WHEN main THEN 'main' END, CASE WHEN bridge THEN 'bridge' END, CASE WHEN tunnel THEN 'tunnel' END))",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "type",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "array_compact(array(type, CASE WHEN main THEN 'main' END, CASE WHEN bridge THEN 'bridge' END, CASE WHEN tunnel THEN 'tunnel' END))",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "uuid_track" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "geometry",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "CASE WHEN (st_numpoints(geometry) = st_numpoints(track_split.`geometry`)) THEN CAST(uuid AS STRING) ELSE (IF((CAST(id AS BIGINT) IS NULL), CAST(NULL AS STRING), UDF(cast(split_idx as bigint), known...",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "id",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "CASE WHEN (st_numpoints(geometry) = st_numpoints(track_split.`geometry`)) THEN CAST(uuid AS STRING) ELSE (IF((CAST(id AS BIGINT) IS NULL), CAST(NULL AS STRING), UDF(cast(split_idx as bigint), known...",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "node_ids",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "CASE WHEN (st_numpoints(geometry) = st_numpoints(track_split.`geometry`)) THEN CAST(uuid AS STRING) ELSE (IF((CAST(id AS BIGINT) IS NULL), CAST(NULL AS STRING), UDF(cast(split_idx as bigint), known...",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-track-raw",
+          "field" : "uuid",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "CASE WHEN (st_numpoints(geometry) = st_numpoints(track_split.`geometry`)) THEN CAST(uuid AS STRING) ELSE (IF((CAST(id AS BIGINT) IS NULL), CAST(NULL AS STRING), UDF(cast(split_idx as bigint), known...",
+            "masking" : false
+          } ]
+        } ]
+      }
+    }
+  }
+}

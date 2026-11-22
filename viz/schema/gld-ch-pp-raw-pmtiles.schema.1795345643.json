@@ -1,0 +1,31 @@
+{
+  "schema" : [ {
+    "name" : "geometry",
+    "dataType" : "geometry",
+    "nullable" : true
+  }, {
+    "name" : "token",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "position",
+    "dataType" : "double",
+    "nullable" : true,
+    "comment" : "position on edge of this positionpoint"
+  }, {
+    "name" : "uuid_edge",
+    "dataType" : "string",
+    "nullable" : true,
+    "comment" : "edge UUID"
+  }, {
+    "name" : "zoom",
+    "dataType" : "short",
+    "nullable" : true,
+    "comment" : "the zoom level of this Positionpoint"
+  }, {
+    "name" : "layer",
+    "dataType" : "string",
+    "nullable" : false
+  } ],
+  "subFeedType" : "SparkSubFeed"
+}

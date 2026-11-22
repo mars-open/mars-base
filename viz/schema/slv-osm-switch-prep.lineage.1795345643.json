@@ -1,0 +1,112 @@
+{
+  "actionId" : "prepare-slv-osm-switch",
+  "dataObjectId" : "slv-osm-switch-prep",
+  "columnLineage" : {
+    "fields" : {
+      "geometry" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-switch-raw",
+          "field" : "geometry",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "properties" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-switch-raw",
+          "field" : "maxspeed_diverging",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "map_filter(map('op', operator, 'nb', ref, 'turnout_side', turnout_side, 'maxspeed_diverging', maxspeed_diverging, 'maxspeed_straight', maxspeed_straight, 'radius', radius), lambdafunction((length(n...",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-switch-raw",
+          "field" : "maxspeed_straight",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "map_filter(map('op', operator, 'nb', ref, 'turnout_side', turnout_side, 'maxspeed_diverging', maxspeed_diverging, 'maxspeed_straight', maxspeed_straight, 'radius', radius), lambdafunction((length(n...",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-switch-raw",
+          "field" : "operator",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "map_filter(map('op', operator, 'nb', ref, 'turnout_side', turnout_side, 'maxspeed_diverging', maxspeed_diverging, 'maxspeed_straight', maxspeed_straight, 'radius', radius), lambdafunction((length(n...",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-switch-raw",
+          "field" : "radius",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "map_filter(map('op', operator, 'nb', ref, 'turnout_side', turnout_side, 'maxspeed_diverging', maxspeed_diverging, 'maxspeed_straight', maxspeed_straight, 'radius', radius), lambdafunction((length(n...",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-switch-raw",
+          "field" : "ref",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "map_filter(map('op', operator, 'nb', ref, 'turnout_side', turnout_side, 'maxspeed_diverging', maxspeed_diverging, 'maxspeed_straight', maxspeed_straight, 'radius', radius), lambdafunction((length(n...",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-switch-raw",
+          "field" : "turnout_side",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "map_filter(map('op', operator, 'nb', ref, 'turnout_side', turnout_side, 'maxspeed_diverging', maxspeed_diverging, 'maxspeed_straight', maxspeed_straight, 'radius', radius), lambdafunction((length(n...",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "src_id" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-switch-raw",
+          "field" : "id",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "CAST(id AS STRING)",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "tags" : {
+        "inputFields" : [ ],
+        "expression" : "array_compact(array('switch'))"
+      },
+      "uuid_node" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "slv-osm-switch-raw",
+          "field" : "uuid",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "IDENTITY",
+            "masking" : false
+          } ]
+        } ]
+      }
+    }
+  }
+}

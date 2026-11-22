@@ -1,0 +1,63 @@
+{
+  "schema" : [ {
+    "name" : "uuid",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "id",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "node_ids",
+    "dataType" : {
+      "dataType" : "array",
+      "elementType" : "long"
+    },
+    "nullable" : true
+  }, {
+    "name" : "geometry",
+    "dataType" : "geometry",
+    "nullable" : true
+  }, {
+    "name" : "type",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "ref",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "track_ref",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "preferred_direction",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "main",
+    "dataType" : "boolean",
+    "nullable" : true
+  }, {
+    "name" : "maxspeed",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "operator",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "level",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "bridge",
+    "dataType" : "boolean",
+    "nullable" : false
+  }, {
+    "name" : "tunnel",
+    "dataType" : "boolean",
+    "nullable" : false
+  } ],
+  "subFeedType" : "SparkSubFeed"
+}

@@ -1,0 +1,80 @@
+{
+  "actionId" : "load-gld-osm-line-fgb",
+  "dataObjectId" : "gld-osm-line-fgb",
+  "columnLineage" : {
+    "fields" : {
+      "geometry" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-track",
+          "field" : "geometry",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "UDF(geometry)",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-track",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "UDF(geometry)",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "line" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-track",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "properties['ref']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "operator" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-track",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "properties['operator']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "uuid_line" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-track",
+          "field" : "geometry",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "UDF( **org.apache.spark.sql.sedona_sql.expressions.ST_AsText**  )",
+            "masking" : false
+          } ]
+        }, {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-track",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "UDF( **org.apache.spark.sql.sedona_sql.expressions.ST_AsText**  )",
+            "masking" : false
+          } ]
+        } ]
+      }
+    }
+  }
+}

@@ -1,0 +1,125 @@
+{
+  "actionId" : "load-slv-osm-switch",
+  "dataObjectId" : "slv-osm-switch-raw",
+  "columnLineage" : {
+    "fields" : {
+      "geometry" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-switch",
+          "field" : "geometry",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "UDF(geometry)",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "id" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-switch",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "ext_osm_switch_sdltemp.properties['@id']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "maxspeed_diverging" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-switch",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "ext_osm_switch_sdltemp.properties['railway:maxspeed:diverging']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "maxspeed_straight" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-switch",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "ext_osm_switch_sdltemp.properties['railway:maxspeed:straight']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "operator" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-switch",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "ext_osm_switch_sdltemp.properties['operator']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "radius" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-switch",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "ext_osm_switch_sdltemp.properties['railway:radius']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "ref" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-switch",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "ext_osm_switch_sdltemp.properties['ref']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "turnout_side" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-switch",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "ext_osm_switch_sdltemp.properties['railway:turnout_side']",
+            "masking" : false
+          } ]
+        } ]
+      },
+      "uuid" : {
+        "inputFields" : [ {
+          "namespace" : "sdlb",
+          "name" : "ext-osm-switch",
+          "field" : "properties",
+          "transformations" : [ {
+            "type" : "DIRECT",
+            "subtype" : "TRANSFORMATION",
+            "description" : "udfUuidFromLong(cast(properties[@id] as bigint))",
+            "masking" : false
+          } ]
+        } ]
+      }
+    }
+  }
+}
