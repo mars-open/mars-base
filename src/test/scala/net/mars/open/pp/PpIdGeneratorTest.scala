@@ -37,4 +37,27 @@ class PpIdGeneratorTest extends AnyFunSuite {
     assert(PpIdGenerator.getToken(id1).take(11) == PpIdGenerator.getToken(id2).take(11))
   }
 
+  test("neighbour cells in range include all cells within distance, but not all neighbours") {
+    import net.mars.open.pp.utils.GeometryCalcUtils.convertTo4326
+    val srcCrs = "EPSG:2056"
+    val radius = 0.25
+    val rnd = new scala.util.Random(1)
+    val nbOfNeighbours = (0 until 200).map { _ =>
+      val (x, y) = (2600000 + rnd.nextDouble() * 100, 1200000 + rnd.nextDouble() * 100)
+      val h3id = PpIdGenerator.getH3idL15(x, y, srcCrs)
+      val wgs84 = convertTo4326(point(x, y), srcCrs).getCoordinate
+      val cells = PpIdGenerator.getH3idL15WithNeighboursInRange(wgs84.getY, wgs84.getX, h3id, radius)
+      // brute force: cells of a 1cm grid within the radius
+      val step = 0.01
+      val n = (radius / step).toInt
+      val expected = (for (i <- -n to n; j <- -n to n if Math.hypot(i * step, j * step) < radius)
+        yield PpIdGenerator.getH3idL15(x + i * step, y + j * step, srcCrs)).toSet
+      assert(cells.head == h3id)
+      assert(expected.subsetOf(cells.toSet), s"missing cells for ($x,$y): ${expected -- cells}")
+      cells.size - 1
+    }
+    println(s"average number of neighbours in range: ${nbOfNeighbours.sum.toDouble / nbOfNeighbours.size}")
+    assert(nbOfNeighbours.sum.toDouble / nbOfNeighbours.size < 3) // instead of 6 neighbours
+  }
+
 }

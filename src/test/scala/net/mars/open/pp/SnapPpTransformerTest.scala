@@ -235,4 +235,173 @@ class SnapPpTransformerTest extends AnyFunSuite {
 
   }
 
+  /**
+   * Create Positionpoint candidates every 0.25m along a straight line.
+   */
+  def straightEdge(uuidEdge: String, x0: Double, y0: Double, angle: Double, nbOfPoints: Int, z: Float = 100f, prio: Short = 1): Seq[PpWithMapping] =
+    (0 until nbOfPoints).map { i =>
+      val pos = i * 0.25
+      PpWithMapping(x0 + pos * Math.cos(angle), y0 + pos * Math.sin(angle), Some(z), None, 3, position = pos, uuid_edge = uuidEdge, prio = prio,
+        azimuth = angle.toFloat, edge_idx = i)
+    }
+
+  def snap(newPpms: Seq[PpWithMapping], existingPps: Seq[Pp]): (Seq[PpWithMappingAndSnap], Seq[PpWithMappingAndSnap]) =
+    transformer.snapNewToExistingPps(ppRadius, ppHeightTolerance, srcCrs)(newPpms, existingPps, h3IdSample).partition(_.is_new_pp)
+
+  def assertUniqueIds(existingPps: Seq[Pp], newPps: Seq[PpWithMappingAndSnap]): Unit = {
+    val ids = existingPps.map(_.id_positionpoint) ++ newPps.map(_.snapped_pp.id_positionpoint)
+    assert(ids.distinct.size == ids.size, "ids of new Positionpoints must not collide with existing ones")
+  }
+
+  test("new pp ids continue after highest existing number in cell, even with gaps and duplicates") {
+    val ppm = PpWithMapping(0, 0, Some(0), None, 0, position = 0.0, uuid_edge = "1", prio = 1, azimuth = 0.0f)
+    val pp0 = Pp.from(ppm, h3IdSample, new PpIdGenerator(0, h3IdSample).nextPpId, srcCrs).copy(x = 10)
+    val pp5 = Pp.from(ppm, h3IdSample, new PpIdGenerator(5, h3IdSample).nextPpId, srcCrs).copy(x = 20)
+    val existingPps = Seq(pp0, pp5, pp5, pp5) // duplicates and gap in numbering
+    val (newPps, snappedPps) = snap(Seq(ppm), existingPps)
+    assert(snappedPps.isEmpty)
+    assert(newPps.size == 1)
+    assert(PpIdGenerator.getPpNumber(newPps.head.snapped_pp.id_positionpoint) == 6)
+    assertUniqueIds(existingPps.distinct, newPps)
+  }
+
+  test("repeating with unchanged candidates creates no new pps") {
+    val edges = straightEdge("1", 0, 0, 0, 20) ++ straightEdge("2", 0, 3, 0, 20)
+    val (newPps1, _) = snap(edges, Seq())
+    assert(newPps1.size == 40)
+    val existingPps = newPps1.map(_.snapped_pp)
+    val (newPps2, snappedPps2) = snap(edges, existingPps)
+    assert(newPps2.isEmpty)
+    assert(snappedPps2.size == 40)
+    // every candidate maps to the pp it created in the first run
+    assert(snappedPps2.map(x => (x.pp, x.snapped_pp.id_positionpoint)).toSet == newPps1.map(x => (x.pp, x.snapped_pp.id_positionpoint)).toSet)
+  }
+
+  test("shifted track creates new pps, unchanged track not") {
+    val edge1 = straightEdge("1", 0, 0, 0, 20)
+    val edge2 = straightEdge("2", 0, 3, 0, 20)
+    val (newPps1, _) = snap(edge1 ++ edge2, Seq())
+    val existingPps = newPps1.map(_.snapped_pp)
+    val edge2Shifted = straightEdge("2", 0, 3.5, 0, 20) // shifted by 0.5m > ppRadius
+    val (newPps2, snappedPps2) = snap(edge1 ++ edge2Shifted, existingPps)
+    assert(newPps2.size == 20)
+    assert(newPps2.forall(_.pp.get.uuid_edge == "2"))
+    assert(snappedPps2.size == 20)
+    assert(snappedPps2.forall(_.pp.get.uuid_edge == "1"))
+    assertUniqueIds(existingPps, newPps2)
+  }
+
+  test("track shifted less than ppRadius snaps to existing pps") {
+    val edge1 = straightEdge("1", 0, 0, 0, 20)
+    val (newPps1, _) = snap(edge1, Seq())
+    val edge1Shifted = straightEdge("1", 0, 0.1, 0, 20)
+    val (newPps2, snappedPps2) = snap(edge1Shifted, newPps1.map(_.snapped_pp))
+    assert(newPps2.isEmpty)
+    assert(snappedPps2.size == 20)
+  }
+
+  test("extended track creates new pps only for the extension") {
+    val (newPps1, _) = snap(straightEdge("1", 0, 0, 0, 20), Seq())
+    val existingPps = newPps1.map(_.snapped_pp)
+    val (newPps2, snappedPps2) = snap(straightEdge("1", 0, 0, 0, 28), existingPps)
+    assert(newPps2.size == 8)
+    assert(newPps2.map(_.pp.get.edge_idx).toSet == (20 until 28).toSet)
+    assert(snappedPps2.size == 20)
+    assertUniqueIds(existingPps, newPps2)
+  }
+
+  test("height change above tolerance creates new pps, within tolerance not") {
+    val (newPps1, _) = snap(straightEdge("1", 0, 0, 0, 20, z = 100f), Seq())
+    val existingPps = newPps1.map(_.snapped_pp)
+    // new bridge over existing track
+    val (newPps2, snappedPps2) = snap(straightEdge("2", 0, 0, 0, 20, z = 105f), existingPps)
+    assert(newPps2.size == 20)
+    assert(snappedPps2.isEmpty)
+    assertUniqueIds(existingPps, newPps2)
+    // height correction within tolerance
+    val (newPps3, snappedPps3) = snap(straightEdge("1", 0, 0, 0, 20, z = 100.5f), existingPps)
+    assert(newPps3.isEmpty)
+    assert(snappedPps3.size == 20)
+  }
+
+  test("new turnout at existing main track creates new pps only where turnout leaves the main track") {
+    val main = straightEdge("1", 0, 0, Math.PI / 2, 13, z = 0f)
+    val turnout = straightEdge("2", 0, 0, Math.atan2(3, 1), 13, z = 0f, prio = 2) // diverging ~18deg
+    val (newPps1, _) = snap(main, Seq())
+    val existingPps = newPps1.map(_.snapped_pp)
+    val (newPps2, snappedPps2) = snap(main ++ turnout, existingPps)
+    assert(newPps2.nonEmpty)
+    assert(newPps2.forall(_.pp.get.uuid_edge == "2"))
+    assert(snappedPps2.count(_.pp.get.uuid_edge == "2") > 0) // turnout points near the switch snap to the main track
+    assert(snappedPps2.count(_.pp.get.uuid_edge == "1") == 13)
+    assertUniqueIds(existingPps, newPps2)
+    // and repeating creates nothing new
+    val (newPps3, _) = snap(main ++ turnout, existingPps ++ newPps2.map(_.snapped_pp))
+    assert(newPps3.isEmpty)
+  }
+
+
+  private def snapSingle(candidate: PpWithMapping, existingX: Double, existingY: Double): PpWithMappingAndSnap = {
+    val existing = Pp.from(candidate, h3IdSample, new PpIdGenerator(0, h3IdSample).nextPpId, srcCrs).copy(x = existingX, y = existingY)
+    val result = transformer.snapNewToExistingPps(ppRadius, ppHeightTolerance, srcCrs)(Seq(candidate), Seq(existing), h3IdSample)
+    assert(result.size == 1)
+    result.head
+  }
+
+  test("position of a new pp is the candidate position") {
+    val candidate = PpWithMapping(0, 0, Some(0), None, 3, position = 10.0, uuid_edge = "1", prio = 1, azimuth = 0.0f)
+    val result = snapSingle(candidate, 1, 1) // existing pp out of range
+    assert(result.is_new_pp)
+    assert(result.position == 10.0)
+  }
+
+  test("position is adapted by the offset along the edge when snapped to an existing pp") {
+    // edge in x direction: offset along the edge is dx, the lateral offset dy is ignored
+    val candidateX = PpWithMapping(0, 0, Some(0), None, 3, position = 10.0, uuid_edge = "1", prio = 1, azimuth = 0.0f)
+    val resultX = snapSingle(candidateX, 0.1, 0.05)
+    assert(!resultX.is_new_pp)
+    assert(math.abs(resultX.position - 10.1) < 1e-6)
+    assert(resultX.pp.get.position == 10.0) // the candidate itself is not changed
+
+    // edge in y direction: offset along the edge is dy
+    val candidateY = candidateX.copy(azimuth = (Math.PI / 2).toFloat)
+    val resultY = snapSingle(candidateY, 0.05, -0.2)
+    assert(!resultY.is_new_pp)
+    assert(math.abs(resultY.position - 9.8) < 1e-6)
+
+    // edge in reverse x direction: offset along the edge is -dx
+    val candidateRev = candidateX.copy(azimuth = Math.PI.toFloat)
+    val resultRev = snapSingle(candidateRev, 0.1, 0.0)
+    assert(!resultRev.is_new_pp)
+    assert(math.abs(resultRev.position - 9.9) < 1e-6)
+
+    // diagonal edge (45°): existing pp 0.1m along the edge
+    val candidateDiag = candidateX.copy(azimuth = (Math.PI / 4).toFloat)
+    val d = 0.1 / math.sqrt(2)
+    val resultDiag = snapSingle(candidateDiag, d, d)
+    assert(math.abs(resultDiag.position - 10.1) < 1e-6)
+  }
+
+  test("position is not negative when snapped to an existing pp before the start of the edge") {
+    val candidate = PpWithMapping(0, 0, Some(0), None, 3, position = 0.125, uuid_edge = "1", prio = 1, azimuth = 0.0f)
+    val result = snapSingle(candidate, -0.2, 0)
+    assert(!result.is_new_pp)
+    assert(result.position == 0.0)
+  }
+
+  test("envelope of candidates is converted to EPSG:4326 with buffer") {
+    import org.locationtech.jts.geom.{Coordinate, Envelope}
+    import net.mars.open.pp.utils.GeometryCalcUtils._
+    val envelope = new Envelope(2658000, 2708000, 1223000, 1273000)
+    val bbox = transformer.getEnvelope4326WithBuffer(envelope, 0.5, srcCrs)
+    // all points on the boundary of the buffered envelope must be inside the converted envelope
+    val buffered = new Envelope(envelope); buffered.expandBy(0.5)
+    val boundary = for (i <- 0 to 100; f = i / 100.0; c <- Seq(
+      new Coordinate(buffered.getMinX + f * buffered.getWidth, buffered.getMinY), new Coordinate(buffered.getMinX + f * buffered.getWidth, buffered.getMaxY),
+      new Coordinate(buffered.getMinX, buffered.getMinY + f * buffered.getHeight), new Coordinate(buffered.getMaxX, buffered.getMinY + f * buffered.getHeight)
+    )) yield convertTo4326(lv95GeomFactory.createPoint(c), srcCrs).getCoordinate
+    assert(boundary.forall(c => bbox.contains(c)))
+    // Zürich region: lng ~8.3-9.0, lat ~47.1-47.6
+    assert(bbox.getMinX > 8 && bbox.getMaxX < 9.2 && bbox.getMinY > 47 && bbox.getMaxY < 47.8, bbox.toString)
+  }
 }

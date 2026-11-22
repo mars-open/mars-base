@@ -28,7 +28,8 @@ import org.apache.spark.sql.sedona_sql.expressions.st_predicates.ST_Contains
 import org.apache.spark.sql.{Column, DataFrame, Dataset, SparkSession}
 import org.json4s.{DefaultFormats, Extraction}
 import org.locationtech.jts.algorithm.Angle
-import org.locationtech.jts.geom.{Coordinate, Geometry, GeometryFactory}
+import org.locationtech.jts.densify.Densifier
+import org.locationtech.jts.geom.{Coordinate, Envelope, Geometry, GeometryFactory}
 
 /**
  * Lookup and snap Positionpoint candidates created from edges to existing Positionpoints. The
@@ -88,91 +89,73 @@ class SnapPpTransformer extends CustomDfsTransformer {
       else if (isValidWithinCrs(srcCrs, polygon)) polygon
       else throw new IllegalArgumentException(s"Invalid filter polygon: Coordinates must be valid in CRS $srcCrs or EPSG:4326: " + geoJson)
     }
-    val regionPolygon4326WithBuffer = srcRegionPolygon.map { polygon =>
-      // add buffer of 2x ppRadius to be sure to include all points
-      val buffered = polygon.buffer(ppRadius * 2)
-      convertTo4326(buffered, srcCrs)
-    }
-
-    val udfH3idL15 = udf(PpIdGenerator.getH3idL15 _)
-
     def ST_Polygon(polygon: Geometry): Column =
       ST_MakePolygon(ST_MakeLine(array(polygon.getCoordinates.map(coord => ST_Point(lit(coord.x), lit(coord.y))): _*)))
 
     val dsPpNewFiltered = srcRegionPolygon.map(polygon => dsPpNew.filter(ST_Contains(ST_Polygon(polygon), ST_Point($"x", $"y"))))
       .getOrElse(dsPpNew)
-      .cache()
-    val dsPpExistingFiltered = regionPolygon4326WithBuffer.map(polygon => dsPpExisting.filter(ST_Contains(ST_Polygon(polygon), ST_Point($"lng", $"lat"))))
-      .getOrElse(
-        dsPpExisting
-      ) // TODO: infer region from input points if no filter polygon is given, to avoid processing of all existing pps when no filter is given
 
-    // get list of prio values
-    val prios = if (isExec) {
-      dsPpNewFiltered
-        .agg(collect_set($"prio").as("prios"))
-        .as[Seq[Short]].head().sorted
-    } else Seq(1)
-    if (isExec) logger.info(s"Found prios ${prios.mkString(",")}")
-    assert(prios.nonEmpty, "No prio values found in input data, input count is " + dsPpNewFiltered.count())
-
-    val dsExistingSnapped = dsPpExistingFiltered
-      .withColumn("pp_existing", struct("*"))
-      .select($"pp_existing".as("snapped_pp"), lit(false).as("is_new_pp"), typedlit[PpWithMapping](null).as("pp"), lit(null).as("direction"))
-      .as[PpWithMappingAndSnap]
-
-    val dsNewSnapped = prios.foldLeft(dsExistingSnapped) {
-      case (dsExistingSnapped, prio) =>
-        val dfNewFiltered = dsPpNewFiltered
-          .where($"prio" === prio)
-          .withColumn("pp_new", struct("*"))
-          .withColumn("h3id", udfH3idL15($"x", $"y", lit(srcCrs)))
-          .groupBy($"h3id")
-          .agg(collect_list($"pp_new").as("pps_new"))
-
-        // TODO: cogroup in snapIteration doesnt work in Scala 2.13 / Spark 3.x
-        // val dsNewFiltered = dfNewFiltered
-        //  .select($"h3id", $"pp_new")
-        //  .as[(Long, PpWithMapping)]
-        // val dsNewSnapped = snapIteration(
-        // dsNewFiltered,
-        // dsExistingSnapped.where($"is_new_pp" || $"pp".isNull),
-        // ppRadius, ppHeightTolerance, srcCrs)
-        // dfNewFiltered.cache.show
-        // dsNewSnapped.cache.select($"pp.*", $"is_new_pp").show
-
-        val dfExisting = dsExistingSnapped
-          .withColumn("pp", struct("snapped_pp.*"))
-          .withColumn("h3id_neighbours",
-            ST_H3KRing($"snapped_pp.h3id", 1, exactRing = false)) // exact=false will include cell 0-kth neighbours, true only kth neighbours
-          .withColumn("h3id", explode($"h3id_neighbours"))
-          .groupBy($"h3id")
-          .agg(collect_list($"pp").as("pps_existing"))
-
-        val udfSnapNewToExistingPps = udf(snapNewToExistingPps(ppRadius, ppHeightTolerance, srcCrs) _)
-          .asNondeterministic()
-        val dsNewSnapped = dfNewFiltered.repartition(nbOfSparkPartitions).hint("merge")
-          .join(dfExisting, Seq("h3id"), "left")
-          .withColumn("pp_snapped", explode(udfSnapNewToExistingPps($"pps_new", $"pps_existing", $"h3id")))
-          .select($"pp_snapped.*")
-          .as[PpWithMappingAndSnap]
-
-        dsExistingSnapped.unionByName(dsNewSnapped)
-    }
+    // Candidates of all prios are keyed by their h3 cell and partitioned only once.
+    // Filtering a prio keeps the hash partitioning, so the rounds don't need to shuffle candidates again.
+    val dfNewKeyed = keyNewPps(dsPpNewFiltered, srcCrs, nbOfSparkPartitions)
       .persist()
+
+    // get list of prio values and the bounding box of the candidates.
+    // Read them from the input and not from dfNewKeyed, as only the prio and coordinate columns need to be read.
+    val (prios, newPpsEnvelope) = if (isExec) {
+      val stats = dsPpNewFiltered
+        .agg(collect_set($"prio").as("prios"), min($"x"), max($"x"), min($"y"), max($"y"))
+        .as[(Seq[Short], Option[Double], Option[Double], Option[Double], Option[Double])]
+        .head()
+      val envelope = for (minX <- stats._2; maxX <- stats._3; minY <- stats._4; maxY <- stats._5) yield new Envelope(minX, maxX, minY, maxY)
+      (stats._1.sorted, envelope)
+    } else (Seq(1.toShort), None)
+    if (isExec) logger.info(s"Found prios ${prios.mkString(",")}")
+    assert(prios.nonEmpty, "No prio values found in input data, input count is " + dfNewKeyed.count())
+
+    // Only existing pps around the candidates are needed. Filter them by the bounding box of the candidates with plain comparisons,
+    // so that Delta can skip files by their min/max statistics. This also covers the filter polygon, as candidates are filtered by it.
+    val dsPpExistingFiltered = newPpsEnvelope
+      .map { envelope =>
+        val bbox = getEnvelope4326WithBuffer(envelope, ppRadius * 2, srcCrs)
+        logger.info(s"Filtering existing pps by bounding box of candidates $bbox")
+        dsPpExisting.where($"lng".between(bbox.getMinX, bbox.getMaxX) && $"lat".between(bbox.getMinY, bbox.getMaxY))
+      }
+      .getOrElse(dsPpExisting)
+
+    // Existing pps are keyed by their h3 cell and neighbour cells only once and persisted, so that later rounds
+    // neither read and explode nor shuffle them again. Later rounds only add the keyed pps created by previous rounds.
+    // Persist is used instead of a checkpoint, as a checkpoint loses the hash partitioning.
+    val dfExistingKeyed = keyExistingPps(dsPpExistingFiltered, ppRadius, nbOfSparkPartitions)
+      .persist()
+
+    // snap one priority after the other, each round sees the pps created by the previous rounds
+    val (_, dsSnappedRounds) = prios.foldLeft((dfExistingKeyed, Seq[Dataset[PpWithMappingAndSnap]]())) {
+      case ((dfExistingKeyed, dsSnappedRounds), prio) =>
+        // Each round sees the pps created by previous rounds in its own and neighbour cells, as they are added to dfExistingKeyed
+        // with the same neighbour keys as existing pps.
+        val dfNewPrio = dfNewKeyed.where($"prio" === prio)
+        // The result of this round is used twice: for the outputs and as input for the next round.
+        // Use a lazy local checkpoint instead of persist as it is written to slv-pp, which is also an input and invalidates the cached DataFrame for the second output.
+        val dsSnapped = snapIteration(dfNewPrio, dfExistingKeyed, ppRadius, ppHeightTolerance, srcCrs)
+          .localCheckpoint(eager = false)
+        val dsCreatedPps = dsSnapped.where($"is_new_pp").select($"snapped_pp.*").as[Pp]
+        (dfExistingKeyed.unionByName(keyExistingPps(dsCreatedPps, ppRadius, nbOfSparkPartitions)), dsSnappedRounds :+ dsSnapped)
+    }
+    // outputs only need the results of the rounds, existing pps are not repeated
+    val dsNewSnapped = dsSnappedRounds.reduce(_ unionByName _)
 
     val dsPpAppend = dsNewSnapped
       .filter(_.is_new_pp)
       .map(_.snapped_pp)
 
     val dfPpMappingOverwrite = dsNewSnapped
-      .where($"pp".isNotNull) // remove initial existing pps
       .select(
         $"snapped_pp.id_positionpoint",
         $"direction",
         $"snapped_pp.zoom",
         $"pp.uuid_edge",
-        $"pp.position", // TODO: adapt position when snapped to existing pp
+        $"position",
         $"pp.edge_idx"
       )
 
@@ -183,34 +166,79 @@ class SnapPpTransformer extends CustomDfsTransformer {
     )
   }
 
-  // TODO: doesnt work with Spark 3.5.x and Scala 2.13. Cogroup returns wrong results, see also https://issues.apache.org/jira/browse/SPARK-47061
-  def snapIteration(dsNewH3: Dataset[(Long, PpWithMapping)], dsExisting: Dataset[Pp], ppRadius: Float, ppHeightTolerance: Float, srcCrs: String)(implicit
-      session: SparkSession
-  ): Dataset[PpWithMappingAndSnap] = {
+  /**
+   * Position of an existing Positionpoint on the edge of a candidate: the candidate position plus the offset to the existing
+   * Positionpoint projected on the edge direction. The edge direction is given by the candidate azimuth, see [[calcAzimuth]].
+   * The position is not negative, as an existing Positionpoint before the start of the edge is mapped to the start.
+   */
+  def getPositionOnEdge(candidate: PpWithMapping, existing: Pp): Double = {
+    val offset = (existing.x - candidate.x) * Math.cos(candidate.azimuth) + (existing.y - candidate.y) * Math.sin(candidate.azimuth)
+    Math.max(0d, candidate.position + offset)
+  }
+
+  /**
+   * Convert an envelope in srcCrs with a buffer to an envelope in EPSG:4326.
+   * The boundary is densified before converting, so that the curvature of the transformed boundary is covered.
+   */
+  def getEnvelope4326WithBuffer(envelope: Envelope, buffer: Double, srcCrs: String): Envelope = {
+    val bufferedEnvelope = new Envelope(envelope)
+    bufferedEnvelope.expandBy(buffer)
+    val polygon = getGeoFactory(srcCrs).toGeometry(bufferedEnvelope)
+    convertTo4326(Densifier.densify(polygon, 1000), srcCrs).getEnvelopeInternal
+  }
+
+  // cogroup needs identical key types incl. nullability for new and existing pps.
+  private def nonNullableKey(key: Column): Column = coalesce(key, lit(-1L))
+
+  /**
+   * Key existing Positionpoints by their h3 cell and the neighbour cells within ppRadius, as only candidates in these cells can
+   * snap to them. The result is hash partitioned by the key, so that it can be unioned with further keyed Positionpoints and
+   * cogrouped with candidates without shuffling it again.
+   */
+  def keyExistingPps(dsExisting: Dataset[Pp], ppRadius: Float, nbOfSparkPartitions: Int): DataFrame = {
+    import dsExisting.sparkSession.implicits._
+    val udfH3idWithNeighbours = udf((lat: Double, lng: Double, h3id: Long) => PpIdGenerator.getH3idL15WithNeighboursInRange(lat, lng, h3id, ppRadius))
+    dsExisting
+      .withColumn("h3id_key", explode(udfH3idWithNeighbours($"lat", $"lng", $"h3id")))
+      .withColumn("h3id_key", nonNullableKey($"h3id_key"))
+      .repartition(nbOfSparkPartitions, $"h3id_key")
+  }
+
+  /**
+   * Key Positionpoint candidates by their h3 cell (resolution 15). The result is hash partitioned the same way as
+   * [[keyExistingPps]], so that both can be cogrouped without shuffling.
+   */
+  def keyNewPps(dsNew: Dataset[PpWithMapping], srcCrs: String, nbOfSparkPartitions: Int): DataFrame = {
+    import dsNew.sparkSession.implicits._
+    val udfH3idL15 = udf(PpIdGenerator.getH3idL15 _)
+    dsNew
+      .withColumn("h3id_key", nonNullableKey(udfH3idL15($"x", $"y", lit(srcCrs))))
+      .repartition(nbOfSparkPartitions, $"h3id_key")
+  }
+
+  /**
+   * Snap Positionpoint candidates to existing Positionpoints, grouped by h3 cell (resolution 15).
+   * @param dfNewKeyed
+   *   Positionpoint candidates keyed and partitioned by [[keyNewPps]].
+   * @param dfExistingKeyed
+   *   existing Positionpoints keyed and partitioned by [[keyExistingPps]].
+   */
+  def snapIteration(
+      dfNewKeyed: DataFrame,
+      dfExistingKeyed: DataFrame,
+      ppRadius: Float,
+      ppHeightTolerance: Float,
+      srcCrs: String
+  )(implicit session: SparkSession): Dataset[PpWithMappingAndSnap] = {
     import session.implicits._
+    val kvNew = dfNewKeyed.groupBy($"h3id_key").as[Long, PpWithMapping]
 
-    // explode existing points for all neighbours
-    val dsExistingH3WithNeighbours = dsExisting
-      .withColumn("pp", struct("*"))
-      .withColumn("h3id_neighbours",
-        ST_H3KRing($"snapped_pp.h3id", 1, exactRing = false)) // exact=false will include cell 0-kth neighbours, true only kth neighbours
-      .withColumn("h3id", explode($"h3id_neighbours"))
-      .select($"h3id", $"pp.snapped_pp")
-      .as[(Long, Pp)]
-      .groupByKey(_._1).mapValues(_._2)
+    val kvExisting = dfExistingKeyed.groupBy($"h3id_key").as[Long, Pp]
 
-    val dsNewSnapped = dsNewH3
-      .groupByKey(_._1).mapValues(_._2)
-      .cogroup(dsExistingH3WithNeighbours) {
-        case (_, newPps, _) if newPps.isEmpty => Seq()
-        case (h3id, newPps, existingPps)      =>
-          val newPpsSeq = newPps.toSeq
-          logger.info(s"h3id=$h3id ${newPpsSeq.map(_.edge_idx).mkString(",")}")
-          val snappedPps = snapNewToExistingPps(ppRadius, ppHeightTolerance, srcCrs)(newPpsSeq, existingPps.toSeq, h3id)
-          snappedPps
-      }
-
-    dsNewSnapped
+    kvNew.cogroup(kvExisting) {
+      case (_, newPps, _) if newPps.isEmpty => Seq.empty[PpWithMappingAndSnap]
+      case (h3id, newPps, existingPps)      => snapNewToExistingPps(ppRadius, ppHeightTolerance, srcCrs)(newPps.toSeq, existingPps.toSeq, h3id)
+    }
   }
 
   /**
@@ -238,9 +266,8 @@ class SnapPpTransformer extends CustomDfsTransformer {
     // build index of existing pps
     val index = new SpatialIndex(existingPps, (pp: Pp) => pp.getGeometry)
 
-    // initialize id generator
-    val cntPpsInTargetH3id = index.count(_.h3id == h3id)
-    val ppIdGenerator = new PpIdGenerator(cntPpsInTargetH3id, h3id)
+    // initialize id generator: continue after the highest number used in the target cell, so that ids of existing pps are never reused.
+    val ppIdGenerator = new PpIdGenerator(PpIdGenerator.nextPpNumber(existingPps.filter(_.h3id == h3id).map(_.id_positionpoint)), h3id)
 
     // lookup existing pp within xy=25cm/z=1m for every new pp
     // process new pp mappings grouped by edges to minimize potential for creating duplicate pp.
@@ -267,7 +294,9 @@ class SnapPpTransformer extends CustomDfsTransformer {
             // calculate mapping direction
             val azimuthDiff = Angle.diff(ppMapping.azimuth, pp.azimuth)
             val direction = if (azimuthDiff < 45) Some(1.toShort) else if (azimuthDiff > 180 - 45) Some(-1.toShort) else Option.empty[Short]
-            PpWithMappingAndSnap(Some(ppMapping), pp, direction, is_new_pp = ppsInRange.isEmpty)
+            // the position of the existing pp on the edge differs from the candidate position by the offset along the edge
+            val position = if (ppsInRange.isEmpty) ppMapping.position else getPositionOnEdge(ppMapping, pp)
+            PpWithMappingAndSnap(Some(ppMapping), pp, direction, is_new_pp = ppsInRange.isEmpty, position)
         }
         index.insert(snappedPps.filter(_.is_new_pp).map(_.snapped_pp)) // add created pps to index for next priority group
         snappedPps
@@ -369,4 +398,13 @@ case class PpWithMapping(
   def getGeometry(implicit factory: GeometryFactory): Geometry = factory.createPoint(coordinate)
 }
 
-case class PpWithMappingAndSnap(pp: Option[PpWithMapping], snapped_pp: Pp, direction: Option[Short], is_new_pp: Boolean)
+/**
+ * @param pp
+ *   Positionpoint candidate
+ * @param snapped_pp
+ *   existing or newly created Positionpoint the candidate is mapped to
+ * @param position
+ *   position of snapped_pp on the edge of the candidate. If snapped to an existing Positionpoint, this is the candidate position
+ *   adapted by the offset of the existing Positionpoint along the edge.
+ */
+case class PpWithMappingAndSnap(pp: Option[PpWithMapping], snapped_pp: Pp, direction: Option[Short], is_new_pp: Boolean, position: Double)
