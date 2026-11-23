@@ -1,0 +1,120 @@
+{
+  "schema" : [ {
+    "name" : "uuid",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "datum_aenderung",
+    "dataType" : "timestamp",
+    "nullable" : true
+  }, {
+    "name" : "datum_erstellung",
+    "dataType" : "timestamp",
+    "nullable" : true
+  }, {
+    "name" : "erstellung_jahr",
+    "dataType" : "integer",
+    "nullable" : true
+  }, {
+    "name" : "erstellung_monat",
+    "dataType" : "double",
+    "nullable" : true
+  }, {
+    "name" : "grund_aenderung",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "herkunft",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "herkunft_jahr",
+    "dataType" : "integer",
+    "nullable" : true
+  }, {
+    "name" : "herkunft_monat",
+    "dataType" : "integer",
+    "nullable" : true
+  }, {
+    "name" : "objektart",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "revision_jahr",
+    "dataType" : "integer",
+    "nullable" : true
+  }, {
+    "name" : "revision_monat",
+    "dataType" : "integer",
+    "nullable" : true
+  }, {
+    "name" : "revision_qualitaet",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "kunstbaute",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "anschlussgleis",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "achse_dkm",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "museumsbahn",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "auf_strasse",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "eroeffnungsdatum",
+    "dataType" : "timestamp",
+    "nullable" : true
+  }, {
+    "name" : "stufe",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "ausser_betrieb",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "zahnradbahn",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "standseilbahn",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "betriebsbahn",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "tlm_oev_name_uuid",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "name",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "anzahl_spuren",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "verkehrsmittel",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "geometry",
+    "dataType" : "geometry",
+    "nullable" : true
+  } ],
+  "subFeedType" : "SparkSubFeed"
+}
