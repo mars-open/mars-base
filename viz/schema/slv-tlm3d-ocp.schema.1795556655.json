@@ -1,0 +1,28 @@
+{
+  "schema" : [ {
+    "name" : "uuid",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "changed",
+    "dataType" : "date",
+    "nullable" : true
+  }, {
+    "name" : "created",
+    "dataType" : "date",
+    "nullable" : true
+  }, {
+    "name" : "name",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "number",
+    "dataType" : "integer",
+    "nullable" : true
+  }, {
+    "name" : "geometry",
+    "dataType" : "geometry",
+    "nullable" : true
+  } ],
+  "subFeedType" : "SparkSubFeed"
+}
