@@ -93,8 +93,7 @@ Viewer: https://geodataviewer.com/studio/
 
 ## Known Limitations
 
-The reference implementation has the following limitiations to keep in mind:
+The reference implementation has the following limitiations to keep in mind, which are 
 
 - **PP Mapping Direction**: may be null when the azimuth difference exceeds 45 degrees (manual correction may be needed)
-- **PP Mapping Position**: can exceed edge boundaries when snapped to existing PPs
-- **Incremental Updates**: current pipelines do not yet support incremental updates
+- **PP Mapping Position**: can exceed edge length by max 12.5cm for the last PP of an edge, as this might be the nearest PP for snapping. 
