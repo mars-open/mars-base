@@ -1,0 +1,40 @@
+{
+  "schema" : [ {
+    "name" : "uuid",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "id",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "geometry",
+    "dataType" : "geometry",
+    "nullable" : true
+  }, {
+    "name" : "ref",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "operator",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "turnout_side",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "maxspeed_diverging",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "maxspeed_straight",
+    "dataType" : "string",
+    "nullable" : true
+  }, {
+    "name" : "radius",
+    "dataType" : "string",
+    "nullable" : true
+  } ],
+  "subFeedType" : "SparkSubFeed"
+}
